@@ -1,0 +1,9 @@
+{
+    "marscode.codeCompletionPro": {
+        "enableCodeCompletionPro": true
+    },
+    "marscode.enableInlineCommand": true,
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "jdk.advanced.disable.nbjavac": false,
+    "marscode.chatLanguage": "cn"
+}

@@ -1,0 +1,2 @@
+C:/z_project/healingai/healing_music/android/app/.cxx/Debug/5t1e01k5/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/z_project/healingai/healing_music/android/app/.cxx/Debug/5t1e01k5/armeabi-v7a/CMakeFiles/rebuild_cache.dir

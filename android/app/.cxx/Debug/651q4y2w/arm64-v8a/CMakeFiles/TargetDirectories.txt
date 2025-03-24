@@ -1,0 +1,2 @@
+E:/project/HealingAI/healing_music3/android/app/.cxx/Debug/651q4y2w/arm64-v8a/CMakeFiles/edit_cache.dir
+E:/project/HealingAI/healing_music3/android/app/.cxx/Debug/651q4y2w/arm64-v8a/CMakeFiles/rebuild_cache.dir
