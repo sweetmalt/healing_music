@@ -41,7 +41,7 @@ class MainPage extends StatelessWidget {
           return IndexedStack(
             index: controller.currentIndex.value,
             children: [
-              MusicPage(),
+              const MusicPage(),
               HealingPage(),
               DepotPage(),
             ],

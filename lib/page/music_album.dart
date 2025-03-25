@@ -16,23 +16,23 @@ class AlbumPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 50,
-        title: PageTitle('Music Album'),
-        centerTitle: true,
-      ),
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/images/bgi.png"),
-            fit: BoxFit.cover,
-          ),
-        ),
-        width: MediaQuery.of(context).size.width, // 使用屏幕宽度
+    return Stack(children: [
+      Image.asset(
+        "assets/images/bgi.png",
         height: MediaQuery.of(context).size.height,
-
-        child: Center(
+        width: MediaQuery.of(context).size.width,
+        fit: BoxFit.cover,
+      ),
+      Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          toolbarHeight: 50,
+          title: PageTitle('Music Album'),
+          centerTitle: true,
+        ),
+        body: Center(
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -113,6 +113,9 @@ class AlbumPage extends StatelessWidget {
                     Get.back();
                   },
                 ),
+                const SizedBox(
+                  height: 20,
+                ),
                 SizedBox(
                   height: 120,
                   child: Center(
@@ -132,11 +135,18 @@ class AlbumPage extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
-                                Icons.arrow_back,
-                                size: 15,
+                                Icons.turn_left_rounded,
+                                size: 20,
                                 color: ThemeData().colorScheme.primary,
                               ),
-                              const Text('返回'),
+                              Text(
+                                '返回',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: ThemeData().colorScheme.primary,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -148,7 +158,7 @@ class AlbumPage extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
+      )
+    ]);
   }
 }

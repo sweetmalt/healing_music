@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:healing_music/style/style.dart';
+import 'package:healing_music/widget/circular_button.dart';
 
 class ItemTitle extends Text {
   ItemTitle(super.data, {super.key})
@@ -45,21 +46,23 @@ class ItemListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(left: 10, right: 10),
-      decoration:  BoxDecoration(
+      decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(
-              color: ThemeData().colorScheme.primaryContainer, width: 1), // 顶部边框
-          left: BorderSide(color: ThemeData().colorScheme.primary, width: 3), // 左侧边框
-          right: BorderSide(color: ThemeData().colorScheme.primary, width: 3), // 右侧边框
+          left: BorderSide(
+              color: ThemeData().colorScheme.primary, width: 3), // 左侧边框
+          right: BorderSide(
+              color: ThemeData().colorScheme.primary, width: 3), // 右侧边框
         ),
       ),
       child: ListTile(
-        tileColor: Colors.transparent,
+        tileColor: ThemeData().colorScheme.secondaryContainer,
         title: ItemTitle(title),
         subtitle: ItemSubtitle(subtitle),
-        trailing: const Icon(
-          Icons.music_note,
-          size: 15,
+        trailing: CircularIconButton(
+          onPressed: () {
+            onTap();
+          },
+          icon: Icons.play_arrow,
         ),
         onTap: onTap,
       ),

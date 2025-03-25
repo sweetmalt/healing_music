@@ -15,8 +15,8 @@ class HealingPage extends StatelessWidget {
   final HealingController controller = Get.put(HealingController());
   final MainController mainController = Get.find();
 
-  final HemController hemController = Get.find();
-  final EnvController envController = Get.find();
+  final HemController hemController = Get.put(HemController());
+  final EnvController envController = Get.put(EnvController());
   final BgmController bgmController = Get.put(BgmController());
   final BbmController bbmController = Get.put(BbmController());
 
