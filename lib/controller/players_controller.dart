@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -9,16 +10,27 @@ class MyAudioCtrl extends GetxController {
   final RxBool isPlaying = false.obs;
   final RxDouble pos = 0.0.obs;
   final RxDouble dur = 1.0.obs;
+  final Rx<Color> backgroundColor =
+      ThemeData().colorScheme.primaryContainer.obs;
+  final Rx<Color> valueColor = ThemeData().colorScheme.primary.obs;
+  bool permitSwitchColor = false;
   final RxDouble maxVol = 0.2.obs;
   double _vol = 1.0;
   final RxInt timeSeconds = 0.obs; //单位：秒
   final RxString timeMinutes = '00:00'.obs; //单位：分钟
-  late final StreamSubscription<Duration> _listener;
+  late final StreamSubscription<Duration> _listenerPos;
+
   late Timer _timer;
   bool _isTimerRunning = false;
 
   setTitle(String title) {
     audioTitle.value = title;
+  }
+
+  switchColor() {
+    Color temp = backgroundColor.value;
+    backgroundColor.value = valueColor.value;
+    valueColor.value = temp;
   }
 
   Future<void> initPlayer({required String audio, bool isLoop = true}) async {
@@ -28,7 +40,7 @@ class MyAudioCtrl extends GetxController {
   }
 
   void startListen({bool isLoop = true}) {
-    _listener = player.positionStream.listen((position) {
+    _listenerPos = player.positionStream.listen((position) {
       pos.value = position.inMilliseconds.toDouble();
       if (isLoop) {
         if (pos.value < 2000) {
@@ -38,6 +50,10 @@ class MyAudioCtrl extends GetxController {
           }
           _vol = p * maxVol.value;
           player.setVolume(_vol);
+          if (permitSwitchColor) {
+            permitSwitchColor = false;
+            switchColor();
+          }
         } else if (pos.value > dur.value - 2000) {
           double p = (dur.value - pos.value) / 2000;
           if (p < 0.2) {
@@ -45,6 +61,7 @@ class MyAudioCtrl extends GetxController {
           }
           _vol = p * maxVol.value;
           player.setVolume(_vol);
+          permitSwitchColor = true;
         } else {
           if (_vol != maxVol.value) {
             _vol = maxVol.value;
@@ -131,7 +148,7 @@ class MyAudioCtrl extends GetxController {
   @override
   void onClose() {
     _timer.cancel();
-    _listener.cancel();
+    _listenerPos.cancel();
     player.dispose();
     super.onClose();
   }

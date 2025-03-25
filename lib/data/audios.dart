@@ -1,18 +1,18 @@
 class Audios {
   const Audios();
   static const Map<String, String> _hem = {
-    "90s 396HZ": "海底轮",
-    "90s 417HZ": "脐轮",
-    "90s 528HZ": "太阳轮",
-    "90s 639HZ": "心轮",
-    "90s 714HZ": "喉轮",
-    "90s 852HZ": "眉心轮",
-    "90s 963HZ": "顶轮"
+    "90s 963HZ": "全息963HZ",
+    "90s 852HZ": "睡眠852HZ",
+    "90s 714HZ": "代谢714HZ",
+    "90s 639HZ": "免疫639HZ",
+    "90s 528HZ": "消化528HZ",
+    "90s 417HZ": "幸福417HZ",
+    "90s 396HZ": "动力396HZ" 
   };
   get hem => _hem;
 
   static const Map<String, String> _bgm = {
-    "BGM Space": "空灵",
+    "BGM Hang": "手碟",
     "BGM Piano": "钢琴",
     "BGM Guitar": "吉他",
     "BGM Flute": "长笛",
@@ -34,9 +34,9 @@ class Audios {
   get env => _env;
 
   static const Map<String, String> _bbm = {
-    "60s 1HZ": "1HZ德尔塔波",
-    "60s 10HZ": "10HZ阿尔法波",
-    "60s 40HZ": "40HZ伽马波"
+    "60s 1HZ": "德尔塔波1HZ助眠",
+    "60s 10HZ": "阿尔法波10HZ放松",
+    "60s 40HZ": "伽马波40HZ专注"
   };
   get bbm => _bbm;
 }

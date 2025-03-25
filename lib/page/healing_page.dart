@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:healing_music/controller/players_controller.dart';
 import 'package:healing_music/controller/healing_controller.dart';
 import 'package:healing_music/controller/main_controller.dart';
+import 'package:healing_music/data/audios.dart';
 import 'package:healing_music/widget/brain_wave_view.dart';
 import 'package:healing_music/widget/circular_button.dart';
 import 'package:healing_music/widget/page_title.dart';
@@ -18,6 +19,8 @@ class HealingPage extends StatelessWidget {
   final EnvController envController = Get.find();
   final BgmController bgmController = Get.put(BgmController());
   final BbmController bbmController = Get.put(BbmController());
+
+  static const Audios _audios = Audios();
 
   @override
   Widget build(BuildContext context) {
@@ -76,70 +79,30 @@ class HealingPage extends StatelessWidget {
               Obx(() => Stack(
                     alignment: Alignment.center,
                     children: [
-                      Container(
-                        width: 120,
-                        height: 120,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(60),
-                        ),
-                        child: CircularProgressIndicator(
-                          backgroundColor:
-                              ThemeData().colorScheme.primaryContainer,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                              ThemeData().colorScheme.primary),
+                      CircularProgress(
+                          radius: 120,
                           value:
                               hemController.pos.value / hemController.dur.value,
-                          strokeWidth: 4,
-                        ),
-                      ),
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                        child: CircularProgressIndicator(
-                          backgroundColor:
-                              ThemeData().colorScheme.primaryContainer,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                              ThemeData().colorScheme.primary),
+                          backgroundColor: hemController.backgroundColor.value,
+                          valueColor: hemController.valueColor.value),
+                      CircularProgress(
+                          radius: 100,
                           value:
                               envController.pos.value / envController.dur.value,
-                          strokeWidth: 4,
-                        ),
-                      ),
-                      Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(40),
-                        ),
-                        child: CircularProgressIndicator(
-                          backgroundColor:
-                              ThemeData().colorScheme.primaryContainer,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                              ThemeData().colorScheme.primary),
+                          backgroundColor: envController.backgroundColor.value,
+                          valueColor: envController.valueColor.value),
+                      CircularProgress(
+                          radius: 80,
                           value:
                               bgmController.pos.value / bgmController.dur.value,
-                          strokeWidth: 4,
-                        ),
-                      ),
-                      Container(
-                        width: 60,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: CircularProgressIndicator(
-                          backgroundColor:
-                              ThemeData().colorScheme.primaryContainer,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                              ThemeData().colorScheme.primary),
+                          backgroundColor: bgmController.backgroundColor.value,
+                          valueColor: bgmController.valueColor.value),
+                      CircularProgress(
+                          radius: 60,
                           value:
                               bbmController.pos.value / bbmController.dur.value,
-                          strokeWidth: 4,
-                        ),
-                      ),
+                          backgroundColor: bbmController.backgroundColor.value,
+                          valueColor: bbmController.valueColor.value),
                       Obx(
                         () => CircularIconButton(
                           onPressed: () {
@@ -157,601 +120,38 @@ class HealingPage extends StatelessWidget {
                       ),
                     ],
                   )),
-              const SizedBox(height: 20.0),
-              Container(
-                height: 40,
-                margin: const EdgeInsets.only(left: 40, right: 40),
-                decoration: BoxDecoration(
-                    color: ThemeData().colorScheme.secondaryContainer,
-                    borderRadius: const BorderRadius.all(Radius.circular(20))),
-                child: Row(
-                  children: [
-                    IconButton(
-                      color: ThemeData().colorScheme.secondary,
-                      onPressed: () {},
-                      icon: const Icon(Icons.music_video),
-                    ),
-                    const Text("BGM"),
-                    Expanded(
-                        child: Obx(() => SliderTheme(
-                              data: SliderTheme.of(context).copyWith(
-                                trackHeight: 1.0,
-                              ),
-                              child: Slider(
-                                min: 0.0,
-                                max: hemController.dur.value.toDouble(),
-                                activeColor: ThemeData().colorScheme.primary,
-                                inactiveColor: ThemeData().colorScheme.surface,
-                                thumbColor:
-                                    ThemeData().colorScheme.primaryContainer,
-                                value: hemController.pos.value.toDouble(),
-                                onChanged: (value) {
-                                  hemController.player.seek(
-                                      Duration(milliseconds: value.toInt()));
-                                },
-                              ),
-                            ))),
-                    IconButton(
-                      color: ThemeData().colorScheme.secondary,
-                      onPressed: () {
-                        hemController.isPlaying.value
-                            ? hemController.pause()
-                            : hemController.play();
-                      },
-                      icon: Obx(() => hemController.isPlaying.value
-                          ? const Icon(Icons.pause)
-                          : const Icon(Icons.play_arrow)),
-                    ),
-                  ],
-                ),
+              PlayBox(
+                title: "脑波音频：",
+                controller: hemController,
               ),
-              Container(
-                padding: const EdgeInsets.only(left: 30, right: 30),
-                child: Wrap(
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        hemController.setTitle("全息963HZ");
-                        hemController.changeAudio(
-                            audio: "assets/audio/90s 963HZ.MP3");
-                      },
-                      child: Obx(() => Text("@全息963HZ",
-                          style: TextStyle(
-                              color: hemController.audioTitle.value == "全息963HZ"
-                                  ? Colors.blue
-                                  : ThemeData().colorScheme.primary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold))),
-                    ),
-                    TextButton(
-                        onPressed: () {
-                          hemController.setTitle("睡眠852HZ");
-                          hemController.changeAudio(
-                              audio: "assets/audio/90s 852HZ.MP3");
-                        },
-                        child: Obx(() => Text("@睡眠852HZ",
-                            style: TextStyle(
-                                color:
-                                    hemController.audioTitle.value == "睡眠852HZ"
-                                        ? Colors.blue
-                                        : ThemeData().colorScheme.primary,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold)))),
-                    TextButton(
-                      onPressed: () {
-                        hemController.setTitle("代谢714HZ");
-                        hemController.changeAudio(
-                            audio: "assets/audio/90s 714HZ.MP3");
-                      },
-                      child: Obx(() => Text("@代谢714HZ",
-                          style: TextStyle(
-                              color: hemController.audioTitle.value == "代谢714HZ"
-                                  ? Colors.blue
-                                  : ThemeData().colorScheme.primary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold))),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        hemController.setTitle("免疫639HZ");
-                        hemController.changeAudio(
-                            audio: "assets/audio/90s 639HZ.MP3");
-                      },
-                      child: Obx(() => Text("@免疫639HZ",
-                          style: TextStyle(
-                              color: hemController.audioTitle.value == "免疫639HZ"
-                                  ? Colors.blue
-                                  : ThemeData().colorScheme.primary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold))),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        hemController.setTitle("消化528HZ");
-                        hemController.changeAudio(
-                            audio: "assets/audio/90s 528HZ.MP3");
-                      },
-                      child: Obx(() => Text("@消化528HZ",
-                          style: TextStyle(
-                              color: hemController.audioTitle.value == "消化528HZ"
-                                  ? Colors.blue
-                                  : ThemeData().colorScheme.primary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold))),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        hemController.setTitle("幸福417HZ");
-                        hemController.changeAudio(
-                            audio: "assets/audio/90s 417HZ.MP3");
-                      },
-                      child: Obx(() => Text("@幸福417HZ",
-                          style: TextStyle(
-                              color: hemController.audioTitle.value == "幸福417HZ"
-                                  ? Colors.blue
-                                  : ThemeData().colorScheme.primary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold))),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        hemController.setTitle("动力396HZ");
-                        hemController.changeAudio(
-                            audio: "assets/audio/90s 396HZ.MP3");
-                      },
-                      child: Obx(() => Text("@动力396HZ",
-                          style: TextStyle(
-                              color: hemController.audioTitle.value == "动力396HZ"
-                                  ? Colors.blue
-                                  : ThemeData().colorScheme.primary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold))),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        //bgmController.setTimer(300);
-                      },
-                      child: Obx(() => Text(
-                          "VOL ${(hemController.maxVol.value * 100).toInt()}%",
-                          style: TextStyle(
-                            color: ThemeData().colorScheme.secondaryContainer,
-                            fontSize: 12,
-                          ))),
-                    )
-                  ],
-                ),
+              AudiosRow(
+                audios: _audios.hem,
+                controller: hemController,
               ),
-              Container(
-                height: 40,
-                margin: const EdgeInsets.only(left: 40, right: 40),
-                decoration: BoxDecoration(
-                    color: ThemeData().colorScheme.secondaryContainer,
-                    borderRadius: const BorderRadius.all(Radius.circular(20))),
-                child: Row(
-                  children: [
-                    IconButton(
-                      color: ThemeData().colorScheme.secondary,
-                      onPressed: () {},
-                      icon: const Icon(Icons.music_note_outlined),
-                    ),
-                    const Text("生境"),
-                    Expanded(
-                        child: Obx(() => SliderTheme(
-                              data: SliderTheme.of(context).copyWith(
-                                trackHeight: 1.0,
-                              ),
-                              child: Slider(
-                                min: 0.0,
-                                max: envController.dur.value.toDouble(),
-                                activeColor: ThemeData().colorScheme.primary,
-                                inactiveColor: ThemeData().colorScheme.surface,
-                                thumbColor:
-                                    ThemeData().colorScheme.primaryContainer,
-                                value: envController.pos.value.toDouble(),
-                                onChanged: (value) {
-                                  envController.player.seek(
-                                      Duration(milliseconds: value.toInt()));
-                                },
-                              ),
-                            ))),
-                    IconButton(
-                      color: ThemeData().colorScheme.secondary,
-                      onPressed: () {
-                        envController.isPlaying.value
-                            ? envController.pause()
-                            : envController.play();
-                      },
-                      icon: Obx(() => envController.isPlaying.value
-                          ? const Icon(Icons.pause)
-                          : const Icon(Icons.play_arrow)),
-                    ),
-                  ],
-                ),
+              PlayBox(
+                title: "生境录音：",
+                controller: envController,
               ),
-              Container(
-                padding: const EdgeInsets.only(left: 30, right: 30),
-                child: Wrap(
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        envController.setTitle("鸟鸣");
-                        envController.changeAudio(
-                            audio: "assets/audio/40s Birds Songs.MP3");
-                      },
-                      child: Obx(() => Text("@鸟鸣",
-                          style: TextStyle(
-                              color: envController.audioTitle.value == "鸟鸣"
-                                  ? Colors.blue
-                                  : ThemeData().colorScheme.primary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold))),
-                    ),
-                    TextButton(
-                        onPressed: () {
-                          envController.setTitle("篝火");
-                          envController.changeAudio(
-                              audio: "assets/audio/40s Fire.MP3");
-                        },
-                        child: Obx(() => Text("@篝火",
-                            style: TextStyle(
-                                color: envController.audioTitle.value == "篝火"
-                                    ? Colors.blue
-                                    : ThemeData().colorScheme.primary,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold)))),
-                    TextButton(
-                      onPressed: () {
-                        envController.setTitle("虫鸣");
-                        envController.changeAudio(
-                            audio: "assets/audio/40s Night.MP3");
-                      },
-                      child: Obx(() => Text("@虫鸣",
-                          style: TextStyle(
-                              color: envController.audioTitle.value == "虫鸣"
-                                  ? Colors.blue
-                                  : ThemeData().colorScheme.primary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold))),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        envController.setTitle("细雨");
-                        envController.changeAudio(
-                            audio: "assets/audio/40s Rain Drop Lotus.MP3");
-                      },
-                      child: Obx(() => Text("@细雨",
-                          style: TextStyle(
-                              color: envController.audioTitle.value == "细雨"
-                                  ? Colors.blue
-                                  : ThemeData().colorScheme.primary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold))),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        envController.setTitle("小溪");
-                        envController.changeAudio(
-                            audio: "assets/audio/40s Rivulet.MP3");
-                      },
-                      child: Obx(() => Text("@小溪",
-                          style: TextStyle(
-                              color: envController.audioTitle.value == "小溪"
-                                  ? Colors.blue
-                                  : ThemeData().colorScheme.primary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold))),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        envController.setTitle("颂钵");
-                        envController.changeAudio(
-                            audio: "assets/audio/40s Singing Bowl.MP3");
-                      },
-                      child: Obx(() => Text("@颂钵",
-                          style: TextStyle(
-                              color: envController.audioTitle.value == "颂钵"
-                                  ? Colors.blue
-                                  : ThemeData().colorScheme.primary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold))),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        envController.setTitle("水滴");
-                        envController.changeAudio(
-                            audio: "assets/audio/40s Water Drops.MP3");
-                      },
-                      child: Obx(() => Text("@水滴",
-                          style: TextStyle(
-                              color: envController.audioTitle.value == "水滴"
-                                  ? Colors.blue
-                                  : ThemeData().colorScheme.primary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold))),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        //envController.setTimer(300);
-                      },
-                      child: Obx(() => Text(
-                          "VOL ${(envController.maxVol.value * 100).toInt()}%",
-                          style: TextStyle(
-                            color: ThemeData().colorScheme.secondaryContainer,
-                            fontSize: 12,
-                          ))),
-                    )
-                  ],
-                ),
+              AudiosRow(
+                audios: _audios.env,
+                controller: envController,
               ),
-              Container(
-                height: 40,
-                margin: const EdgeInsets.only(left: 40, right: 40),
-                decoration: BoxDecoration(
-                    color: ThemeData().colorScheme.secondaryContainer,
-                    borderRadius: const BorderRadius.all(Radius.circular(20))),
-                child: Row(
-                  children: [
-                    IconButton(
-                      color: ThemeData().colorScheme.secondary,
-                      onPressed: () {},
-                      icon: const Icon(Icons.music_note),
-                    ),
-                    const Text("器乐"),
-                    Expanded(
-                        child: Obx(() => SliderTheme(
-                              data: SliderTheme.of(context).copyWith(
-                                trackHeight: 1.0,
-                              ),
-                              child: Slider(
-                                min: 0.0,
-                                max: bgmController.dur.value.toDouble(),
-                                activeColor: ThemeData().colorScheme.primary,
-                                inactiveColor: ThemeData().colorScheme.surface,
-                                thumbColor:
-                                    ThemeData().colorScheme.primaryContainer,
-                                value: bgmController.pos.value.toDouble(),
-                                onChanged: (value) {
-                                  bgmController.player.seek(
-                                      Duration(milliseconds: value.toInt()));
-                                },
-                              ),
-                            ))),
-                    IconButton(
-                      color: ThemeData().colorScheme.secondary,
-                      onPressed: () {
-                        bgmController.isPlaying.value
-                            ? bgmController.pause()
-                            : bgmController.play();
-                      },
-                      icon: Obx(() => bgmController.isPlaying.value
-                          ? const Icon(Icons.pause)
-                          : const Icon(Icons.play_arrow)),
-                    ),
-                  ],
-                ),
+              PlayBox(
+                title: "经典器乐：",
+                controller: bgmController,
               ),
-              Container(
-                padding: const EdgeInsets.only(left: 30, right: 30),
-                child: Wrap(
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        bgmController.setTitle("手碟");
-                        bgmController.changeAudio(
-                            audio: "assets/audio/BGM Hang.MP3");
-                      },
-                      child: Obx(() => Text("@手碟",
-                          style: TextStyle(
-                              color: bgmController.audioTitle.value == "手碟"
-                                  ? Colors.blue
-                                  : ThemeData().colorScheme.primary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold))),
-                    ),
-                    TextButton(
-                        onPressed: () {
-                          bgmController.setTitle("钢琴");
-                          bgmController.changeAudio(
-                              audio: "assets/audio/BGM Piano.MP3");
-                        },
-                        child: Obx(() => Text("@钢琴",
-                            style: TextStyle(
-                                color: bgmController.audioTitle.value == "钢琴"
-                                    ? Colors.blue
-                                    : ThemeData().colorScheme.primary,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold)))),
-                    TextButton(
-                      onPressed: () {
-                        bgmController.setTitle("吉他");
-                        bgmController.changeAudio(
-                            audio: "assets/audio/BGM Guitar.MP3");
-                      },
-                      child: Obx(() => Text("@吉他",
-                          style: TextStyle(
-                              color: bgmController.audioTitle.value == "吉他"
-                                  ? Colors.blue
-                                  : ThemeData().colorScheme.primary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold))),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        bgmController.setTitle("长笛");
-                        bgmController.changeAudio(
-                            audio: "assets/audio/BGM Flute.MP3");
-                      },
-                      child: Obx(() => Text("@长笛",
-                          style: TextStyle(
-                              color: bgmController.audioTitle.value == "长笛"
-                                  ? Colors.blue
-                                  : ThemeData().colorScheme.primary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold))),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        bgmController.setTitle("小提琴");
-                        bgmController.changeAudio(
-                            audio: "assets/audio/BGM Violin.MP3");
-                      },
-                      child: Obx(() => Text("@小提琴",
-                          style: TextStyle(
-                              color: bgmController.audioTitle.value == "小提琴"
-                                  ? Colors.blue
-                                  : ThemeData().colorScheme.primary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold))),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        bgmController.setTitle("大提琴");
-                        bgmController.changeAudio(
-                            audio: "assets/audio/BGM Cello.MP3");
-                      },
-                      child: Obx(() => Text("@大提琴",
-                          style: TextStyle(
-                              color: bgmController.audioTitle.value == "大提琴"
-                                  ? Colors.blue
-                                  : ThemeData().colorScheme.primary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold))),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        bgmController.setTitle("古筝");
-                        bgmController.changeAudio(
-                            audio: "assets/audio/BGM Guzheng.MP3");
-                      },
-                      child: Obx(() => Text("@古筝",
-                          style: TextStyle(
-                              color: bgmController.audioTitle.value == "古筝"
-                                  ? Colors.blue
-                                  : ThemeData().colorScheme.primary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold))),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        //bgmController.setTimer(300);
-                      },
-                      child: Obx(() => Text(
-                          "VOL ${(bgmController.maxVol.value * 100).toInt()}%",
-                          style: TextStyle(
-                            color: ThemeData().colorScheme.secondaryContainer,
-                            fontSize: 12,
-                          ))),
-                    )
-                  ],
-                ),
+              AudiosRow(
+                audios: _audios.bgm,
+                controller: bgmController,
               ),
-              Container(
-                height: 40,
-                margin: const EdgeInsets.only(left: 40, right: 40),
-                decoration: BoxDecoration(
-                    color: ThemeData().colorScheme.secondaryContainer,
-                    borderRadius: const BorderRadius.all(Radius.circular(20))),
-                child: Row(
-                  children: [
-                    IconButton(
-                      color: ThemeData().colorScheme.secondary,
-                      onPressed: () {},
-                      icon: const Icon(Icons.headphones),
-                    ),
-                    const Text("双耳节拍"),
-                    //Expanded(child: BbtView()),
-                    Expanded(
-                        child: Obx(() => SliderTheme(
-                              data: SliderTheme.of(context).copyWith(
-                                trackHeight: 1.0,
-                              ),
-                              child: Slider(
-                                min: 0.0,
-                                max: bbmController.dur.value.toDouble(),
-                                activeColor: ThemeData().colorScheme.primary,
-                                inactiveColor: ThemeData().colorScheme.surface,
-                                thumbColor:
-                                    ThemeData().colorScheme.primaryContainer,
-                                value: bbmController.pos.value.toDouble(),
-                                onChanged: (value) {
-                                  bbmController.player.seek(
-                                      Duration(milliseconds: value.toInt()));
-                                },
-                              ),
-                            ))),
-                    IconButton(
-                      color: ThemeData().colorScheme.secondary,
-                      onPressed: () {
-                        if (bbmController.isPlaying.value) {
-                          bbmController.isPlaying.value = false;
-                          bbmController.pause();
-                        } else {
-                          bbmController.isPlaying.value = true;
-                          bbmController.play();
-                        }
-                      },
-                      icon: Obx(() => bbmController.isPlaying.value
-                          ? const Icon(Icons.pause)
-                          : const Icon(Icons.play_arrow)),
-                    ),
-                  ],
-                ),
+              PlayBox(
+                title: "双耳节拍：",
+                controller: bbmController,
               ),
-              Container(
-                  padding: const EdgeInsets.only(left: 30, right: 30),
-                  child: Wrap(children: [
-                    TextButton(
-                      onPressed: () {
-                        //bbtController.hz.value = 100;
-                        bbmController.isPlaying.value = true;
-                        bbmController.setTitle("德尔塔波1Hz助眠");
-                        bbmController.changeAudio(
-                            audio: "assets/audio/60s 1HZ.MP3");
-                      },
-                      child: Obx(() => Text("@德尔塔波1Hz助眠",
-                          style: TextStyle(
-                              color:
-                                  bbmController.audioTitle.value == "德尔塔波1Hz助眠"
-                                      ? Colors.blue
-                                      : ThemeData().colorScheme.primary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold))),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        //bbtController.hz.value = 40;
-                        bbmController.isPlaying.value = true;
-                        bbmController.setTitle("阿尔法波10Hz放松");
-                        bbmController.changeAudio(
-                            audio: "assets/audio/60s 10HZ.MP3");
-                      },
-                      child: Obx(() => Text("@阿尔法波10Hz放松",
-                          style: TextStyle(
-                              color:
-                                  bbmController.audioTitle.value == "阿尔法波10Hz放松"
-                                      ? Colors.blue
-                                      : ThemeData().colorScheme.primary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold))),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        //bbtController.hz.value = 10;
-                        bbmController.isPlaying.value = true;
-                        bbmController.setTitle("伽马波40Hz专注");
-                        bbmController.changeAudio(
-                            audio: "assets/audio/60s 40HZ.MP3");
-                      },
-                      child: Obx(() => Text("@伽马波40Hz专注",
-                          style: TextStyle(
-                              color:
-                                  bbmController.audioTitle.value == "伽马波40Hz专注"
-                                      ? Colors.blue
-                                      : ThemeData().colorScheme.primary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold))),
-                    ),
-                  ])),
+              AudiosRow(
+                audios: _audios.bbm,
+                controller: bbmController,
+              ),
               Container(
                 padding: const EdgeInsets.only(left: 20, right: 20),
                 child: Row(
@@ -806,6 +206,174 @@ class HealingPage extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class CircularProgress extends StatelessWidget {
+  final double radius;
+  final double value;
+  final Color backgroundColor;
+  final Color valueColor;
+
+  const CircularProgress({
+    super.key,
+    required this.radius,
+    required this.value,
+    required this.backgroundColor,
+    required this.valueColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: radius,
+      height: radius,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(radius / 2),
+      ),
+      child: CircularProgressIndicator(
+        backgroundColor: backgroundColor,
+        valueColor: AlwaysStoppedAnimation<Color>(valueColor),
+        value: value,
+        strokeWidth: 4,
+      ),
+    );
+  }
+}
+
+class AudioItem extends StatelessWidget {
+  final String title;
+  final String url;
+  final MyAudioCtrl controller;
+
+  const AudioItem({
+    super.key,
+    required this.title,
+    required this.url,
+    required this.controller,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() => TextButton(
+          style: ButtonStyle(
+            backgroundColor: controller.audioTitle.value == title
+                ? WidgetStateProperty.all(ThemeData().colorScheme.secondary)
+                : WidgetStateProperty.all(ThemeData().colorScheme.surface),
+          ),
+          onPressed: () {
+            controller.setTitle(title);
+            controller.changeAudio(audio: url);
+          },
+          child: Obx(() => Text(title,
+              style: TextStyle(
+                  color: controller.audioTitle.value == title
+                      ? ThemeData().colorScheme.surface
+                      : ThemeData().colorScheme.secondary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold))),
+        ));
+  }
+}
+
+class AudiosRow extends StatelessWidget {
+  final MyAudioCtrl controller;
+  final Map<String, String> audios;
+  const AudiosRow({
+    super.key,
+    required this.controller,
+    required this.audios,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 50,
+      width: MediaQuery.of(context).size.width,
+      padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+      margin: const EdgeInsets.only(left: 10, right: 10, top: 1, bottom: 10),
+      decoration: BoxDecoration(
+          color: ThemeData().colorScheme.secondaryContainer,
+          borderRadius: const BorderRadius.all(Radius.circular(5))),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: audios.entries.map<Widget>((entry) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              child: AudioItem(
+                title: entry.value,
+                url: "assets/audio/${entry.key}.MP3",
+                controller: controller,
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+}
+
+class PlayBox extends StatelessWidget {
+  final MyAudioCtrl controller;
+  final String title;
+  const PlayBox({
+    super.key,
+    required this.controller,
+    required this.title,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 40,
+      margin: const EdgeInsets.only(left: 10, right: 10, top: 10),
+      decoration: BoxDecoration(
+          color: ThemeData().colorScheme.secondaryContainer,
+          borderRadius: const BorderRadius.all(Radius.circular(5))),
+      child: Row(
+        children: [
+          IconButton(
+            color: ThemeData().colorScheme.secondary,
+            onPressed: () {},
+            icon: const Icon(Icons.headphones),
+          ),
+          Text(title),
+          Expanded(
+              child: Obx(() => SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      trackHeight: 1.0,
+                      activeTrackColor:
+                          ThemeData().colorScheme.secondaryContainer,
+                      inactiveTrackColor: ThemeData().colorScheme.surface,
+                      thumbColor: ThemeData().colorScheme.secondaryContainer,
+                    ),
+                    child: Slider(
+                      padding: EdgeInsets.zero,
+                      min: 0.0,
+                      max: controller.dur.value.toDouble(),
+                      value: controller.pos.value.toDouble(),
+                      onChanged: (value) {
+                        controller.player
+                            .seek(Duration(milliseconds: value.toInt()));
+                      },
+                    ),
+                  ))),
+          IconButton(
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(), 
+            onPressed: () {
+              controller.isPlaying.value
+                  ? controller.pause()
+                  : controller.play();
+            },
+            icon: Obx(() => controller.isPlaying.value
+                ? const Icon(Icons.pause)
+                : const Icon(Icons.play_arrow)),
+          ),
+        ],
       ),
     );
   }
