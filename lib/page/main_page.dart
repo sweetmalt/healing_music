@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:healing_music/controller/main_controller.dart';
 import 'package:healing_music/page/face_page.dart';
@@ -6,7 +7,6 @@ import 'package:healing_music/page/music_page.dart';
 import 'package:healing_music/page/healing_page.dart';
 import 'package:healing_music/page/depot_page.dart';
 import 'package:healing_music/widget/app_bar_title.dart';
-import 'package:healing_music/widget/bottom_navigation_bar.dart';
 
 class MainPage extends StatelessWidget {
   const MainPage({super.key});
@@ -20,9 +20,20 @@ class MainPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 25,
+        toolbarHeight: 40,
         title: AppBarTitle('AI音疗 HealingMusic'),
         centerTitle: true,
+        shadowColor: ThemeData().colorScheme.primary,
+        leading: IconButton(onPressed: () => {}, icon: const Icon(Icons.menu)),
+        actions: [
+          CloseButton(
+            onPressed: () => SystemNavigator.pop(),
+            style: ButtonStyle(
+              backgroundColor: WidgetStateProperty.all(
+                  ThemeData().colorScheme.primaryContainer),
+            ),
+          )
+        ],
       ),
       body: GetX<MainController>(
         init: MainController(),
@@ -39,5 +50,32 @@ class MainPage extends StatelessWidget {
       ),
       bottomNavigationBar: BottomNavigationBarWidget(),
     );
+  }
+}
+
+class BottomNavigationBarWidget extends StatelessWidget {
+  BottomNavigationBarWidget({super.key});
+  final MainController controller = Get.put(MainController());
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() => BottomNavigationBar(
+          currentIndex: controller.currentIndex.value,
+          onTap: controller.changePage,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.music_note),
+              label: '疗愈音乐',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.hearing),
+              label: '音疗服务',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.people),
+              label: '能量驿站',
+            ),
+          ],
+        ));
   }
 }

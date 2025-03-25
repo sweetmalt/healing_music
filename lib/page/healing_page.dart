@@ -13,7 +13,6 @@ class HealingPage extends StatelessWidget {
   HealingPage({super.key});
   final HealingController controller = Get.put(HealingController());
   final MainController mainController = Get.find();
-  //final BbtController bbtController = Get.put(BbtController());
 
   final HemController hemController = Get.find();
   final EnvController envController = Get.find();
@@ -25,7 +24,7 @@ class HealingPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 25,
-        title: PageTitle('service'),
+        title: PageTitle('Healing Service'),
         centerTitle: true,
       ),
       body: Center(
@@ -33,60 +32,66 @@ class HealingPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              //Obx(() => Text("【${controller.receivedData.value}】",
-              //   style: const TextStyle(color: Colors.grey, fontSize: 8))),
-              IconButton(
-                iconSize: 20.0,
-                color: ThemeData().colorScheme.primary,
-                onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height * 0.8,
-                    ),
-                    builder: (context) {
-                      return BrainWaveView();
-                    },
-                  );
-                },
-                icon: Obx(() => controller.isCtrlByDevice.value
-                    ? const Icon(
-                        Icons.bluetooth_audio,
-                        color: Colors.green,
-                        size: 40,
-                      )
-                    : const Icon(
-                        Icons.bluetooth_audio,
-                        color: Colors.grey,
-                      )),
+              Obx(
+                () => CircularIconButton(
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height * 0.8,
+                      ),
+                      builder: (context) {
+                        return BrainWaveView();
+                      },
+                    );
+                  },
+                  icon: controller.isCtrlByDevice.value
+                      ? Icons.bluetooth_audio
+                      : Icons.bluetooth,
+                ),
               ),
               Obx(() => Text(controller.title.value,
                   style: TextStyle(
                       color: ThemeData().colorScheme.primary,
                       fontSize: 20.0,
                       fontWeight: FontWeight.bold))),
-              Obx(() => Text("BGM@${hemController.audioTitle.value}",
-                  style: TextStyle(
-                      color: ThemeData().colorScheme.primary, fontSize: 16))),
-              Obx(() => Text("生境@${envController.audioTitle.value}",
-                  style: TextStyle(
-                      color: ThemeData().colorScheme.primary, fontSize: 14))),
-              Obx(() => Text("器乐@${bgmController.audioTitle.value}",
-                  style: TextStyle(
-                      color: ThemeData().colorScheme.secondary, fontSize: 12))),
-              Obx(() => Text("双耳@${bbmController.audioTitle.value}",
-                  style: TextStyle(
-                      color: ThemeData().colorScheme.secondary, fontSize: 10))),
-              Obx(() => Text(hemController.timeMinutes.value,
-                  style: TextStyle(
+              IntrinsicWidth(
+                child: Container(
+                  height: 40,
+                  margin: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
                       color: ThemeData().colorScheme.secondaryContainer,
-                      fontSize: 40,
-                      fontWeight: FontWeight.bold))),
-              const SizedBox(height: 20.0),
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(20))),
+                  child: Obx(() => Text(hemController.timeMinutes.value,
+                      style: TextStyle(
+                          color: ThemeData().colorScheme.secondary,
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold))),
+                ),
+              ),
               Obx(() => Stack(
                     alignment: Alignment.center,
                     children: [
+                      Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(60),
+                        ),
+                        child: CircularProgressIndicator(
+                          backgroundColor:
+                              ThemeData().colorScheme.primaryContainer,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                              ThemeData().colorScheme.primary),
+                          value:
+                              hemController.pos.value / hemController.dur.value,
+                          strokeWidth: 4,
+                        ),
+                      ),
                       Container(
                         width: 100,
                         height: 100,
@@ -94,11 +99,12 @@ class HealingPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(50),
                         ),
                         child: CircularProgressIndicator(
-                          backgroundColor: Colors.grey[200],
+                          backgroundColor:
+                              ThemeData().colorScheme.primaryContainer,
                           valueColor: AlwaysStoppedAnimation<Color>(
-                              ThemeData().colorScheme.primaryContainer),
+                              ThemeData().colorScheme.primary),
                           value:
-                              hemController.pos.value / hemController.dur.value,
+                              envController.pos.value / envController.dur.value,
                           strokeWidth: 4,
                         ),
                       ),
@@ -109,11 +115,12 @@ class HealingPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(40),
                         ),
                         child: CircularProgressIndicator(
-                          backgroundColor: Colors.grey[200],
+                          backgroundColor:
+                              ThemeData().colorScheme.primaryContainer,
                           valueColor: AlwaysStoppedAnimation<Color>(
-                              ThemeData().colorScheme.primaryContainer),
+                              ThemeData().colorScheme.primary),
                           value:
-                              envController.pos.value / envController.dur.value,
+                              bgmController.pos.value / bgmController.dur.value,
                           strokeWidth: 4,
                         ),
                       ),
@@ -124,46 +131,29 @@ class HealingPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(30),
                         ),
                         child: CircularProgressIndicator(
-                          backgroundColor: Colors.grey[200],
+                          backgroundColor:
+                              ThemeData().colorScheme.primaryContainer,
                           valueColor: AlwaysStoppedAnimation<Color>(
-                              ThemeData().colorScheme.primaryContainer),
-                          value:
-                              bgmController.pos.value / bgmController.dur.value,
-                          strokeWidth: 4,
-                        ),
-                      ),
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: CircularProgressIndicator(
-                          backgroundColor: Colors.grey[200],
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                              ThemeData().colorScheme.primaryContainer),
+                              ThemeData().colorScheme.primary),
                           value:
                               bbmController.pos.value / bbmController.dur.value,
                           strokeWidth: 4,
                         ),
                       ),
-                      IconButton(
-                        iconSize: 20.0,
-                        color: ThemeData().colorScheme.primary,
-                        onPressed: () {
-                          showModalBottomSheet(
-                            context: context,
-                            builder: (context) {
-                              return VolumeView();
-                            },
-                          );
-                        },
-                        icon: Obx(() => controller.isMute.value
-                            ? const Icon(
-                                Icons.volume_off_sharp,
-                                size: 40,
-                              )
-                            : const Icon(Icons.volume_up_sharp)),
+                      Obx(
+                        () => CircularIconButton(
+                          onPressed: () {
+                            showModalBottomSheet(
+                              context: context,
+                              builder: (context) {
+                                return VolumeView();
+                              },
+                            );
+                          },
+                          icon: controller.isMute.value
+                              ? Icons.volume_off_sharp
+                              : Icons.volume_up_sharp,
+                        ),
                       ),
                     ],
                   )),

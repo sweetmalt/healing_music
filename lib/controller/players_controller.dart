@@ -114,12 +114,14 @@ class MyAudioCtrl extends GetxController {
       _timer.cancel();
     }
     _isTimerRunning = true;
+    int tempSecs = 0;
     const oneSec = Duration(seconds: 1);
     _timer = Timer.periodic(oneSec, (Timer timer) {
       if (timeSeconds.value > 0) {
+        tempSecs++;
         timeSeconds.value--;
         timeMinutes.value =
-            '${(timeSeconds.value / 60).floor()}:${(timeSeconds.value % 60).toString().padLeft(2, '0')}';
+            '${(tempSecs / 60).floor()}:${(tempSecs % 60).toString().padLeft(2, '0')} - ${(timeSeconds.value / 60).floor()}:${(timeSeconds.value % 60).toString().padLeft(2, '0')}';
       } else {
         stop();
       }
@@ -166,4 +168,3 @@ class HemController extends MyAudioCtrl {
     super.onInit();
   }
 }
-

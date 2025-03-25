@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 class CircularButton extends StatelessWidget {
   final String text;
   final IconData icon;
@@ -17,8 +18,8 @@ class CircularButton extends StatelessWidget {
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         shape: const CircleBorder(),
-        padding: const EdgeInsets.all(20),
-        elevation: 10,
+        padding: const EdgeInsets.all(10),
+        elevation: 1,
         backgroundColor: ThemeData().colorScheme.primaryContainer,
         foregroundColor: ThemeData().colorScheme.primary,
       ),
@@ -30,6 +31,32 @@ class CircularButton extends StatelessWidget {
           Text(text),
         ],
       ),
+    );
+  }
+}
+
+class CircularIconButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  const CircularIconButton({
+    super.key,
+    required this.icon,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        shape: const CircleBorder(),
+        padding: const EdgeInsets.all(10),
+        elevation: 1,
+        backgroundColor: ThemeData().colorScheme.primaryContainer,
+        foregroundColor: ThemeData().colorScheme.primary,
+      ),
+      child: Icon(icon),
     );
   }
 }
