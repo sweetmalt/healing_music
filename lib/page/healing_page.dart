@@ -25,9 +25,6 @@ class HealingPage extends StatelessWidget {
 
   void ctrlByPlan() {
     envController.play();
-
-
-    
   }
 
   void quitCtrlByPlan() {
@@ -154,7 +151,7 @@ class HealingPage extends StatelessWidget {
                   ? PlanZone(
                       title: healingController.title.value,
                       subTitle: healingController.subTitle.value,
-                      quitCtrlByPlan:quitCtrlByPlan,
+                      quitCtrlByPlan: quitCtrlByPlan,
                     )
                   : Container()),
               const SizedBox(height: 10),
@@ -404,9 +401,8 @@ class ToolsRow extends StatelessWidget {
                 text: entry.value,
                 icon: Icons.ring_volume,
                 onPressed: () async {
-                  await controller.singlePlayer
-                      .setAsset("assets/audio/${entry.key}.MP3");
-                  await controller.singlePlayer.play();
+                  controller.changeAudio("assets/audio/${entry.key}.MP3",
+                      autoPlay: true);
                 },
               ),
             );

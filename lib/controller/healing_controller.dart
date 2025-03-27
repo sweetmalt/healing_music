@@ -2,11 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:healing_music/controller/ctrl.dart';
 import 'package:healing_music/widget/wave_chart.dart';
-import 'package:just_audio/just_audio.dart';
 
-class HealingController extends GetxController {
-  AudioPlayer singlePlayer = AudioPlayer();
+class HealingController extends Ctrl {
   final RxString title = ''.obs;
   final RxString subTitle = ''.obs;
   final RxBool isMute = false.obs;//是否静音
