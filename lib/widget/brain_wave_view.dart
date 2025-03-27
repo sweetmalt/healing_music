@@ -14,7 +14,6 @@ class BrainWaveView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      
       width: MediaQuery.of(context).size.width,
       padding: const EdgeInsets.all(20),
       decoration: const BoxDecoration(
@@ -42,30 +41,26 @@ class BrainWaveView extends StatelessWidget {
           const SizedBox(
             height: 40,
           ),
-          Obx(()=>Stack(
-            alignment: Alignment.center,
-            children: [
-              Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                        child: CircularProgressIndicator(
-                          backgroundColor: Colors.grey[200],
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                              ThemeData().colorScheme.primaryContainer),
-                          value:
-                              healingController.bciAtt.value / 100,
-                          strokeWidth: 40,
-                        ),
-                      ),
-                      Text(
-                        '${healingController.bciAtt.value.toInt()}%',
-                        style: const TextStyle(fontSize: 24),
-                      ),
-            ]
-          )),
+          Obx(() => Stack(alignment: Alignment.center, children: [
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  child: CircularProgressIndicator(
+                    backgroundColor: Colors.grey[200],
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                        ThemeData().colorScheme.primaryContainer),
+                    value: healingController.bciAtt.value / 100,
+                    strokeWidth: 40,
+                  ),
+                ),
+                Text(
+                  '${healingController.bciAtt.value.toInt()}%',
+                  style: const TextStyle(fontSize: 24),
+                ),
+              ])),
           ListTile(
             title: Text(_dataDoc['bciAtt']?['title'] ?? '',
                 style: MyStyle.paragraphTitleTextStyle),
@@ -88,30 +83,26 @@ class BrainWaveView extends StatelessWidget {
           const SizedBox(
             height: 40,
           ),
-          Obx(()=>Stack(
-            alignment: Alignment.center,
-            children: [
-              Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                        child: CircularProgressIndicator(
-                          backgroundColor: Colors.grey[200],
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                              ThemeData().colorScheme.primaryContainer),
-                          value:
-                              healingController.bciMed.value / 100,
-                          strokeWidth: 40,
-                        ),
-                      ),
-                      Text(
-                        '${healingController.bciMed.value.toInt()}%',
-                        style: const TextStyle(fontSize: 24),
-                      ),
-            ]
-          )),
+          Obx(() => Stack(alignment: Alignment.center, children: [
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  child: CircularProgressIndicator(
+                    backgroundColor: Colors.grey[200],
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                        ThemeData().colorScheme.primaryContainer),
+                    value: healingController.bciMed.value / 100,
+                    strokeWidth: 40,
+                  ),
+                ),
+                Text(
+                  '${healingController.bciMed.value.toInt()}%',
+                  style: const TextStyle(fontSize: 24),
+                ),
+              ])),
           ListTile(
             title: Text(_dataDoc['bciMed']?['title'] ?? '',
                 style: MyStyle.paragraphTitleTextStyle),
@@ -422,7 +413,7 @@ class BrainWaveView extends StatelessWidget {
             lineWidth: 3,
           ),
           Container(
-            height: 100,
+            height: 120,
             alignment: Alignment.center,
             child: const Text(
               '__ 什么叫活在当下 __',

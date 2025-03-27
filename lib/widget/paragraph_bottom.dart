@@ -11,11 +11,13 @@ class ParagraphBottomTitle extends Text {
 class ParagraphBottomListTile extends StatelessWidget {
   final String title;
   final VoidCallback onTap;
+  final IconData? icon;
 
   const ParagraphBottomListTile({
     super.key,
     required this.title,
     required this.onTap,
+    this.icon,
   });
 
   @override
@@ -36,8 +38,8 @@ class ParagraphBottomListTile extends StatelessWidget {
       ),
       child: ListTile(
         title: ParagraphBottomTitle(title),
-        trailing: const Icon(
-          Icons.auto_stories_outlined,
+        trailing: Icon(
+          icon,//Icons.auto_stories_outlined,
           size: 12,
         ),
         onTap: onTap,

@@ -7,9 +7,11 @@ import 'package:just_audio/just_audio.dart';
 
 class HealingController extends GetxController {
   AudioPlayer singlePlayer = AudioPlayer();
-  final RxString title = '能量驿站'.obs;
-  final RxBool isMute = false.obs;
+  final RxString title = ''.obs;
+  final RxString subTitle = ''.obs;
+  final RxBool isMute = false.obs;//是否静音
   final RxBool isCtrlByDevice = false.obs;
+  final RxBool isCtrlByPlan = false.obs;
   static const eventChannel = EventChannel('top.healingAI.brainlink/receiver');
   StreamSubscription? _streamSubscription;
   final RxString receivedData = "等待设备连接...".obs;

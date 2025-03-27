@@ -11,17 +11,19 @@ class ParagraphTitle extends Text {
 class ParagraphListTile extends StatelessWidget {
   final String title;
   final VoidCallback onTap;
+  final IconData? icon;
 
   const ParagraphListTile({
     super.key,
     required this.title,
     required this.onTap,
+    this.icon,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(top: 40, left: 10, right: 10),
+      margin: const EdgeInsets.only(left: 10, right: 10),
       decoration: BoxDecoration(
         color: ThemeData().colorScheme.primaryContainer,
         border: Border(
@@ -39,8 +41,8 @@ class ParagraphListTile extends StatelessWidget {
       ),
       child: ListTile(
         title: ParagraphTitle(title),
-        trailing: const Icon(
-          Icons.attach_file,
+        trailing: Icon(
+          icon,//Icons.attach_file,
           size: 15,
         ),
         onTap: onTap,

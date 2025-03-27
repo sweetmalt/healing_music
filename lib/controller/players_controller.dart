@@ -116,6 +116,8 @@ class MyAudioCtrl extends GetxController {
     if (_isTimerRunning) {
       _isTimerRunning = false;
       _timer.cancel();
+      timeSeconds.value = 0;
+      timeMinutes.value = "00:00";
     }
     isPlaying.value = false;
     player.stop();

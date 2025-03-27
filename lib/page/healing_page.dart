@@ -6,15 +6,16 @@ import 'package:healing_music/controller/main_controller.dart';
 import 'package:healing_music/data/audios.dart';
 import 'package:healing_music/widget/brain_wave_view.dart';
 import 'package:healing_music/widget/circular_button.dart';
+import 'package:healing_music/widget/item.dart';
 import 'package:healing_music/widget/page_title.dart';
-import 'package:healing_music/widget/single_view.dart';
+import 'package:healing_music/widget/paragraph.dart';
+import 'package:healing_music/widget/paragraph_bottom.dart';
 import 'package:healing_music/widget/volume_view.dart';
 
 class HealingPage extends StatelessWidget {
   HealingPage({super.key});
-  final HealingController controller = Get.put(HealingController());
   final MainController mainController = Get.find();
-
+  final HealingController healingController = Get.put(HealingController());
   final HemController hemController = Get.put(HemController());
   final EnvController envController = Get.put(EnvController());
   final BgmController bgmController = Get.put(BgmController());
@@ -22,8 +23,26 @@ class HealingPage extends StatelessWidget {
 
   static const Audios _audios = Audios();
 
+  void ctrlByPlan() {
+    envController.play();
+
+
+    
+  }
+
+  void quitCtrlByPlan() {
+    hemController.stop();
+    envController.stop();
+    bgmController.stop();
+    bbmController.stop();
+    healingController.isCtrlByPlan.value = false;
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (healingController.isCtrlByPlan.value) {
+      ctrlByPlan();
+    }
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 25,
@@ -40,6 +59,8 @@ class HealingPage extends StatelessWidget {
                   onPressed: () {
                     showModalBottomSheet(
                       context: context,
+                      showDragHandle: true,
+                      useRootNavigator: true,
                       isScrollControlled: true,
                       constraints: BoxConstraints(
                         maxHeight: MediaQuery.of(context).size.height * 0.8,
@@ -49,32 +70,13 @@ class HealingPage extends StatelessWidget {
                       },
                     );
                   },
-                  icon: controller.isCtrlByDevice.value
+                  icon: healingController.isCtrlByDevice.value
                       ? Icons.bluetooth_audio
                       : Icons.bluetooth,
                 ),
               ),
-              Obx(() => Text(controller.title.value,
-                  style: TextStyle(
-                      color: ThemeData().colorScheme.primary,
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.bold))),
-              IntrinsicWidth(
-                child: Container(
-                  height: 40,
-                  margin: const EdgeInsets.all(10),
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                      color: ThemeData().colorScheme.secondaryContainer,
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(20))),
-                  child: Obx(() => Text(hemController.timeMinutes.value,
-                      style: TextStyle(
-                          color: ThemeData().colorScheme.secondary,
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold))),
-                ),
+              const SizedBox(
+                height: 10,
               ),
               Obx(() => Stack(
                     alignment: Alignment.center,
@@ -113,13 +115,49 @@ class HealingPage extends StatelessWidget {
                               },
                             );
                           },
-                          icon: controller.isMute.value
+                          icon: healingController.isMute.value
                               ? Icons.volume_off_sharp
                               : Icons.volume_up_sharp,
                         ),
                       ),
                     ],
                   )),
+              const SizedBox(
+                height: 10,
+              ),
+              Obx(() => healingController.isCtrlByPlan.value
+                  ? IntrinsicWidth(
+                      child: Container(
+                        height: 40,
+                        //margin: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            color: ThemeData().colorScheme.secondaryContainer,
+                            border: Border.all(
+                                color: ThemeData().colorScheme.secondary,
+                                width: 1),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(20))),
+                        child: Text(hemController.timeMinutes.value,
+                            style: TextStyle(
+                                color: ThemeData().colorScheme.secondary,
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold)),
+                      ),
+                    )
+                  : Container()),
+              const SizedBox(
+                height: 1,
+              ),
+              Obx(() => healingController.isCtrlByPlan.value
+                  ? PlanZone(
+                      title: healingController.title.value,
+                      subTitle: healingController.subTitle.value,
+                      quitCtrlByPlan:quitCtrlByPlan,
+                    )
+                  : Container()),
+              const SizedBox(height: 10),
               PlayBox(
                 title: "脑波音频：",
                 controller: hemController,
@@ -152,57 +190,15 @@ class HealingPage extends StatelessWidget {
                 audios: _audios.bbm,
                 controller: bbmController,
               ),
-              Container(
-                padding: const EdgeInsets.only(left: 20, right: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    CircularButton(
-                      text: '颂钵',
-                      icon: Icons.rice_bowl,
-                      onPressed: () async {
-                        await controller.singlePlayer
-                            .setAsset("assets/audio/10s Singging Bowl.MP3");
-                        //await controller.singlePlayer.setLoopMode(LoopMode.off);
-                        await controller.singlePlayer.play();
-                      },
-                    ),
-                    CircularButton(
-                      text: '雨棍',
-                      icon: Icons.line_style,
-                      onPressed: () async {
-                        await controller.singlePlayer
-                            .setAsset("assets/audio/10s Rain Stick.MP3");
-                        //await controller.singlePlayer.setLoopMode(LoopMode.off);
-                        await controller.singlePlayer.play();
-                      },
-                    ),
-                    CircularButton(
-                      text: '丁夏',
-                      icon: Icons.ring_volume,
-                      onPressed: () async {
-                        await controller.singlePlayer
-                            .setAsset("assets/audio/10s Bell.MP3");
-                        //await controller.singlePlayer.setLoopMode(LoopMode.off);
-                        await controller.singlePlayer.play();
-                      },
-                    ),
-                    CircularButton(
-                      text: '更多',
-                      icon: Icons.more_horiz,
-                      onPressed: () async {
-                        showModalBottomSheet(
-                          context: context,
-                          builder: (context) {
-                            return SingleView();
-                          },
-                        );
-                      },
-                    ),
-                  ],
-                ),
+              ToolsRow(
+                audios: _audios.too,
+                controller: healingController,
               ),
-              const SizedBox(height: 120),
+              Container(
+                alignment: Alignment.center,
+                height: 120,
+                child: const Text("快乐疗愈生活"),
+              ),
             ],
           ),
         ),
@@ -363,7 +359,7 @@ class PlayBox extends StatelessWidget {
                   ))),
           IconButton(
             padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(), 
+            constraints: const BoxConstraints(),
             onPressed: () {
               controller.isPlaying.value
                   ? controller.pause()
@@ -375,6 +371,119 @@ class PlayBox extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class ToolsRow extends StatelessWidget {
+  final HealingController controller;
+  final Map<String, String> audios;
+  const ToolsRow({
+    super.key,
+    required this.controller,
+    required this.audios,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 120,
+      width: MediaQuery.of(context).size.width,
+      padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+      margin: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+      decoration: BoxDecoration(
+          color: ThemeData().colorScheme.secondaryContainer,
+          borderRadius: const BorderRadius.all(Radius.circular(5))),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: audios.entries.map<Widget>((entry) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: CircularButton(
+                text: entry.value,
+                icon: Icons.ring_volume,
+                onPressed: () async {
+                  await controller.singlePlayer
+                      .setAsset("assets/audio/${entry.key}.MP3");
+                  await controller.singlePlayer.play();
+                },
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+}
+
+class PlanZone extends StatelessWidget {
+  final VoidCallback quitCtrlByPlan;
+  final String title;
+  final String subTitle;
+  const PlanZone(
+      {super.key,
+      required this.title,
+      required this.subTitle,
+      required this.quitCtrlByPlan});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        ParagraphListTile(
+          title: title,
+          icon: Icons.close,
+          onTap: () {
+            showConfirmationDialog(context);
+          },
+        ),
+        ItemListTile(
+          title: "XXX",
+          subtitle: "xxx",
+          onTap: () async {},
+        ),
+        ParagraphBottomListTile(
+          title: subTitle,
+          onTap: () {},
+        ),
+      ],
+    );
+  }
+
+  Future<void> showConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // 用户必须点击按钮才能关闭对话框
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('关闭当前自动任务'),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('您确定要执行此操作吗？'),
+                Text('此操作不可撤销。'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('取消'),
+              onPressed: () {
+                Navigator.of(context).pop(); // 关闭对话框
+              },
+            ),
+            TextButton(
+              child: const Text('确认'),
+              onPressed: () {
+                // 在这里执行确认后的操作
+                quitCtrlByPlan();
+                Navigator.of(context).pop(); // 关闭对话框
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -19,8 +19,8 @@ class CircularButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         shape: const CircleBorder(),
         padding: const EdgeInsets.all(10),
-        elevation: 1,
-        backgroundColor: ThemeData().colorScheme.primaryContainer,
+        elevation: 2,
+        backgroundColor: ThemeData().colorScheme.surface,
         foregroundColor: ThemeData().colorScheme.primary,
       ),
       child: Column(

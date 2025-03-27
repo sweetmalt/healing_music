@@ -3,16 +3,30 @@ import 'package:get/get.dart';
 import 'package:healing_music/controller/healing_controller.dart';
 import 'package:healing_music/controller/main_controller.dart';
 import 'package:healing_music/controller/players_controller.dart';
+import 'package:healing_music/data/audios.dart';
 import 'package:healing_music/widget/circular_button.dart';
 import 'package:healing_music/widget/page_title.dart';
 
 class AlbumPage extends StatelessWidget {
   final MainController mainController = Get.find();
+  final HealingController healingController = Get.find();
   final HemController hemController = Get.find();
   final EnvController envController = Get.find();
-  final HealingController healingController = Get.find();
-
+  final BgmController bgmController = Get.find();
+  final BbmController bbmController = Get.find();
+  static const Audios _audios = Audios();
+  final List<List> _pla = _audios.pla;
   AlbumPage({super.key});
+
+  void _setTimer(int t) {
+    hemController.setTimer(t);
+    envController.setTimer(t);
+    bgmController.setTimer(t);
+    bbmController.setTimer(t);
+    healingController.isCtrlByPlan.value = true;
+    mainController.changePage(1);
+    Get.back();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,66 +70,21 @@ class AlbumPage extends StatelessWidget {
                           fontSize: 20,
                           fontWeight: FontWeight.bold)),
                 ),
-                CircularButton(
-                  text: '15分钟',
-                  icon: Icons.timer,
-                  onPressed: () {
-                    hemController.play();
-                    envController.play();
-                    hemController.setTimer(900);
-                    envController.setTimer(900);
-                    mainController.changePage(1);
-                    Get.back();
-                  },
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                CircularButton(
-                  text: '30分钟',
-                  icon: Icons.timer,
-                  onPressed: () {
-                    hemController.play();
-                    envController.play();
-                    hemController.setTimer(1800);
-                    envController.setTimer(1800);
-                    mainController.changePage(1);
-                    Get.back();
-                  },
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                CircularButton(
-                  text: '45分钟',
-                  icon: Icons.timer,
-                  onPressed: () async {
-                    hemController.play();
-                    envController.play();
-                    hemController.setTimer(2700);
-                    envController.setTimer(2700);
-                    mainController.changePage(1);
-                    Get.back();
-                  },
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                CircularButton(
-                  text: '60分钟',
-                  icon: Icons.timer,
-                  onPressed: () async {
-                    hemController.play();
-                    envController.play();
-                    hemController.setTimer(3600);
-                    envController.setTimer(3600);
-                    mainController.changePage(1);
-                    Get.back();
-                  },
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
+                for (int i = 0; i < _pla.length; i++)
+                  Column(
+                    children: [
+                      CircularButton(
+                        text: _pla[i][0],
+                        icon: Icons.timer,
+                        onPressed: () async {
+                          _setTimer(_pla[i][1]);
+                        },
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      )
+                    ],
+                  ),
                 SizedBox(
                   height: 120,
                   child: Center(
