@@ -1,48 +1,56 @@
 import 'dart:async';
-import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 
 class Ctrl extends GetxController {
-  late final VoidCallback onTimeSeconds;
   final AudioPlayer player = AudioPlayer();
   final RxString _audio = 'assets/audio/40s Birds Songs.MP3'.obs;
   final RxBool isPlaying = false.obs;
   final RxInt timeSeconds = 0.obs; //单位：秒
   final RxInt usedTimeSeconds = 0.obs; //单位：秒
-  final RxInt restTimeSeconds = 0.obs; //单位：秒
+  final RxString textTimeSeconds = "00:00".obs;
   late Timer _timer;
-  bool _isTimerRunning = false;
-  void setTimer(int secs) {
+  final RxBool isTimerRunning = false.obs;
+  void setTimer(int sec) {
     clearTimer();
-    if (secs <= 0) {
+    timeSeconds.value = sec;
+  }
+
+  void startTimer(VoidCallback onTimerRunning, VoidCallback onTimerEnd) {
+    if (timeSeconds.value <= 0) {
       return;
-    } else {
-      timeSeconds.value = secs;
-      usedTimeSeconds.value = 0;
-      restTimeSeconds.value = secs;
     }
-    _isTimerRunning = true;
+    isTimerRunning.value = true;
     const oneSec = Duration(seconds: 1);
     _timer = Timer.periodic(oneSec, (Timer timer) {
-      if (restTimeSeconds.value > 0) {
+      if (timeSeconds.value > 0) {
+        onTimerRunning();
         usedTimeSeconds.value++;
-        restTimeSeconds.value--;
-        onTimeSeconds();
+        timeSeconds.value--;
+        textTimeSeconds.value =
+            "${usedTimeSeconds.value ~/ 60}:${usedTimeSeconds.value % 60} - ${timeSeconds.value ~/ 60}:${timeSeconds.value % 60}";
       } else {
-        stop();
+        onTimerEnd();
       }
     });
   }
 
+  void pauseTimer() {
+    if (isTimerRunning.value && timeSeconds.value > 0) {
+      isTimerRunning.value = false;
+      _timer.cancel();
+    }
+  }
+
   void clearTimer() {
-    if (_isTimerRunning) {
-      _isTimerRunning = false;
+    if (timeSeconds.value > 0 || usedTimeSeconds.value > 0) {
+      isTimerRunning.value = false;
       _timer.cancel();
       timeSeconds.value = 0;
       usedTimeSeconds.value = 0;
-      restTimeSeconds.value = 0;
+      textTimeSeconds.value = "00:00";
     }
   }
 

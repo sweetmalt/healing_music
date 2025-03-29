@@ -1,0 +1,250 @@
+{
+    "15分钟": [
+        {
+            "start": 0,
+            "end": 300,
+            "interval": "5分钟",
+            "task": {
+                "player": "双耳节拍",
+                "audio": "60s 10HZ",
+                "healing": "凝神静气，万念归一，开启疗愈之门"
+            }
+        },
+        {
+            "start": 300,
+            "end": 540,
+            "interval": "4分钟",
+            "task": {
+                "player": "生境纯音",
+                "audio": "",
+                "healing": "激活潜藏在DNA里强大的原始自愈力"
+            }
+        },
+        {
+            "start": 540,
+            "end": 720,
+            "interval": "3分钟",
+            "task": {
+                "player": "脑波音频",
+                "audio": "",
+                "healing": "拔除杂念，净化心灵，重塑稳态平衡"
+            }
+        },
+        {
+            "start": 720,
+            "end": 900,
+            "interval": "3分钟",
+            "task": {
+                "player": "经典器乐",
+                "audio": "",
+                "healing": "疗愈终章，唤醒身心，回归美好现实"
+            }
+        }
+    ],
+    "30分钟": [
+        {
+            "start": 0,
+            "end": 300,
+            "interval": "5分钟",
+            "task": {
+                "player": "双耳节拍",
+                "audio": "60s 10HZ",
+                "healing": "凝神静气，万念归一，开启疗愈之门"
+            }
+        },
+        {
+            "start": 300,
+            "end": 1020,
+            "interval": "12分钟",
+            "task": {
+                "player": "生境纯音",
+                "audio": "",
+                "healing": "激活潜藏在DNA里强大的原始自愈力"
+            }
+        },
+        {
+            "start": 1020,
+            "end": 1200,
+            "interval": "3分钟",
+            "task": {
+                "player": "脑波音频",
+                "audio": "",
+                "healing": "拔除杂念，净化心灵，重塑稳态平衡"
+            }
+        },
+        {
+            "start": 1200,
+            "end": 1260,
+            "interval": "1分钟",
+            "task": {
+                "player": "双耳节拍",
+                "audio": "60s 1HZ",
+                "healing": "空灵舒缓，物我两忘，导向睡眠模式"
+            }
+        },
+        {
+            "start": 1260,
+            "end": 1620,
+            "interval": "6分钟",
+            "task": {
+                "player": "生境纯音",
+                "audio": "",
+                "healing": "激活潜藏在DNA里强大的原始自愈力"
+            }
+        },
+        {
+            "start": 1620,
+            "end": 1800,
+            "interval": "3分钟",
+            "task": {
+                "player": "经典器乐",
+                "audio": "",
+                "healing": "疗愈终章，唤醒身心，回归美好现实"
+            }
+        }
+    ],
+    "45分钟": [
+        {
+            "start": 0,
+            "end": 300,
+            "interval": "5分钟",
+            "task": {
+                "player": "双耳节拍",
+                "audio": "60s 10HZ",
+                "healing": "凝神静气，万念归一，开启疗愈之门"
+            }
+        },
+        {
+            "start": 300,
+            "end": 1020,
+            "interval": "12分钟",
+            "task": {
+                "player": "生境纯音",
+                "audio": "",
+                "healing": "激活潜藏在DNA里强大的原始自愈力"
+            }
+        },
+        {
+            "start": 1020,
+            "end": 1200,
+            "interval": "3分钟",
+            "task": {
+                "player": "脑波音频",
+                "audio": "",
+                "healing": "拔除杂念，净化心灵，重塑稳态平衡"
+            }
+        },
+        {
+            "start": 1200,
+            "end": 1920,
+            "interval": "12分钟",
+            "task": {
+                "player": "生境纯音",
+                "audio": "",
+                "healing": "激活潜藏在DNA里强大的原始自愈力"
+            }
+        },
+        {
+            "start": 1920,
+            "end": 2100,
+            "interval": "3分钟",
+            "task": {
+                "player": "双耳节拍",
+                "audio": "60s 1HZ",
+                "healing": "空灵舒缓，物我两忘，导向睡眠模式"
+            }
+        },
+        {
+            "start": 2100,
+            "end": 2580,
+            "interval": "8分钟",
+            "task": {
+                "player": "生境纯音",
+                "audio": "",
+                "healing": "激活潜藏在DNA里强大的原始自愈力"
+            }
+        },
+        {
+            "start": 2580,
+            "end": 2700,
+            "interval": "2分钟",
+            "task": {
+                "player": "经典器乐",
+                "audio": "",
+                "healing": "疗愈终章，唤醒身心，回归美好现实"
+            }
+        }
+    ],
+    "60分钟": [
+        {
+            "start": 0,
+            "end": 300,
+            "interval": "5分钟",
+            "task": {
+                "player": "双耳节拍",
+                "audio": "60s 10HZ",
+                "healing": "凝神静气，万念归一，开启疗愈之门"
+            }
+        },
+        {
+            "start": 300,
+            "end": 1020,
+            "interval": "12分钟",
+            "task": {
+                "player": "生境纯音",
+                "audio": "",
+                "healing": "激活潜藏在DNA里强大的原始自愈力"
+            }
+        },
+        {
+            "start": 1020,
+            "end": 1200,
+            "interval": "3分钟",
+            "task": {
+                "player": "脑波音频",
+                "audio": "",
+                "healing": "拔除杂念，净化心灵，重塑稳态平衡"
+            }
+        },
+        {
+            "start": 1200,
+            "end": 2400,
+            "interval": "20分钟",
+            "task": {
+                "player": "生境纯音",
+                "audio": "",
+                "healing": "激活潜藏在DNA里强大的原始自愈力"
+            }
+        },
+        {
+            "start": 2400,
+            "end": 2700,
+            "interval": "5分钟",
+            "task": {
+                "player": "双耳节拍",
+                "audio": "60s 1HZ",
+                "healing": "空灵舒缓，物我两忘，导向睡眠模式"
+            }
+        },
+        {
+            "start": 2700,
+            "end": 3420,
+            "interval": "12分钟",
+            "task": {
+                "player": "生境纯音",
+                "audio": "",
+                "healing": "激活潜藏在DNA里强大的原始自愈力"
+            }
+        },
+        {
+            "start": 3420,
+            "end": 3600,
+            "interval": "3分钟",
+            "task": {
+                "player": "经典器乐",
+                "audio": "",
+                "healing": "疗愈终章，唤醒身心，回归美好现实"
+            }
+        }
+    ]
+}

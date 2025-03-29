@@ -63,6 +63,8 @@ class MusicBox extends StatelessWidget {
     String bgmAudio = _audios.bgm.keys.toList()[3];
     String bbmTitle = _audios.bbm.values.toList()[1];
     String bbmAudio = _audios.bbm.keys.toList()[1];
+    String audioTitle = "$hemTitle & $envTitle";
+    String audioSubTitle = "$hemAudio,$envAudio";
     return Column(
       children: [
         ParagraphListTile(
@@ -72,9 +74,12 @@ class MusicBox extends StatelessWidget {
         ItemListTile(
           title: '$hemTitle & $envTitle',
           subtitle: '$hemAudio,$envAudio',
+          icon: Icons.play_arrow,
           onTap: () async {
             healingController.title.value = title;
             healingController.subTitle.value = subTitle;
+            healingController.audioTitle.value = audioTitle;
+            healingController.audioSubTitle.value = audioSubTitle;
             hemController.setTitle(hemTitle);
             await hemController.changeAudio(
                 audio: "assets/audio/$hemAudio.MP3", autoPlay: false);

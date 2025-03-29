@@ -12,7 +12,7 @@ import 'package:healing_music/widget/paragraph.dart';
 import 'package:healing_music/widget/paragraph_bottom.dart';
 import 'package:healing_music/widget/volume_view.dart';
 
-class HealingPage extends StatelessWidget {
+class HealingPage extends GetView<HealingController> {
   HealingPage({super.key});
   final MainController mainController = Get.find();
   final HealingController healingController = Get.put(HealingController());
@@ -23,11 +23,100 @@ class HealingPage extends StatelessWidget {
 
   static const Audios _audios = Audios();
 
+  void onTimerRunning() {
+    int usedTimeSeconds = healingController.usedTimeSeconds.value;
+    List<Map<String, dynamic>> htd = healingController.healingTimeData;
+    for (var i = 0; i < htd.length; i++) {
+      int start = htd[i]["start"] as int;
+      int end = htd[i]["end"] as int;
+      String interval = htd[i]["interval"] as String;
+      Map<String, String> task = Map<String, String>.from(htd[i]["task"]);
+      String player = task["player"] ?? "";
+      //String audio = task["audio"] ?? "";
+      String healing = task["healing"] ?? "";
+      MyAudioCtrl audioCtrl = envController;
+      switch (player) {
+        case "脑波音频":
+          audioCtrl = hemController;
+          break;
+        case "生境纯音":
+          audioCtrl = envController;
+          break;
+        case "经典器乐":
+          audioCtrl = bgmController;
+          break;
+        case "双耳节拍":
+          audioCtrl = bbmController;
+          break;
+      }
+      if (usedTimeSeconds == start) {
+        healingController.healingTimeIndex.value = i;
+        audioCtrl.play();
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          SnackBar(
+            content: Text('$interval : $player : $healing'),
+            duration: const Duration(seconds: 3),
+            backgroundColor: Colors.deepPurple,
+          ),
+        );
+      }
+      if (usedTimeSeconds == end - 1) {
+        audioCtrl.pause();
+      }
+    }
+  }
+
+  void onTimerEnd() {
+    ScaffoldMessenger.of(Get.context!).showSnackBar(
+      const SnackBar(
+        content: Text('结束预编排音疗服务'),
+        duration: Duration(seconds: 3),
+        backgroundColor: Colors.deepPurple,
+      ),
+    );
+    healingController.clearTimer();
+    hemController.stop();
+    envController.stop();
+    bgmController.stop();
+    bbmController.stop();
+    //healingController.isCtrlByPlan.value = false;
+  }
+
   void ctrlByPlan() {
-    envController.play();
+    ScaffoldMessenger.of(Get.context!).showSnackBar(
+      const SnackBar(
+        content: Text('开始预编排音疗服务'),
+        duration: Duration(seconds: 3),
+        backgroundColor: Colors.deepPurple,
+      ),
+    );
+    healingController.startTimer(onTimerRunning, onTimerEnd);
+  }
+
+  void pauseCtrlByPlan() {
+    ScaffoldMessenger.of(Get.context!).showSnackBar(
+      const SnackBar(
+        content: Text('暂停预编排音疗服务'),
+        duration: Duration(seconds: 3),
+        backgroundColor: Colors.deepPurple,
+      ),
+    );
+    healingController.pauseTimer();
+    hemController.pause();
+    envController.pause();
+    bgmController.pause();
+    bbmController.pause();
   }
 
   void quitCtrlByPlan() {
+    ScaffoldMessenger.of(Get.context!).showSnackBar(
+      const SnackBar(
+        content: Text('退出预编排音疗服务'),
+        duration: Duration(seconds: 3),
+        backgroundColor: Colors.deepPurple,
+      ),
+    );
+    healingController.clearTimer();
     hemController.stop();
     envController.stop();
     bgmController.stop();
@@ -37,9 +126,6 @@ class HealingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (healingController.isCtrlByPlan.value) {
-      ctrlByPlan();
-    }
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 25,
@@ -136,7 +222,7 @@ class HealingPage extends StatelessWidget {
                                 width: 1),
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(20))),
-                        child: Text(hemController.timeMinutes.value,
+                        child: Text(healingController.textTimeSeconds.value,
                             style: TextStyle(
                                 color: ThemeData().colorScheme.secondary,
                                 fontSize: 30,
@@ -149,14 +235,23 @@ class HealingPage extends StatelessWidget {
               ),
               Obx(() => healingController.isCtrlByPlan.value
                   ? PlanZone(
+                      ctrlByPlan: ctrlByPlan,
+                      pauseCtrlByPlan: pauseCtrlByPlan,
+                      quitCtrlByPlan: quitCtrlByPlan,
                       title: healingController.title.value,
                       subTitle: healingController.subTitle.value,
-                      quitCtrlByPlan: quitCtrlByPlan,
+                      audioTitle: healingController.audioTitle.value,
+                      audioSubTitle: healingController.audioSubTitle.value,
+                      isTimerRunning: healingController.isTimerRunning.value,
+                      healingTimeText:
+                          healingController.healingTimeText.toList(),
+                      healingTimeIndex:
+                          healingController.healingTimeIndex.value,
                     )
                   : Container()),
               const SizedBox(height: 10),
               PlayBox(
-                title: "脑波音频：",
+                title: "脑波音频",
                 controller: hemController,
               ),
               AudiosRow(
@@ -164,7 +259,7 @@ class HealingPage extends StatelessWidget {
                 controller: hemController,
               ),
               PlayBox(
-                title: "生境录音：",
+                title: "生境纯音",
                 controller: envController,
               ),
               AudiosRow(
@@ -172,7 +267,7 @@ class HealingPage extends StatelessWidget {
                 controller: envController,
               ),
               PlayBox(
-                title: "经典器乐：",
+                title: "经典器乐",
                 controller: bgmController,
               ),
               AudiosRow(
@@ -180,7 +275,7 @@ class HealingPage extends StatelessWidget {
                 controller: bgmController,
               ),
               PlayBox(
-                title: "双耳节拍：",
+                title: "双耳节拍",
                 controller: bbmController,
               ),
               AudiosRow(
@@ -194,7 +289,7 @@ class HealingPage extends StatelessWidget {
               Container(
                 alignment: Alignment.center,
                 height: 120,
-                child: const Text("快乐疗愈生活"),
+                child: const Text("音乐疗愈美好生活"),
               ),
             ],
           ),
@@ -334,6 +429,9 @@ class PlayBox extends StatelessWidget {
             icon: const Icon(Icons.headphones),
           ),
           Text(title),
+          const SizedBox(
+            width: 10,
+          ),
           Expanded(
               child: Obx(() => SliderTheme(
                     data: SliderTheme.of(context).copyWith(
@@ -414,14 +512,28 @@ class ToolsRow extends StatelessWidget {
 }
 
 class PlanZone extends StatelessWidget {
+  final VoidCallback ctrlByPlan;
+  final VoidCallback pauseCtrlByPlan;
   final VoidCallback quitCtrlByPlan;
   final String title;
   final String subTitle;
+  final String audioTitle;
+  final String audioSubTitle;
+  final List healingTimeText;
+  final int healingTimeIndex;
+  final bool isTimerRunning;
   const PlanZone(
       {super.key,
+      required this.ctrlByPlan,
+      required this.pauseCtrlByPlan,
+      required this.quitCtrlByPlan,
       required this.title,
       required this.subTitle,
-      required this.quitCtrlByPlan});
+      required this.audioTitle,
+      required this.audioSubTitle,
+      required this.isTimerRunning,
+      required this.healingTimeIndex,
+      required this.healingTimeText});
 
   @override
   Widget build(BuildContext context) {
@@ -435,9 +547,36 @@ class PlanZone extends StatelessWidget {
           },
         ),
         ItemListTile(
-          title: "XXX",
-          subtitle: "xxx",
-          onTap: () async {},
+          title: audioTitle,
+          subtitle: audioSubTitle,
+          icon: isTimerRunning ? Icons.pause : Icons.play_arrow,
+          onTap: () async {
+            if (isTimerRunning) {
+              pauseCtrlByPlan();
+            } else {
+              ctrlByPlan();
+            }
+          },
+        ),
+        HealingItemListTile(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: healingTimeText.map((healingTime) {
+              //取字符串healingTime内第一个冒号前的数字子串,并转换成数字
+              int i = getNumberBeforeColon(healingTime);
+              return Text(
+                healingTime,
+                style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: (i - 1 == healingTimeIndex)
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                    color: (i - 1 == healingTimeIndex)
+                        ? ThemeData().colorScheme.primary
+                        : Colors.grey),
+              );
+            }).toList(),
+          ),
         ),
         ParagraphBottomListTile(
           title: subTitle,
@@ -445,6 +584,17 @@ class PlanZone extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  int getNumberBeforeColon(String healingTime) {
+    RegExp regex = RegExp(r'(\d+):');
+    Match? match = regex.firstMatch(healingTime);
+    if (match != null && match.groupCount > 0) {
+      String numberString = match.group(1)!;
+      return int.parse(numberString);
+    } else {
+      return 0;
+    }
   }
 
   Future<void> showConfirmationDialog(BuildContext context) async {

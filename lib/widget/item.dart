@@ -34,12 +34,14 @@ class ItemListTile extends StatelessWidget {
   final String title;
   final String subtitle;
   final VoidCallback onTap;
+  final IconData icon;
 
   const ItemListTile({
     super.key,
     required this.title,
     required this.subtitle,
     required this.onTap,
+    required this.icon
   });
 
   @override
@@ -62,10 +64,36 @@ class ItemListTile extends StatelessWidget {
           onPressed: () {
             onTap();
           },
-          icon: Icons.play_arrow,
+          icon: icon,//Icons.play_arrow,
         ),
         onTap: onTap,
       ),
+    );
+  }
+}
+class HealingItemListTile extends StatelessWidget {
+  final Widget child;
+
+  const HealingItemListTile({
+    super.key,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(left: 10, right: 10),
+      padding: const EdgeInsets.only(left: 20,top: 10, bottom: 10),
+      width: MediaQuery.of(context).size.width,
+      decoration: BoxDecoration(
+        border: Border(
+          left: BorderSide(
+              color: ThemeData().colorScheme.primary, width: 3), // 左侧边框
+          right: BorderSide(
+              color: ThemeData().colorScheme.primary, width: 3), // 右侧边框
+        ),
+      ),
+      child: child,
     );
   }
 }

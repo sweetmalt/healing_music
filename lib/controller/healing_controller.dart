@@ -3,14 +3,22 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:healing_music/controller/ctrl.dart';
+import 'package:healing_music/controller/players_controller.dart';
 import 'package:healing_music/widget/wave_chart.dart';
 
 class HealingController extends Ctrl {
   final RxString title = ''.obs;
   final RxString subTitle = ''.obs;
-  final RxBool isMute = false.obs;//是否静音
-  final RxBool isCtrlByDevice = false.obs;
+  final RxString audioTitle = ''.obs;
+  final RxString audioSubTitle = ''.obs;
+  final RxBool isMute = false.obs; //是否静音
+  final RxBool isCtrlByDevice = true.obs;
+  final RxString healingTimeKey = ''.obs;
+  List<Map<String, dynamic>> healingTimeData = [];
+  final RxInt healingTimeIndex = 0.obs;
+  final RxList healingTimeText = [].obs;
   final RxBool isCtrlByPlan = false.obs;
+  final RxBool isPauseCtrlByPlan = false.obs;
   static const eventChannel = EventChannel('top.healingAI.brainlink/receiver');
   StreamSubscription? _streamSubscription;
   final RxString receivedData = "等待设备连接...".obs;
@@ -27,9 +35,20 @@ class HealingController extends Ctrl {
   final RxDouble bciMiddleGamma = 0.0.obs;
   final RxDouble bciTemperature = 0.0.obs;
   final RxDouble bciHeartRate = 0.0.obs;
-  final RxString bciHrv = "0".obs;//hrv数组字符串
+  final RxString bciHrv = "0".obs; //hrv数组字符串
   final RxDouble bciGrind = 0.0.obs;
   final RxDouble bciCurrentTimeMillis = 0.0.obs;
+
+  final HemController hemController = Get.put(HemController());
+  final EnvController envController = Get.put(EnvController());
+  final BgmController bgmController = Get.put(BgmController());
+  final BbmController bbmController = Get.put(BbmController());
+  void _ctrlByDevice(){
+    if(isCtrlByDevice.value){
+      envController.setMaxVol(1);
+    }
+
+  }
 
   final bciAttWaveController = WaveChartController(
     maxDataPoints: 60,
@@ -144,6 +163,7 @@ class HealingController extends Ctrl {
         bciCurrentTimeMillis.value = double.parse(temp[15]);
 
         _showRealData();
+        _ctrlByDevice();
       }
     }, onError: (error) {});
   }
