@@ -21,6 +21,8 @@ class AlbumPage extends StatelessWidget {
 
   void _setTimer(String k, int v) {
     healingController.isCtrlByPlan.value = true;
+    healingController.isPauseCtrlByPlan.value = false;
+    healingController.healingTimeIndex.value = 0;
     healingController.healingTimeKey.value = k;
     healingController.setTimer(v);
     Data dataObj = Data(jsonFileName: "healing.json");

@@ -242,18 +242,16 @@ class HealingPage extends GetView<HealingController> {
                                 color: ThemeData().colorScheme.secondary,
                                 width: 1),
                             borderRadius:
-                                const BorderRadius.all(Radius.circular(20))),
-                        child: Text(healingController.textTimeSeconds.value,
+                                const BorderRadius.all(Radius.circular(5))),
+                        child: Text(
+                            "${healingController.healingTimeKey} - ${healingController.textTimeSeconds.value}",
                             style: TextStyle(
                                 color: ThemeData().colorScheme.secondary,
-                                fontSize: 30,
+                                fontSize: 20,
                                 fontWeight: FontWeight.bold)),
                       ),
                     )
                   : Container()),
-              const SizedBox(
-                height: 1,
-              ),
               Obx(() => healingController.isCtrlByPlan.value
                   ? PlanZone(
                       ctrlByPlan: ctrlByPlan,
