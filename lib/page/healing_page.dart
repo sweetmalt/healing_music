@@ -22,7 +22,9 @@ class HealingPage extends GetView<HealingController> {
   final BbmController bbmController = Get.put(BbmController());
 
   static const Audios _audios = Audios();
-
+  final List<String> currentPlayers = [
+    "",
+  ];
   void onTimerRunning() {
     int usedTimeSeconds = healingController.usedTimeSeconds.value;
     List<Map<String, dynamic>> htd = healingController.healingTimeData;
@@ -32,6 +34,7 @@ class HealingPage extends GetView<HealingController> {
       String interval = htd[i]["interval"] as String;
       Map<String, String> task = Map<String, String>.from(htd[i]["task"]);
       String player = task["player"] ?? "";
+
       //String audio = task["audio"] ?? "";
       String healing = task["healing"] ?? "";
       MyAudioCtrl audioCtrl = envController;
@@ -52,6 +55,7 @@ class HealingPage extends GetView<HealingController> {
       if (usedTimeSeconds == start) {
         healingController.healingTimeIndex.value = i;
         audioCtrl.play();
+        currentPlayers[0] = player;
         ScaffoldMessenger.of(Get.context!).showSnackBar(
           SnackBar(
             content: Text('$interval : $player : $healing'),
@@ -70,7 +74,7 @@ class HealingPage extends GetView<HealingController> {
     ScaffoldMessenger.of(Get.context!).showSnackBar(
       const SnackBar(
         content: Text('结束预编排音疗服务'),
-        duration: Duration(seconds: 3),
+        duration: Duration(seconds: 2),
         backgroundColor: Colors.deepPurple,
       ),
     );
@@ -85,19 +89,35 @@ class HealingPage extends GetView<HealingController> {
   void ctrlByPlan() {
     ScaffoldMessenger.of(Get.context!).showSnackBar(
       const SnackBar(
-        content: Text('开始预编排音疗服务'),
-        duration: Duration(seconds: 3),
+        content: Text('启动预编排音疗服务'),
+        duration: Duration(seconds: 2),
         backgroundColor: Colors.deepPurple,
       ),
     );
     healingController.startTimer(onTimerRunning, onTimerEnd);
+    if (currentPlayers[0].isNotEmpty) {
+      switch (currentPlayers[0]) {
+        case "脑波音频":
+          hemController.play();
+          break;
+        case "生境纯音":
+          envController.play();
+          break;
+        case "经典器乐":
+          bgmController.play();
+          break;
+        case "双耳节拍":
+          bbmController.play();
+          break;
+      }
+    }
   }
 
   void pauseCtrlByPlan() {
     ScaffoldMessenger.of(Get.context!).showSnackBar(
       const SnackBar(
         content: Text('暂停预编排音疗服务'),
-        duration: Duration(seconds: 3),
+        duration: Duration(seconds: 2),
         backgroundColor: Colors.deepPurple,
       ),
     );
@@ -112,11 +132,12 @@ class HealingPage extends GetView<HealingController> {
     ScaffoldMessenger.of(Get.context!).showSnackBar(
       const SnackBar(
         content: Text('退出预编排音疗服务'),
-        duration: Duration(seconds: 3),
+        duration: Duration(seconds: 2),
         backgroundColor: Colors.deepPurple,
       ),
     );
     healingController.clearTimer();
+    currentPlayers[0] = "";
     hemController.stop();
     envController.stop();
     bgmController.stop();
