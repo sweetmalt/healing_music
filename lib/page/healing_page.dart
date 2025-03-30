@@ -214,6 +214,13 @@ class HealingPage extends GetView<HealingController> {
                           onPressed: () {
                             showModalBottomSheet(
                               context: context,
+                              showDragHandle: true,
+                              useRootNavigator: true,
+                              isScrollControlled: true,
+                              constraints: BoxConstraints(
+                                maxHeight:
+                                    MediaQuery.of(context).size.height * 0.6,
+                              ),
                               builder: (context) {
                                 return VolumeView();
                               },

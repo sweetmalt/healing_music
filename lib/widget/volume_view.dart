@@ -38,10 +38,10 @@ class VolumeView extends StatelessWidget {
                       bbmController.setMaxVol(0.001);
                       hemController.setMaxVol(0.001);
                     } else {
-                      bgmController.setMaxVol(0.2);
-                      envController.setMaxVol(0.2);
-                      bbmController.setMaxVol(0.2);
-                      hemController.setMaxVol(0.2);
+                      bgmController.setMaxVol(0.5);
+                      envController.setMaxVol(0.5);
+                      bbmController.setMaxVol(0.5);
+                      hemController.setMaxVol(0.5);
                     }
                   },
                   icon: Obx(() => healingController.isMute.value
@@ -53,7 +53,7 @@ class VolumeView extends StatelessWidget {
                 )),
             Row(
               children: [
-                const Text('BGM'),
+                const Text('脑波音频'),
                 Expanded(
                     child: Obx(() => Slider(
                           value: hemController.maxVol.value,
@@ -69,7 +69,7 @@ class VolumeView extends StatelessWidget {
             ),
             Row(
               children: [
-                const Text('生境'),
+                const Text('生境纯音'),
                 Expanded(
                     child: Obx(() => Slider(
                           value: envController.maxVol.value,
@@ -83,7 +83,7 @@ class VolumeView extends StatelessWidget {
                     Text('${(envController.maxVol.value * 100).toInt()}%')),
               ],
             ),
-            const Text('BGM & 生境均衡器'),
+            const Text('脑波音频 & 生境纯音 均衡器'),
             Container(
               height: 60,
               padding: const EdgeInsets.only(left: 20, right: 20),
@@ -94,7 +94,7 @@ class VolumeView extends StatelessWidget {
               child: Row(
                 children: [
                   Obx(() => Text(
-                      'BGM ${(hemController.maxVol.value / (hemController.maxVol.value + envController.maxVol.value) * 100).toInt()}%')),
+                      '脑波 ${(hemController.maxVol.value / (hemController.maxVol.value + envController.maxVol.value) * 100).toInt()}%')),
                   Expanded(
                       child: Obx(() => Slider(
                             value: hemController.maxVol.value /
@@ -116,7 +116,7 @@ class VolumeView extends StatelessWidget {
             ),
             Row(
               children: [
-                const Text('器乐'),
+                const Text('经典器乐'),
                 Expanded(
                     child: Obx(() => Slider(
                           value: bgmController.maxVol.value,
@@ -132,7 +132,7 @@ class VolumeView extends StatelessWidget {
             ),
             Row(
               children: [
-                const Text('双耳'),
+                const Text('双耳节拍'),
                 Expanded(
                     child: Obx(() => Slider(
                           value: bbmController.maxVol.value,
