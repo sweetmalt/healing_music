@@ -6,7 +6,7 @@ import 'package:just_audio/just_audio.dart';
 class MyAudioCtrl extends GetxController {
   final AudioPlayer player = AudioPlayer();
   final RxString audioTitle = ''.obs;
-  final RxString audioName = 'assets/audio/BGM Piano.MP3'.obs;
+  final RxString audioName = 'assets/audio/40s Birds Songs.MP3'.obs;
   final RxBool isPlaying = false.obs;
   final RxDouble pos = 0.0.obs;
   final RxDouble dur = 1.0.obs;
@@ -14,7 +14,7 @@ class MyAudioCtrl extends GetxController {
       ThemeData().colorScheme.primaryContainer.obs;
   final Rx<Color> valueColor = ThemeData().colorScheme.primary.obs;
   bool permitSwitchColor = false;
-  final RxDouble maxVol = 0.4.obs;
+  final RxDouble maxVol = 0.5.obs;
   double _vol = 1.0;
   final RxInt timeSeconds = 0.obs; //单位：秒
   final RxString timeMinutes = '00:00'.obs; //单位：分钟
