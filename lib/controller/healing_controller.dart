@@ -43,8 +43,9 @@ class HealingController extends Ctrl {
   final EnvController envController = Get.put(EnvController());
   final BgmController bgmController = Get.put(BgmController());
   final BbmController bbmController = Get.put(BbmController());
-  void _ctrlByDevice(){
-    if(isCtrlByDevice.value){
+
+  void _ctrlByDevice() {
+    if (isCtrlByDevice.value) {
       /**
        * 当用户出现瞬时心流状态时（松弛度>80+专注度>80），以20%的音量插播一次10秒颂钵音频，一分钟内不再插播
        * 当用户出现瞬时满分松弛度时（100），以20%的音量插播一次10秒雨棍音频，一分钟内不再插播
@@ -54,9 +55,7 @@ class HealingController extends Ctrl {
        * 专注度>80,会提高音量，每次1%，上限40%
        * 放松度>80,会降低音量，每次1%，下限10%
        */
-
     }
-
   }
 
   final bciAttWaveController = WaveChartController(
@@ -175,11 +174,14 @@ class HealingController extends Ctrl {
         _ctrlByDevice();
       }
     }, onError: (error) {});
+
+
   }
 
   @override
   void onClose() {
     _streamSubscription?.cancel();
     super.onClose();
+
   }
 }

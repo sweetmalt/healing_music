@@ -222,7 +222,7 @@ class HealingPage extends GetView<HealingController> {
                                     MediaQuery.of(context).size.height * 0.6,
                               ),
                               builder: (context) {
-                                return VolumeView();
+                                return const VolumeView();
                               },
                             );
                           },

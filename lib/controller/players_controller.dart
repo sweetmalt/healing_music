@@ -15,13 +15,9 @@ class MyAudioCtrl extends GetxController {
   final Rx<Color> valueColor = ThemeData().colorScheme.primary.obs;
   bool permitSwitchColor = false;
   final RxDouble maxVol = 0.5.obs;
-  double _vol = 1.0;
-  final RxInt timeSeconds = 0.obs; //单位：秒
-  final RxString timeMinutes = '00:00'.obs; //单位：分钟
+  double _vol = 0.5;
+  double _volTemp = 0.5;
   late final StreamSubscription<Duration> _listenerPos;
-
-  // late Timer _timer;
-  // bool _isTimerRunning = false;
 
   setTitle(String title) {
     audioTitle.value = title;
@@ -37,7 +33,6 @@ class MyAudioCtrl extends GetxController {
     await player.setLoopMode(isLoop ? LoopMode.all : LoopMode.off);
     await changeAudio(audio: audio, autoPlay: false, isLoop: isLoop);
     await startListen(isLoop: isLoop);
-    //_listenerPos.pause();
   }
 
   Future<void> startListen({bool isLoop = true}) async {
@@ -49,8 +44,7 @@ class MyAudioCtrl extends GetxController {
           if (p < 0.1) {
             p = 0.1;
           }
-          _vol = p * maxVol.value;
-          player.setVolume(_vol);
+          player.setVolume(p * _vol);
           if (permitSwitchColor) {
             permitSwitchColor = false;
             switchColor();
@@ -60,14 +54,10 @@ class MyAudioCtrl extends GetxController {
           if (p < 0.1) {
             p = 0.1;
           }
-          _vol = p * maxVol.value;
-          player.setVolume(_vol);
+          player.setVolume(p * _vol);
           permitSwitchColor = true;
         } else {
-          if (_vol != maxVol.value) {
-            _vol = maxVol.value;
-            player.setVolume(_vol);
-          }
+          player.setVolume(_vol);
         }
       }
     });
@@ -83,7 +73,6 @@ class MyAudioCtrl extends GetxController {
     }
     audioName.value = audio;
     await player.setAsset(audioName.value);
-    player.setVolume(maxVol.value);
     if (player.duration != null) {
       int durTemp = player.duration!.inMilliseconds;
       if (durTemp > 0) {
@@ -91,69 +80,53 @@ class MyAudioCtrl extends GetxController {
       }
     }
     if (autoPlay) {
+      player.setVolume(_vol);
       play();
     }
   }
 
-  void setMaxVol(double mv) {
-    maxVol.value = mv;
-    _vol = mv;
-    if (isPlaying.value) {
-      player.setVolume(_vol);
+  void setVol(double mv) {
+    if (mv < 0 || mv > 1.0) {
+      return;
     }
+    _vol = mv > maxVol.value ? maxVol.value : mv;
+    player.setVolume(_vol);
+  }
+
+  void setVolMute(bool isMute) {
+    if (isMute) {
+      _volTemp = _vol;
+      setVol(0.01);
+    } else {
+      setVol(_volTemp);
+    }
+  }
+
+  void setMaxVol(double mv) {
+    if (mv < 0 || mv > 1.0) {
+      return;
+    }
+    maxVol.value = mv;
+    setVol(maxVol.value);
   }
 
   void play() {
     isPlaying.value = true;
     player.play();
-    //_listenerPos.resume();
   }
 
   void pause() {
     isPlaying.value = false;
-    //_listenerPos.pause();
     player.pause();
   }
 
   void stop() {
-    // if (_isTimerRunning) {
-    //   _isTimerRunning = false;
-    //   _timer.cancel();
-    //   timeSeconds.value = 0;
-    //   timeMinutes.value = "00:00";
-    // }
     isPlaying.value = false;
-    //_listenerPos.pause();
     player.stop();
   }
 
-  // void setTimer(int secs) {
-  //   if (secs <= 0) {
-  //     return;
-  //   } else {
-  //     timeSeconds.value = secs;
-  //   }
-  //   if (_isTimerRunning) {
-  //     _timer.cancel();
-  //   }
-  //   _isTimerRunning = true;
-  //   int tempSecs = 0;
-  //   const oneSec = Duration(seconds: 1);
-  //   _timer = Timer.periodic(oneSec, (Timer timer) {
-  //     if (timeSeconds.value > 0) {
-  //       tempSecs++;
-  //       timeSeconds.value--;
-  //       timeMinutes.value =
-  //           '${(tempSecs / 60).floor()}:${(tempSecs % 60).toString().padLeft(2, '0')} - ${(timeSeconds.value / 60).floor()}:${(timeSeconds.value % 60).toString().padLeft(2, '0')}';
-  //     } else {
-  //       stop();
-  //     }
-  //   });
-  // }
-
   @override
   void onClose() {
-    //_timer.cancel();
     _listenerPos.cancel();
     player.dispose();
     super.onClose();

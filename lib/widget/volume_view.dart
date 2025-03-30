@@ -2,18 +2,68 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:healing_music/controller/healing_controller.dart';
 import 'package:healing_music/controller/players_controller.dart';
+import 'package:healing_music/data/data.dart';
 
-class VolumeView extends StatelessWidget {
-  final BgmController bgmController = Get.find();
-  final EnvController envController = Get.find();
-  final BbmController bbmController = Get.find();
-  final HemController hemController = Get.find();
+class VolumeView extends StatefulWidget {
+  const VolumeView({super.key});
+
+  @override
+  VolumeViewState createState() => VolumeViewState();
+}
+
+class VolumeViewState extends State<VolumeView> with WidgetsBindingObserver {
+  final HemController hemController = Get.put(HemController());
+  final EnvController envController = Get.put(EnvController());
+  final BgmController bgmController = Get.put(BgmController());
+  final BbmController bbmController = Get.put(BbmController());
 
   final HealingController healingController = Get.find();
+  final Map<String, double> _volumes = {
+    'hem': 0.5,
+    'env': 0.5,
+    'bgm': 0.5,
+    'bbm': 0.5
+  };
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _loadVolumes();
+  }
 
-  VolumeView({
-    super.key,
-  });
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _saveVolumes();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      _saveVolumes();
+    }
+  }
+
+  void _loadVolumes() {
+    Data dataObj = Data(jsonFileName: "volume.json");
+    dataObj.read().then((volumesData) {
+      _volumes['hem'] = volumesData['hem'];
+      _volumes['env'] = volumesData['env'];
+      _volumes['bgm'] = volumesData['bgm'];
+      _volumes['bbm'] = volumesData['bbm'];
+      hemController.setMaxVol(_volumes['hem']!);
+      envController.setMaxVol(_volumes['env']!);
+      bgmController.setMaxVol(_volumes['bgm']!);
+      bbmController.setMaxVol(_volumes['bbm']!);
+    });
+  }
+
+  void _saveVolumes() {
+    Data dataObj = Data(jsonFileName: "volume.json");
+    dataObj.write(_volumes);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -26,29 +76,19 @@ class VolumeView extends StatelessWidget {
           children: [
             ListTile(
                 title:
-                    Text('音量', style: Theme.of(context).textTheme.titleLarge),
-                subtitle: const Text('调节各音乐元素的音量'),
+                    Text('最高音量', style: Theme.of(context).textTheme.titleLarge),
+                subtitle: const Text('限定各音乐元素的最高音量'),
                 trailing: IconButton(
                   onPressed: () {
                     healingController.isMute.value =
                         !healingController.isMute.value;
-                    if (healingController.isMute.value) {
-                      bgmController.setMaxVol(0.001);
-                      envController.setMaxVol(0.001);
-                      bbmController.setMaxVol(0.001);
-                      hemController.setMaxVol(0.001);
-                    } else {
-                      bgmController.setMaxVol(0.5);
-                      envController.setMaxVol(0.5);
-                      bbmController.setMaxVol(0.5);
-                      hemController.setMaxVol(0.5);
-                    }
+                    hemController.setVolMute(healingController.isMute.value);
+                    envController.setVolMute(healingController.isMute.value);
+                    bgmController.setVolMute(healingController.isMute.value);
+                    bbmController.setVolMute(healingController.isMute.value);
                   },
                   icon: Obx(() => healingController.isMute.value
-                      ? const Icon(
-                          Icons.volume_off_sharp,
-                          size: 40,
-                        )
+                      ? const Icon(Icons.volume_off_sharp)
                       : const Icon(Icons.volume_up_sharp)),
                 )),
             Row(
@@ -60,6 +100,7 @@ class VolumeView extends StatelessWidget {
                           min: 0,
                           max: 1,
                           onChanged: (value) {
+                             _volumes['hem'] = value;
                             hemController.setMaxVol(value);
                           },
                         ))),
@@ -76,6 +117,7 @@ class VolumeView extends StatelessWidget {
                           min: 0,
                           max: 1,
                           onChanged: (value) {
+                             _volumes['env'] = value;
                             envController.setMaxVol(value);
                           },
                         ))),
@@ -105,6 +147,8 @@ class VolumeView extends StatelessWidget {
                             activeColor: ThemeData().colorScheme.surface,
                             inactiveColor: ThemeData().colorScheme.surface,
                             onChanged: (value) {
+                              _volumes['hem'] = value;
+                              _volumes['env'] = 1 - value;
                               hemController.setMaxVol(value);
                               envController.setMaxVol(1 - value);
                             },
@@ -123,6 +167,7 @@ class VolumeView extends StatelessWidget {
                           min: 0,
                           max: 1,
                           onChanged: (value) {
+                            _volumes['bgm'] = value;
                             bgmController.setMaxVol(value);
                           },
                         ))),
@@ -139,6 +184,7 @@ class VolumeView extends StatelessWidget {
                           min: 0,
                           max: 1,
                           onChanged: (value) {
+                            _volumes['bbm'] = value;
                             bbmController.setMaxVol(value);
                           },
                         ))),
