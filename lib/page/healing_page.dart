@@ -175,8 +175,14 @@ class HealingPage extends GetView<HealingController> {
                     );
                   },
                   icon: healingController.isCtrlByDevice.value
-                      ? Icons.bluetooth_audio
-                      : Icons.bluetooth,
+                      ? Icons.sensors_rounded
+                      : Icons.sensors_off_rounded,
+                  backgroundColor: healingController.isDeviceLinking.value
+                      ? Colors.green
+                      : ThemeData().colorScheme.primaryContainer,
+                  foregroundColor: healingController.isDeviceLinking.value
+                      ? Colors.white
+                      : ThemeData().colorScheme.primary,
                 ),
               ),
               const SizedBox(

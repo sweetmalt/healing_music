@@ -38,12 +38,14 @@ class CircularButton extends StatelessWidget {
 class CircularIconButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onPressed;
-
-  const CircularIconButton({
-    super.key,
-    required this.icon,
-    required this.onPressed,
-  });
+  final Color? backgroundColor;
+  final Color? foregroundColor;
+  const CircularIconButton(
+      {super.key,
+      required this.icon,
+      required this.onPressed,
+      this.backgroundColor,
+      this.foregroundColor});
 
   @override
   Widget build(BuildContext context) {
@@ -53,8 +55,8 @@ class CircularIconButton extends StatelessWidget {
         shape: const CircleBorder(),
         padding: const EdgeInsets.all(10),
         elevation: 1,
-        backgroundColor: ThemeData().colorScheme.primaryContainer,
-        foregroundColor: ThemeData().colorScheme.primary,
+        backgroundColor: backgroundColor,
+        foregroundColor: foregroundColor,
       ),
       child: Icon(icon),
     );

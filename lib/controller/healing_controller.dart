@@ -13,8 +13,11 @@ class HealingController extends Ctrl {
   final RxString audioSubTitle = ''.obs;
   final RxBool isMute = false.obs; //是否静音
   final RxBool isCtrlByDevice = true.obs;
+  final RxBool isDeviceLinking = true.obs;
+  final List<int> bciCurrentTwoTimeMillis = [0, 0]; //用于判断连接状态
+  late Timer _whileTrue;
   final RxString healingTimeKey = ''.obs;
-  final RxInt healingTimeKeyIndex = 2.obs;//默认选择第三项，45分钟
+  final RxInt healingTimeKeyIndex = 2.obs; //默认选择第三项，45分钟
   List<Map<String, dynamic>> healingTimeData = [];
   final RxInt healingTimeIndex = 0.obs;
   final RxList healingTimeText = [].obs;
@@ -39,12 +42,24 @@ class HealingController extends Ctrl {
   final RxDouble bciHeartRate = 0.0.obs;
   final RxString bciHrv = "0".obs; //hrv数组字符串
   final RxDouble bciGrind = 0.0.obs;
-  final RxDouble bciCurrentTimeMillis = 0.0.obs;
+  final RxInt bciCurrentTimeMillis = 0.obs; //时间戳
 
   final HemController hemController = Get.put(HemController());
   final EnvController envController = Get.put(EnvController());
   final BgmController bgmController = Get.put(BgmController());
   final BbmController bbmController = Get.put(BbmController());
+
+  void _initWhileTrue() {
+    const seconds = Duration(seconds: 3);
+    _whileTrue = Timer.periodic(seconds, (Timer timer) {
+      if (bciCurrentTwoTimeMillis[1] != bciCurrentTwoTimeMillis[0]) {
+        isDeviceLinking.value = true;
+        bciCurrentTwoTimeMillis[0] = bciCurrentTwoTimeMillis[1];
+      } else {
+        isDeviceLinking.value = false;
+      }
+    });
+  }
 
   void _ctrlByDevice() {
     if (isCtrlByDevice.value) {
@@ -151,6 +166,7 @@ class HealingController extends Ctrl {
   @override
   void onInit() {
     super.onInit();
+    _initWhileTrue();
     _streamSubscription = eventChannel.receiveBroadcastStream().listen((data) {
       receivedData.value = data.toString();
       List<String> temp = data.toString().split(',');
@@ -170,8 +186,8 @@ class HealingController extends Ctrl {
         bciHeartRate.value = double.parse(temp[12]);
         bciHrv.value = temp[13];
         bciGrind.value = double.parse(temp[14]);
-        bciCurrentTimeMillis.value = double.parse(temp[15]);
-
+        bciCurrentTimeMillis.value = int.parse(temp[15]);
+        bciCurrentTwoTimeMillis[1] = bciCurrentTimeMillis.value;
         _showRealData();
         _ctrlByDevice();
       }
@@ -181,6 +197,7 @@ class HealingController extends Ctrl {
   @override
   void onClose() {
     _streamSubscription?.cancel();
+    _whileTrue.cancel();
     super.onClose();
   }
 }

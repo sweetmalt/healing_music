@@ -18,6 +18,7 @@ class Ctrl extends GetxController {
     timeSeconds.value = sec;
   }
 
+
   void startTimer(VoidCallback onTimerRunning, VoidCallback onTimerEnd) {
     if (timeSeconds.value <= 0) {
       return;

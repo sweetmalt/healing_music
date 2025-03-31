@@ -22,21 +22,25 @@ class BrainWaveView extends StatelessWidget {
       child: ListView(
         children: [
           ListTile(
-            title: Text('“随意”播放', style: MyStyle.paragraphTitleTextStyle),
+            title: Text('是否让设备参与音乐控制？', style: MyStyle.paragraphTitleTextStyle),
             subtitle: const Text(
-                '是否将疗愈音乐的播放权交给来自脑波设备的个性化数据？具体来说，软件将根据用户的脑波数据变化，实时增减音乐组内的各种元素以及各元素的节奏、音量等，以达到最佳的疗愈效果。例如，当用户逐渐进入睡眠状态时，软件将减少除生境音频外的其他元素、把音量逐步调低至10%以内，反之，则会寻机增添器乐元素，并将音量调高至20%左右。'),
+                '是否将疗愈音乐的播放权交给脑波设备？具体来说，软件将根据用户的脑波数据变化，实时增减音乐组内的各种元素以及各元素的节奏、音量等，以达到最佳的疗愈效果。例如，当用户逐渐进入睡眠状态时，软件将逐步调低音量，反之则调高。'),
             trailing: IconButton(
                 onPressed: () {
                   healingController.isCtrlByDevice.value =
                       !healingController.isCtrlByDevice.value;
                 },
                 icon: Obx(() => healingController.isCtrlByDevice.value
-                    ? const Icon(
-                        Icons.circle,
-                        color: Colors.green,
-                        size: 40,
+                    ? Icon(
+                        Icons.sensors_rounded,
+                        color: healingController.isDeviceLinking.value
+                            ? Colors.green
+                            : ThemeData().colorScheme.primary,
                       )
-                    : const Icon(Icons.menu, color: Colors.grey))),
+                    : Icon(Icons.sensors_off_rounded,
+                        color: healingController.isDeviceLinking.value
+                            ? Colors.green
+                            : ThemeData().colorScheme.primary))),
           ),
           const SizedBox(
             height: 40,
