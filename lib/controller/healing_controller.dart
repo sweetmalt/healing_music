@@ -17,14 +17,14 @@ class HealingController extends Ctrl {
   final RxBool isDeviceLinking = true.obs;
   final List<int> bciCurrentTwoTimeMillis = [0, 0]; //用于判断连接状态
   late Timer _whileTrue;
-  final RxString healingTimeKey = ''.obs;
-  final RxInt healingTimeKeyIndex = 2.obs; //默认选择第三项，45分钟
-  List<Map<String, dynamic>> healingTimeData = [];
-  final RxInt healingTimeIndex = 0.obs;
-  final RxList healingTimeText = [].obs;
-  final RxBool isCtrlByPlan = false.obs;
-  final RxBool isPauseCtrlByPlan = false.obs;
-  final RxBool isShowDetails = false.obs;
+  final RxString healingTimePlanKey = ''.obs;
+  final RxInt healingTimePlanKeyIndex = 2.obs; //默认选择第三项，45分钟
+  List<Map<String, dynamic>> healingTimePlanData = [];
+  final RxInt healingTimePlanIndex = 0.obs;
+  final RxList healingTimePlanTexts = [].obs;
+  final RxBool isCtrlByTimePlan = false.obs;
+  final RxBool isPauseCtrlByTimePlan = false.obs;
+  final RxBool isShowDetails = true.obs;
   static const eventChannel = EventChannel('top.healingAI.brainlink/receiver');
   StreamSubscription? _streamSubscription;
   final RxString receivedData = "等待设备连接...".obs;
@@ -50,11 +50,11 @@ class HealingController extends Ctrl {
   final BgmController bgmController = Get.put(BgmController());
   final BbmController bbmController = Get.put(BbmController());
 
-  Future<void> pipline(String k, int v) async {
-    isCtrlByPlan.value = true;
-    isPauseCtrlByPlan.value = false;
-    healingTimeIndex.value = 0;
-    healingTimeKey.value = k;
+  Future<void> startTimePlan(String k, int v) async {
+    isCtrlByTimePlan.value = true;
+    isPauseCtrlByTimePlan.value = false;
+    healingTimePlanIndex.value = 0;
+    healingTimePlanKey.value = k;
     setTimer(v);
     Data dataObj = Data(jsonFileName: "healing.json");
     dataObj.read().then((healingPlan) {
@@ -74,8 +74,8 @@ class HealingController extends Ctrl {
             String healing = task["healing"] ?? "";
             temp.add("${i + 1}:$interval:$player:$healing");
           }
-          healingTimeText.value = temp;
-          healingTimeData = htd;
+          healingTimePlanTexts.value = temp;
+          healingTimePlanData = htd;
         }
       }
     });

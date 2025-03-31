@@ -81,10 +81,10 @@ class MusicBox extends StatelessWidget {
             healingController.subTitle.value = subTitle;
             healingController.audioTitle.value = audioTitle;
             healingController.audioSubTitle.value = audioSubTitle;
-            await healingController.pipline(
-                _pla[healingController.healingTimeKeyIndex.value][0],
-                _pla[healingController.healingTimeKeyIndex.value][1]);
-                
+            await healingController.startTimePlan(
+                _pla[healingController.healingTimePlanKeyIndex.value][0],
+                _pla[healingController.healingTimePlanKeyIndex.value][1]);
+
             hemController.setTitle(hemTitle);
             await hemController.changeAudio(
                 audio: "assets/audio/$hemAudio.MP3", autoPlay: false);

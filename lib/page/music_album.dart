@@ -68,16 +68,16 @@ class AlbumPage extends StatelessWidget {
                       Obx(() => CircularButton(
                             text: _pla[i][0],
                             icon:
-                                healingController.healingTimeKeyIndex.value == i
+                                healingController.healingTimePlanKeyIndex.value == i
                                     ? Icons.check_box_rounded
                                     : Icons.check_box_outline_blank_rounded,
                             onPressed: () async {
-                              healingController.healingTimeKeyIndex.value = i;
-                              await healingController.pipline(
+                              healingController.healingTimePlanKeyIndex.value = i;
+                              await healingController.startTimePlan(
                                   _pla[healingController
-                                      .healingTimeKeyIndex.value][0],
+                                      .healingTimePlanKeyIndex.value][0],
                                   _pla[healingController
-                                      .healingTimeKeyIndex.value][1]);
+                                      .healingTimePlanKeyIndex.value][1]);
                             },
                           )),
                       const SizedBox(

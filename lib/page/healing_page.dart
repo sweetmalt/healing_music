@@ -25,9 +25,9 @@ class HealingPage extends GetView<HealingController> {
   final List<String> currentPlayers = [
     "",
   ];
-  void onTimerRunning() {
+  void onTimePlanRun() {
     int usedTimeSeconds = healingController.usedTimeSeconds.value;
-    List<Map<String, dynamic>> htd = healingController.healingTimeData;
+    List<Map<String, dynamic>> htd = healingController.healingTimePlanData;
     for (var i = 0; i < htd.length; i++) {
       int start = htd[i]["start"] as int;
       int end = htd[i]["end"] as int;
@@ -53,7 +53,7 @@ class HealingPage extends GetView<HealingController> {
           break;
       }
       if (usedTimeSeconds == start) {
-        healingController.healingTimeIndex.value = i;
+        healingController.healingTimePlanIndex.value = i;
         audioCtrl.play();
         currentPlayers[0] = player;
         ScaffoldMessenger.of(Get.context!).showSnackBar(
@@ -70,7 +70,7 @@ class HealingPage extends GetView<HealingController> {
     }
   }
 
-  void onTimerEnd() {
+  void onTimePlanEnd() {
     ScaffoldMessenger.of(Get.context!).showSnackBar(
       const SnackBar(
         content: Text('结束预编排音疗服务'),
@@ -86,7 +86,7 @@ class HealingPage extends GetView<HealingController> {
     //healingController.isCtrlByPlan.value = false;
   }
 
-  void ctrlByPlan() {
+  void ctrlByTimePlan() {
     ScaffoldMessenger.of(Get.context!).showSnackBar(
       const SnackBar(
         content: Text('启动预编排音疗服务'),
@@ -94,7 +94,7 @@ class HealingPage extends GetView<HealingController> {
         backgroundColor: Colors.deepPurple,
       ),
     );
-    healingController.startTimer(onTimerRunning, onTimerEnd);
+    healingController.startTimer(onTimePlanRun, onTimePlanEnd);
     if (currentPlayers[0].isNotEmpty) {
       switch (currentPlayers[0]) {
         case "脑波音频":
@@ -113,7 +113,7 @@ class HealingPage extends GetView<HealingController> {
     }
   }
 
-  void pauseCtrlByPlan() {
+  void pauseCtrlByTimePlan() {
     ScaffoldMessenger.of(Get.context!).showSnackBar(
       const SnackBar(
         content: Text('暂停预编排音疗服务'),
@@ -128,7 +128,7 @@ class HealingPage extends GetView<HealingController> {
     bbmController.pause();
   }
 
-  void quitCtrlByPlan() {
+  void quitCtrlByTimePlan() {
     ScaffoldMessenger.of(Get.context!).showSnackBar(
       const SnackBar(
         content: Text('退出预编排音疗服务'),
@@ -142,7 +142,7 @@ class HealingPage extends GetView<HealingController> {
     envController.stop();
     bgmController.stop();
     bbmController.stop();
-    healingController.isCtrlByPlan.value = false;
+    healingController.isCtrlByTimePlan.value = false;
   }
 
   @override
@@ -242,7 +242,7 @@ class HealingPage extends GetView<HealingController> {
               const SizedBox(
                 height: 10,
               ),
-              Obx(() => healingController.isCtrlByPlan.value
+              Obx(() => healingController.isCtrlByTimePlan.value
                   ? IntrinsicWidth(
                       child: Container(
                         height: 40,
@@ -257,7 +257,7 @@ class HealingPage extends GetView<HealingController> {
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(5))),
                         child: Text(
-                            "${healingController.healingTimeKey} - ${healingController.textTimeSeconds.value}",
+                            "${healingController.healingTimePlanKey} - ${healingController.textTimeSeconds.value}",
                             style: TextStyle(
                                 color: ThemeData().colorScheme.secondary,
                                 fontSize: 20,
@@ -265,11 +265,11 @@ class HealingPage extends GetView<HealingController> {
                       ),
                     )
                   : Container()),
-              Obx(() => healingController.isCtrlByPlan.value
+              Obx(() => healingController.isCtrlByTimePlan.value
                   ? PlanZone(
-                      ctrlByPlan: ctrlByPlan,
-                      pauseCtrlByPlan: pauseCtrlByPlan,
-                      quitCtrlByPlan: quitCtrlByPlan,
+                      ctrlByTimePlan: ctrlByTimePlan,
+                      pauseCtrlByTimePlan: pauseCtrlByTimePlan,
+                      quitCtrlByTimePlan: quitCtrlByTimePlan,
                       title: healingController.title.value,
                       subTitle: healingController.subTitle.value,
                       audioTitle: healingController.audioTitle.value,
@@ -284,9 +284,9 @@ class HealingPage extends GetView<HealingController> {
                           ? Icons.keyboard_double_arrow_up
                           : Icons.keyboard_double_arrow_down,
                       healingTimeText:
-                          healingController.healingTimeText.toList(),
+                          healingController.healingTimePlanTexts.toList(),
                       healingTimeIndex:
-                          healingController.healingTimeIndex.value,
+                          healingController.healingTimePlanIndex.value,
                     )
                   : Container()),
               const SizedBox(height: 10),
@@ -552,9 +552,9 @@ class ToolsRow extends StatelessWidget {
 }
 
 class PlanZone extends StatelessWidget {
-  final VoidCallback ctrlByPlan;
-  final VoidCallback pauseCtrlByPlan;
-  final VoidCallback quitCtrlByPlan;
+  final VoidCallback ctrlByTimePlan;
+  final VoidCallback pauseCtrlByTimePlan;
+  final VoidCallback quitCtrlByTimePlan;
   final String title;
   final String subTitle;
   final String audioTitle;
@@ -567,9 +567,9 @@ class PlanZone extends StatelessWidget {
   final IconData leadingIcon;
   const PlanZone(
       {super.key,
-      required this.ctrlByPlan,
-      required this.pauseCtrlByPlan,
-      required this.quitCtrlByPlan,
+      required this.ctrlByTimePlan,
+      required this.pauseCtrlByTimePlan,
+      required this.quitCtrlByTimePlan,
       required this.title,
       required this.subTitle,
       required this.audioTitle,
@@ -601,9 +601,9 @@ class PlanZone extends StatelessWidget {
                 icon: isTimerRunning ? Icons.pause : Icons.play_arrow,
                 onTap: () async {
                   if (isTimerRunning) {
-                    pauseCtrlByPlan();
+                    pauseCtrlByTimePlan();
                   } else {
-                    ctrlByPlan();
+                    ctrlByTimePlan();
                   }
                 },
               )
@@ -677,7 +677,7 @@ class PlanZone extends StatelessWidget {
               child: const Text('确认'),
               onPressed: () {
                 // 在这里执行确认后的操作
-                quitCtrlByPlan();
+                quitCtrlByTimePlan();
                 Navigator.of(context).pop(); // 关闭对话框
               },
             ),
