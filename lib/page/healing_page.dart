@@ -269,6 +269,14 @@ class HealingPage extends GetView<HealingController> {
                       audioTitle: healingController.audioTitle.value,
                       audioSubTitle: healingController.audioSubTitle.value,
                       isTimerRunning: healingController.isTimerRunning.value,
+                      isShowDetails: healingController.isShowDetails.value,
+                      onLeadingTap: () => {
+                        healingController.isShowDetails.value =
+                            !healingController.isShowDetails.value
+                      },
+                      leadingIcon: healingController.isShowDetails.value
+                          ? Icons.keyboard_double_arrow_up
+                          : Icons.keyboard_double_arrow_down,
                       healingTimeText:
                           healingController.healingTimeText.toList(),
                       healingTimeIndex:
@@ -548,6 +556,9 @@ class PlanZone extends StatelessWidget {
   final List healingTimeText;
   final int healingTimeIndex;
   final bool isTimerRunning;
+  final bool isShowDetails;
+  final VoidCallback onLeadingTap;
+  final IconData leadingIcon;
   const PlanZone(
       {super.key,
       required this.ctrlByPlan,
@@ -557,57 +568,68 @@ class PlanZone extends StatelessWidget {
       required this.subTitle,
       required this.audioTitle,
       required this.audioSubTitle,
-      required this.isTimerRunning,
+      required this.healingTimeText,
       required this.healingTimeIndex,
-      required this.healingTimeText});
+      required this.isTimerRunning,
+      required this.isShowDetails,
+      required this.onLeadingTap,
+      required this.leadingIcon});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         ParagraphListTile(
+          onLeadingTap: onLeadingTap,
+          leadingIcon: leadingIcon,
           title: title,
           icon: Icons.close,
           onTap: () {
             showConfirmationDialog(context);
           },
         ),
-        ItemListTile(
-          title: audioTitle,
-          subtitle: audioSubTitle,
-          icon: isTimerRunning ? Icons.pause : Icons.play_arrow,
-          onTap: () async {
-            if (isTimerRunning) {
-              pauseCtrlByPlan();
-            } else {
-              ctrlByPlan();
-            }
-          },
-        ),
-        HealingItemListTile(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: healingTimeText.map((healingTime) {
-              //取字符串healingTime内第一个冒号前的数字子串,并转换成数字
-              int i = getNumberBeforeColon(healingTime);
-              return Text(
-                healingTime,
-                style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: (i - 1 == healingTimeIndex)
-                        ? FontWeight.bold
-                        : FontWeight.normal,
-                    color: (i - 1 == healingTimeIndex)
-                        ? ThemeData().colorScheme.primary
-                        : Colors.grey),
-              );
-            }).toList(),
-          ),
-        ),
-        ParagraphBottomListTile(
-          title: subTitle,
-          onTap: () {},
-        ),
+        isShowDetails
+            ? ItemListTile(
+                title: audioTitle,
+                subtitle: audioSubTitle,
+                icon: isTimerRunning ? Icons.pause : Icons.play_arrow,
+                onTap: () async {
+                  if (isTimerRunning) {
+                    pauseCtrlByPlan();
+                  } else {
+                    ctrlByPlan();
+                  }
+                },
+              )
+            : Container(),
+        isShowDetails
+            ? HealingItemListTile(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: healingTimeText.map((healingTime) {
+                    //取字符串healingTime内第一个冒号前的数字子串,并转换成数字
+                    int i = getNumberBeforeColon(healingTime);
+                    return Text(
+                      healingTime,
+                      style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: (i - 1 == healingTimeIndex)
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                          color: (i - 1 == healingTimeIndex)
+                              ? ThemeData().colorScheme.primary
+                              : Colors.grey),
+                    );
+                  }).toList(),
+                ),
+              )
+            : Container(),
+        isShowDetails
+            ? ParagraphBottomListTile(
+                title: subTitle,
+                onTap: () {},
+              )
+            : Container(),
       ],
     );
   }

@@ -14,11 +14,13 @@ class HealingController extends Ctrl {
   final RxBool isMute = false.obs; //是否静音
   final RxBool isCtrlByDevice = true.obs;
   final RxString healingTimeKey = ''.obs;
+  final RxInt healingTimeKeyIndex = 2.obs;//默认选择第三项，45分钟
   List<Map<String, dynamic>> healingTimeData = [];
   final RxInt healingTimeIndex = 0.obs;
   final RxList healingTimeText = [].obs;
   final RxBool isCtrlByPlan = false.obs;
   final RxBool isPauseCtrlByPlan = false.obs;
+  final RxBool isShowDetails = false.obs;
   static const eventChannel = EventChannel('top.healingAI.brainlink/receiver');
   StreamSubscription? _streamSubscription;
   final RxString receivedData = "等待设备连接...".obs;
@@ -174,14 +176,11 @@ class HealingController extends Ctrl {
         _ctrlByDevice();
       }
     }, onError: (error) {});
-
-
   }
 
   @override
   void onClose() {
     _streamSubscription?.cancel();
     super.onClose();
-
   }
 }

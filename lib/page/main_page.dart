@@ -7,6 +7,7 @@ import 'package:healing_music/page/music_page.dart';
 import 'package:healing_music/page/healing_page.dart';
 import 'package:healing_music/page/depot_page.dart';
 import 'package:healing_music/widget/app_bar_title.dart';
+import 'package:healing_music/widget/circular_button.dart';
 
 class MainPage extends StatelessWidget {
   const MainPage({super.key});
@@ -20,19 +21,16 @@ class MainPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 40,
+        toolbarHeight: 50,
         title: AppBarTitle('AI音疗 HealingMusic'),
         centerTitle: true,
         shadowColor: ThemeData().colorScheme.primary,
         leading: IconButton(onPressed: () => {}, icon: const Icon(Icons.menu)),
         actions: [
-          CloseButton(
-            onPressed: () => SystemNavigator.pop(),
-            style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all(
-                  ThemeData().colorScheme.primaryContainer),
-            ),
-          )
+          CircularIconButton(
+            onPressed: () => {showConfirmationDialog(context)},
+            icon: Icons.logout, //Icons.play_arrow,
+          ),
         ],
       ),
       body: GetX<MainController>(
@@ -49,6 +47,39 @@ class MainPage extends StatelessWidget {
         },
       ),
       bottomNavigationBar: BottomNavigationBarWidget(),
+    );
+  }
+
+  Future<void> showConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // 用户必须点击按钮才能关闭对话框
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('退出程序'),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('您确定要执行此操作吗？'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('取消'),
+              onPressed: () {
+                Navigator.of(context).pop(); // 关闭对话框
+              },
+            ),
+            TextButton(
+              child: const Text('确认'),
+              onPressed: () {
+                SystemNavigator.pop(); // 退出程序
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -19,7 +19,7 @@ class AlbumPage extends StatelessWidget {
   final List<List> _pla = _audios.pla;
   AlbumPage({super.key});
 
-  void _setTimer(String k, int v) {
+  Future<void> _setTimer(String k, int v) async {
     healingController.isCtrlByPlan.value = true;
     healingController.isPauseCtrlByPlan.value = false;
     healingController.healingTimeIndex.value = 0;
@@ -42,16 +42,13 @@ class AlbumPage extends StatelessWidget {
             String player = task["player"] ?? "";
             //String audio = task["audio"] ?? "";
             String healing = task["healing"] ?? "";
-            temp.add("${i+1}:$interval:$player:$healing");
+            temp.add("${i + 1}:$interval:$player:$healing");
           }
           healingController.healingTimeText.value = temp;
           healingController.healingTimeData = htd;
         }
       }
     });
-
-    mainController.changePage(1);
-    Get.back();
   }
 
   @override
@@ -99,13 +96,21 @@ class AlbumPage extends StatelessWidget {
                 for (int i = 0; i < _pla.length; i++)
                   Column(
                     children: [
-                      CircularButton(
-                        text: _pla[i][0],
-                        icon: Icons.timer,
-                        onPressed: () async {
-                          _setTimer(_pla[i][0], _pla[i][1]);
-                        },
-                      ),
+                      Obx(() => CircularButton(
+                            text: _pla[i][0],
+                            icon:
+                                healingController.healingTimeKeyIndex.value == i
+                                    ? Icons.check_box_rounded
+                                    : Icons.check_box_outline_blank_rounded,
+                            onPressed: () async {
+                              healingController.healingTimeKeyIndex.value = i;
+                              await _setTimer(
+                                  _pla[healingController
+                                      .healingTimeKeyIndex.value][0],
+                                  _pla[healingController
+                                      .healingTimeKeyIndex.value][1]);
+                            },
+                          )),
                       const SizedBox(
                         height: 20,
                       )
@@ -130,7 +135,7 @@ class AlbumPage extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
-                                Icons.turn_left_rounded,
+                                Icons.navigate_before_rounded,
                                 size: 20,
                                 color: ThemeData().colorScheme.primary,
                               ),
@@ -141,6 +146,35 @@ class AlbumPage extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                   color: ThemeData().colorScheme.primary,
                                 ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                ThemeData().colorScheme.primaryContainer,
+                            foregroundColor: ThemeData().colorScheme.primary,
+                          ),
+                          onPressed: () {
+                            mainController.changePage(1);
+                            Get.back(closeOverlays: true);
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                '确定',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: ThemeData().colorScheme.primary,
+                                ),
+                              ),
+                              Icon(
+                                Icons.navigate_next_rounded,
+                                size: 20,
+                                color: ThemeData().colorScheme.primary,
                               ),
                             ],
                           ),

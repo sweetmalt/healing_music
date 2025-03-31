@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:healing_music/style/style.dart';
 
 class ParagraphBottomTitle extends Text {
+
   ParagraphBottomTitle(super.data, {super.key})
       : super(
           style: MyStyle.paragraphBottomTitleTextStyle,

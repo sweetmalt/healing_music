@@ -12,7 +12,7 @@ class MainController extends GetxController {
 
   int currentLogTime = DateTime.now().millisecondsSinceEpoch;
 
-  void changePage(int index) {
+  void  changePage(int index)  {
     currentIndex.value = index;
   }
 

@@ -9,12 +9,16 @@ class ParagraphTitle extends Text {
 }
 
 class ParagraphListTile extends StatelessWidget {
+  final VoidCallback? onLeadingTap;
+  final IconData? leadingIcon;
   final String title;
   final VoidCallback onTap;
   final IconData? icon;
 
   const ParagraphListTile({
     super.key,
+    this.onLeadingTap,
+    this.leadingIcon,
     required this.title,
     required this.onTap,
     this.icon,
@@ -40,12 +44,22 @@ class ParagraphListTile extends StatelessWidget {
         ),
       ),
       child: ListTile(
+        leading: IconButton(
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            onPressed: onLeadingTap,
+            icon: Icon(
+              leadingIcon,
+              size: 15,
+            )),
         title: ParagraphTitle(title),
-        trailing: Icon(
-          icon,//Icons.attach_file,
-          size: 15,
+        trailing: IconButton(
+          onPressed: onTap,
+          icon: Icon(
+            icon,
+            size: 15,
+          ), //Icons.attach_file,
         ),
-        onTap: onTap,
       ),
     );
   }

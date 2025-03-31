@@ -8,8 +8,8 @@ class FacePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //5秒钟后，返回主界面
-    Future.delayed(const Duration(seconds: 5), () {
+    //3秒钟后，返回主界面
+    Future.delayed(const Duration(seconds: 3), () {
       Get.back();
     });
     return Scaffold(
