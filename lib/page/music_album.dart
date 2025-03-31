@@ -4,7 +4,6 @@ import 'package:healing_music/controller/healing_controller.dart';
 import 'package:healing_music/controller/main_controller.dart';
 import 'package:healing_music/controller/players_controller.dart';
 import 'package:healing_music/data/audios.dart';
-import 'package:healing_music/data/data.dart';
 import 'package:healing_music/widget/circular_button.dart';
 import 'package:healing_music/widget/page_title.dart';
 
@@ -19,37 +18,7 @@ class AlbumPage extends StatelessWidget {
   final List<List> _pla = _audios.pla;
   AlbumPage({super.key});
 
-  Future<void> _setTimer(String k, int v) async {
-    healingController.isCtrlByPlan.value = true;
-    healingController.isPauseCtrlByPlan.value = false;
-    healingController.healingTimeIndex.value = 0;
-    healingController.healingTimeKey.value = k;
-    healingController.setTimer(v);
-    Data dataObj = Data(jsonFileName: "healing.json");
-    dataObj.read().then((healingPlan) {
-      if (k != "") {
-        var healingTimeData = healingPlan[k];
-        if (healingTimeData is List) {
-          List<Map<String, dynamic>> htd = healingTimeData
-              .map((item) => Map<String, dynamic>.from(item))
-              .toList();
-          List temp = [];
-          for (var i = 0; i < htd.length; i++) {
-            //int start = htd[i]["start"] as int;
-            //int end = htd[i]["end"] as int;
-            String interval = htd[i]["interval"] as String;
-            Map<String, String> task = Map<String, String>.from(htd[i]["task"]);
-            String player = task["player"] ?? "";
-            //String audio = task["audio"] ?? "";
-            String healing = task["healing"] ?? "";
-            temp.add("${i + 1}:$interval:$player:$healing");
-          }
-          healingController.healingTimeText.value = temp;
-          healingController.healingTimeData = htd;
-        }
-      }
-    });
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +73,7 @@ class AlbumPage extends StatelessWidget {
                                     : Icons.check_box_outline_blank_rounded,
                             onPressed: () async {
                               healingController.healingTimeKeyIndex.value = i;
-                              await _setTimer(
+                              await healingController.pipline(
                                   _pla[healingController
                                       .healingTimeKeyIndex.value][0],
                                   _pla[healingController

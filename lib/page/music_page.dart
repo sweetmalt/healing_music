@@ -38,6 +38,7 @@ class MusicPage extends StatelessWidget {
 }
 
 const Audios _audios = Audios();
+final List<List> _pla = _audios.pla;
 
 class MusicBox extends StatelessWidget {
   final int index;
@@ -80,6 +81,10 @@ class MusicBox extends StatelessWidget {
             healingController.subTitle.value = subTitle;
             healingController.audioTitle.value = audioTitle;
             healingController.audioSubTitle.value = audioSubTitle;
+            await healingController.pipline(
+                _pla[healingController.healingTimeKeyIndex.value][0],
+                _pla[healingController.healingTimeKeyIndex.value][1]);
+                
             hemController.setTitle(hemTitle);
             await hemController.changeAudio(
                 audio: "assets/audio/$hemAudio.MP3", autoPlay: false);

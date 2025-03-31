@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:healing_music/controller/ctrl.dart';
 import 'package:healing_music/controller/players_controller.dart';
+import 'package:healing_music/data/data.dart';
 import 'package:healing_music/widget/wave_chart.dart';
 
 class HealingController extends Ctrl {
@@ -48,6 +49,37 @@ class HealingController extends Ctrl {
   final EnvController envController = Get.put(EnvController());
   final BgmController bgmController = Get.put(BgmController());
   final BbmController bbmController = Get.put(BbmController());
+
+  Future<void> pipline(String k, int v) async {
+    isCtrlByPlan.value = true;
+    isPauseCtrlByPlan.value = false;
+    healingTimeIndex.value = 0;
+    healingTimeKey.value = k;
+    setTimer(v);
+    Data dataObj = Data(jsonFileName: "healing.json");
+    dataObj.read().then((healingPlan) {
+      if (k != "") {
+        var pplData = healingPlan[k];
+        if (pplData is List) {
+          List<Map<String, dynamic>> htd =
+              pplData.map((item) => Map<String, dynamic>.from(item)).toList();
+          List temp = [];
+          for (var i = 0; i < htd.length; i++) {
+            //int start = htd[i]["start"] as int;
+            //int end = htd[i]["end"] as int;
+            String interval = htd[i]["interval"] as String;
+            Map<String, String> task = Map<String, String>.from(htd[i]["task"]);
+            String player = task["player"] ?? "";
+            //String audio = task["audio"] ?? "";
+            String healing = task["healing"] ?? "";
+            temp.add("${i + 1}:$interval:$player:$healing");
+          }
+          healingTimeText.value = temp;
+          healingTimeData = htd;
+        }
+      }
+    });
+  }
 
   void _initWhileTrue() {
     const seconds = Duration(seconds: 3);
