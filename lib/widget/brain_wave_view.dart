@@ -24,7 +24,7 @@ class BrainWaveView extends StatelessWidget {
           ListTile(
             title: Text('是否让设备参与音乐控制？', style: MyStyle.paragraphTitleTextStyle),
             subtitle: const Text(
-                '是否将疗愈音乐的播放权交给脑波设备？具体来说，软件将根据用户的脑波数据变化，实时调节音乐组内各元素的编排、节奏、音量等，以达到最佳疗愈效果。例如，当用户逐渐进入睡眠状态时，软件将逐步调低音量，反之则调高。'),
+                '是否将疗愈音乐的播放控制权交给脑波设备？具体来说，软件将根据用户的脑波数据变化，实时调节音乐组内各元素的编排、节奏、音量等，以达到最佳疗愈效果。例如，当用户逐渐进入睡眠状态时，软件将逐步调低音量，反之则调高。'),
             trailing: IconButton(
                 onPressed: () {
                   healingController.isCtrlByDevice.value =
