@@ -10,7 +10,6 @@ class BrainWaveView extends StatelessWidget {
   });
 
   final HealingController healingController = Get.find();
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -53,11 +52,125 @@ class BrainWaveView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(50),
                   ),
                   child: CircularProgressIndicator(
-                    backgroundColor: Colors.grey[200],
+                    backgroundColor: Colors.grey[300],
                     valueColor: AlwaysStoppedAnimation<Color>(
-                        ThemeData().colorScheme.primaryContainer),
+                        ThemeData().colorScheme.primary),
+                    value: healingController.curRelax.value / 100,
+                    strokeWidth: 20,
+                  ),
+                ),
+                Text(
+                  '${healingController.curRelax.value.toInt()}%',
+                  style: const TextStyle(fontSize: 24),
+                ),
+              ])),
+          ListTile(
+            title: Text(_dataDoc['curRelax']?['title'] ?? '',
+                style: MyStyle.paragraphTitleTextStyle),
+            subtitle: Obx(
+              () => _showShortDoc.value
+                  ? Text(_dataDoc['curRelax']?['short'] ?? '')
+                  : Text(_dataDoc['curRelax']?['long'] ?? ''),
+            ),
+            trailing: Obx(() => _showShortDocIconButton()),
+          ),
+          WaveChart(
+            controller: healingController.curRelaxWaveController,
+            lineColor: ThemeData().colorScheme.primary,
+            lineWidth: 3,
+          ),
+          const SizedBox(
+            height: 40,
+          ),
+          Obx(() => Stack(alignment: Alignment.center, children: [
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  child: CircularProgressIndicator(
+                    backgroundColor: Colors.grey[300],
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                        ThemeData().colorScheme.primary),
+                    value: healingController.curSharp.value / 100,
+                    strokeWidth: 20,
+                  ),
+                ),
+                Text(
+                  '${healingController.curSharp.value.toInt()}%',
+                  style: const TextStyle(fontSize: 24),
+                ),
+              ])),
+          ListTile(
+            title: Text(_dataDoc['curSharp']?['title'] ?? '',
+                style: MyStyle.paragraphTitleTextStyle),
+            subtitle: Obx(
+              () => _showShortDoc.value
+                  ? Text(_dataDoc['curSharp']?['short'] ?? '')
+                  : Text(_dataDoc['curSharp']?['long'] ?? ''),
+            ),
+            trailing: Obx(() => _showShortDocIconButton()),
+          ),
+          WaveChart(
+            controller: healingController.curSharpWaveController,
+            lineColor: ThemeData().colorScheme.primary,
+            lineWidth: 3,
+          ),
+          const SizedBox(
+            height: 40,
+          ),
+          Obx(() => Stack(alignment: Alignment.center, children: [
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  child: CircularProgressIndicator(
+                    backgroundColor: Colors.grey[300],
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                        ThemeData().colorScheme.primary),
+                    value: healingController.curFlow.value / 100,
+                    strokeWidth: 20,
+                  ),
+                ),
+                Text(
+                  '${healingController.curFlow.value.toInt()}%',
+                  style: const TextStyle(fontSize: 24),
+                ),
+              ])),
+          ListTile(
+            title: Text(_dataDoc['curFlow']?['title'] ?? '',
+                style: MyStyle.paragraphTitleTextStyle),
+            subtitle: Obx(
+              () => _showShortDoc.value
+                  ? Text(_dataDoc['curFlow']?['short'] ?? '')
+                  : Text(_dataDoc['curFlow']?['long'] ?? ''),
+            ),
+            trailing: Obx(() => _showShortDocIconButton()),
+          ),
+          WaveChart(
+            controller: healingController.curFlowWaveController,
+            lineColor: ThemeData().colorScheme.primary,
+            lineWidth: 3,
+          ),
+          const SizedBox(
+            height: 40,
+          ),
+          Obx(() => Stack(alignment: Alignment.center, children: [
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  child: CircularProgressIndicator(
+                    backgroundColor: Colors.grey[300],
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                        ThemeData().colorScheme.primary),
                     value: healingController.bciAtt.value / 100,
-                    strokeWidth: 40,
+                    strokeWidth: 20,
                   ),
                 ),
                 Text(
@@ -73,11 +186,7 @@ class BrainWaveView extends StatelessWidget {
                   ? Text(_dataDoc['bciAtt']?['short'] ?? '')
                   : Text(_dataDoc['bciAtt']?['long'] ?? ''),
             ),
-            trailing: IconButton(
-                onPressed: () {
-                  _showShortDoc.value = !_showShortDoc.value;
-                },
-                icon: const Icon(Icons.monitor_heart)),
+            trailing: Obx(() => _showShortDocIconButton()),
           ),
           WaveChart(
             controller: healingController.bciAttWaveController,
@@ -95,11 +204,11 @@ class BrainWaveView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(50),
                   ),
                   child: CircularProgressIndicator(
-                    backgroundColor: Colors.grey[200],
+                    backgroundColor: Colors.grey[300],
                     valueColor: AlwaysStoppedAnimation<Color>(
-                        ThemeData().colorScheme.primaryContainer),
+                        ThemeData().colorScheme.primary),
                     value: healingController.bciMed.value / 100,
-                    strokeWidth: 40,
+                    strokeWidth: 20,
                   ),
                 ),
                 Text(
@@ -115,11 +224,7 @@ class BrainWaveView extends StatelessWidget {
                   ? Text(_dataDoc['bciMed']?['short'] ?? '')
                   : Text(_dataDoc['bciMed']?['long'] ?? ''),
             ),
-            trailing: IconButton(
-                onPressed: () {
-                  _showShortDoc.value = !_showShortDoc.value;
-                },
-                icon: const Icon(Icons.monitor_heart)),
+            trailing: Obx(() => _showShortDocIconButton()),
           ),
           WaveChart(
             controller: healingController.bciMedWaveController,
@@ -129,6 +234,26 @@ class BrainWaveView extends StatelessWidget {
           const SizedBox(
             height: 40,
           ),
+          Obx(() => Stack(alignment: Alignment.center, children: [
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  child: CircularProgressIndicator(
+                    backgroundColor: Colors.grey[300],
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                        ThemeData().colorScheme.primary),
+                    value: healingController.bciAp.value / 4,
+                    strokeWidth: 20,
+                  ),
+                ),
+                Text(
+                  '${_dataDoc['bciAp']?['state']?.split(",")[healingController.bciAp.value.toInt()]}',
+                  style: const TextStyle(fontSize: 24),
+                ),
+              ])),
           ListTile(
             title: Text(_dataDoc['bciAp']?['title'] ?? '',
                 style: MyStyle.paragraphTitleTextStyle),
@@ -137,11 +262,7 @@ class BrainWaveView extends StatelessWidget {
                   ? Text(_dataDoc['bciAp']?['short'] ?? '')
                   : Text(_dataDoc['bciAp']?['long'] ?? ''),
             ),
-            trailing: IconButton(
-                onPressed: () {
-                  _showShortDoc.value = !_showShortDoc.value;
-                },
-                icon: const Icon(Icons.monitor_heart)),
+            trailing: Obx(() => _showShortDocIconButton()),
           ),
           WaveChart(
             controller: healingController.bciApWaveController,
@@ -163,11 +284,7 @@ class BrainWaveView extends StatelessWidget {
                   ? Text(_dataDoc['bciDelta']?['short'] ?? '')
                   : Text(_dataDoc['bciDelta']?['long'] ?? ''),
             ),
-            trailing: IconButton(
-                onPressed: () {
-                  _showShortDoc.value = !_showShortDoc.value;
-                },
-                icon: const Icon(Icons.monitor_heart)),
+            trailing: Obx(() => _showShortDocIconButton()),
           ),
           WaveChart(
             controller: healingController.bciDeltaWaveController,
@@ -185,11 +302,7 @@ class BrainWaveView extends StatelessWidget {
                   ? Text(_dataDoc['bciTheta']?['short'] ?? '')
                   : Text(_dataDoc['bciTheta']?['long'] ?? ''),
             ),
-            trailing: IconButton(
-                onPressed: () {
-                  _showShortDoc.value = !_showShortDoc.value;
-                },
-                icon: const Icon(Icons.monitor_heart)),
+            trailing: Obx(() => _showShortDocIconButton()),
           ),
           WaveChart(
             controller: healingController.bciThetaWaveController,
@@ -207,11 +320,7 @@ class BrainWaveView extends StatelessWidget {
                   ? Text(_dataDoc['bciLowAlpha']?['short'] ?? '')
                   : Text(_dataDoc['bciLowAlpha']?['long'] ?? ''),
             ),
-            trailing: IconButton(
-                onPressed: () {
-                  _showShortDoc.value = !_showShortDoc.value;
-                },
-                icon: const Icon(Icons.monitor_heart)),
+            trailing: Obx(() => _showShortDocIconButton()),
           ),
           WaveChart(
             controller: healingController.bciLowAlphaWaveController,
@@ -229,11 +338,7 @@ class BrainWaveView extends StatelessWidget {
                   ? Text(_dataDoc['bciHighAlpha']?['short'] ?? '')
                   : Text(_dataDoc['bciHighAlpha']?['long'] ?? ''),
             ),
-            trailing: IconButton(
-                onPressed: () {
-                  _showShortDoc.value = !_showShortDoc.value;
-                },
-                icon: const Icon(Icons.monitor_heart)),
+            trailing: Obx(() => _showShortDocIconButton()),
           ),
           WaveChart(
             controller: healingController.bciHighAlphaWaveController,
@@ -251,11 +356,7 @@ class BrainWaveView extends StatelessWidget {
                   ? Text(_dataDoc['bciLowBeta']?['short'] ?? '')
                   : Text(_dataDoc['bciLowBeta']?['long'] ?? ''),
             ),
-            trailing: IconButton(
-                onPressed: () {
-                  _showShortDoc.value = !_showShortDoc.value;
-                },
-                icon: const Icon(Icons.monitor_heart)),
+            trailing: Obx(() => _showShortDocIconButton()),
           ),
           WaveChart(
             controller: healingController.bciLowBetaWaveController,
@@ -273,11 +374,7 @@ class BrainWaveView extends StatelessWidget {
                   ? Text(_dataDoc['bciHighBeta']?['short'] ?? '')
                   : Text(_dataDoc['bciHighBeta']?['long'] ?? ''),
             ),
-            trailing: IconButton(
-                onPressed: () {
-                  _showShortDoc.value = !_showShortDoc.value;
-                },
-                icon: const Icon(Icons.monitor_heart)),
+            trailing: Obx(() => _showShortDocIconButton()),
           ),
           WaveChart(
             controller: healingController.bciHighBetaWaveController,
@@ -295,11 +392,7 @@ class BrainWaveView extends StatelessWidget {
                   ? Text(_dataDoc['bciLowGamma']?['short'] ?? '')
                   : Text(_dataDoc['bciLowGamma']?['long'] ?? ''),
             ),
-            trailing: IconButton(
-                onPressed: () {
-                  _showShortDoc.value = !_showShortDoc.value;
-                },
-                icon: const Icon(Icons.monitor_heart)),
+            trailing: Obx(() => _showShortDocIconButton()),
           ),
           WaveChart(
             controller: healingController.bciLowGammaWaveController,
@@ -317,11 +410,7 @@ class BrainWaveView extends StatelessWidget {
                   ? Text(_dataDoc['bciMiddleGamma']?['short'] ?? '')
                   : Text(_dataDoc['bciMiddleGamma']?['long'] ?? ''),
             ),
-            trailing: IconButton(
-                onPressed: () {
-                  _showShortDoc.value = !_showShortDoc.value;
-                },
-                icon: const Icon(Icons.monitor_heart)),
+            trailing: Obx(() => _showShortDocIconButton()),
           ),
           WaveChart(
             controller: healingController.bciMiddleGammaWaveController,
@@ -339,11 +428,7 @@ class BrainWaveView extends StatelessWidget {
                   ? Text(_dataDoc['bciTemperature']?['short'] ?? '')
                   : Text(_dataDoc['bciTemperature']?['long'] ?? ''),
             ),
-            trailing: IconButton(
-                onPressed: () {
-                  _showShortDoc.value = !_showShortDoc.value;
-                },
-                icon: const Icon(Icons.monitor_heart)),
+            trailing: Obx(() => _showShortDocIconButton()),
           ),
           WaveChart(
             controller: healingController.bciTemperatureWaveController,
@@ -361,16 +446,15 @@ class BrainWaveView extends StatelessWidget {
                   ? Text(_dataDoc['bciHeartRate']?['short'] ?? '')
                   : Text(_dataDoc['bciHeartRate']?['long'] ?? ''),
             ),
-            trailing: IconButton(
-                onPressed: () {
-                  _showShortDoc.value = !_showShortDoc.value;
-                },
-                icon: const Icon(Icons.monitor_heart)),
+            trailing: Obx(() => _showShortDocIconButton()),
           ),
           WaveChart(
             controller: healingController.bciHeartRateWaveController,
             lineColor: ThemeData().colorScheme.primary,
             lineWidth: 3,
+          ),
+          const SizedBox(
+            height: 40,
           ),
           ListTile(
             title: Text(_dataDoc['bciHrv']?['title'] ?? '',
@@ -380,19 +464,12 @@ class BrainWaveView extends StatelessWidget {
                   ? Text(_dataDoc['bciHrv']?['short'] ?? '')
                   : Text(_dataDoc['bciHrv']?['long'] ?? ''),
             ),
-            trailing: IconButton(
-                onPressed: () {
-                  _showShortDoc.value = !_showShortDoc.value;
-                },
-                icon: const Icon(Icons.monitor_heart)),
+            trailing: Obx(() => _showShortDocIconButton()),
           ),
-          Container(
-            height: 40,
-            alignment: Alignment.center,
-            child: Obx(() => Text(
-                  '【${healingController.bciHrv.value}】',
-                  style: const TextStyle(color: Colors.grey),
-                )),
+          WaveChart(
+            controller: healingController.bciHrvWaveController,
+            lineColor: ThemeData().colorScheme.primary,
+            lineWidth: 3,
           ),
           const SizedBox(
             height: 40,
@@ -405,11 +482,7 @@ class BrainWaveView extends StatelessWidget {
                   ? Text(_dataDoc['bciGrind']?['short'] ?? '')
                   : Text(_dataDoc['bciGrind']?['long'] ?? ''),
             ),
-            trailing: IconButton(
-                onPressed: () {
-                  _showShortDoc.value = !_showShortDoc.value;
-                },
-                icon: const Icon(Icons.monitor_heart)),
+            trailing: Obx(() => _showShortDocIconButton()),
           ),
           WaveChart(
             controller: healingController.bciGrindWaveController,
@@ -429,8 +502,33 @@ class BrainWaveView extends StatelessWidget {
     );
   }
 
+  IconButton _showShortDocIconButton() {
+    return IconButton(
+        onPressed: () {
+          _showShortDoc.value = !_showShortDoc.value;
+        },
+        icon: _showShortDoc.value
+            ? const Icon(Icons.keyboard_double_arrow_down)
+            : const Icon(Icons.keyboard_double_arrow_up));
+  }
+
   final RxBool _showShortDoc = true.obs;
   static final Map<String, Map<String, String>> _dataDoc = {
+    'curRelax': {
+      "title": '松弛度 RELAX',
+      "short": "RELAX = 0.5 ✖ (100 - ATT) + 0.5 ✖ MED",
+      "long": "宽宥，从容"
+    },
+    'curSharp': {
+      "title": '敏锐度 SHARP',
+      "short": "SHARP = 0.5 ✖ ATT + 0.5 ✖ (100 - MED)",
+      "long": "感受，觉醒"
+    },
+    'curFlow': {
+      "title": '心流指数 FLOW',
+      "short": "FLOW = 0.5 ✖ ATT + 0.5 ✖ MED",
+      "long": "思维，艺术"
+    },
     'bciAtt': {
       "title": '专注度 ATT',
       "short": "注意力越集中，精神内耗越低，越能把更多能量用于身心修复。",
@@ -438,14 +536,15 @@ class BrainWaveView extends StatelessWidget {
           "在快节奏的生活里，人们常陷入精神内耗的漩涡。其实，注意力的集中程度与精神内耗有着紧密联系。当我们全身心地投入到一件事情中，注意力高度集中，大脑便不会被纷杂的杂念所占据。此时，内心如同澄澈的湖面，毫无波澜。这种状态下，我们用于对抗内耗的能量大幅减少，从而能将更多的能量用于身心的修复。就像在静谧的深夜，专注于冥想的人，能让疲惫的身心得到深度滋养，重新焕发生机，以更饱满的精神迎接新的挑战 。"
     },
     'bciMed': {
-      "title": '松弛度 MED',
+      "title": '安全感 MED',
       "short": "安全感越高，人越松弛，副交感神经承受的压力越低，越能把更多能量用于身心疗愈。",
       "long":
           "安全感，宛如心灵的坚固护盾，深刻影响着我们的身心状态。当安全感充足，我们周身紧绷的神经便会慢慢舒缓，整个人呈现出松弛自在的模样。在这一状态下，主导身体放松与恢复的副交感神经，所承受的压力也随之显著降低。副交感神经压力的减轻，意味着身体不再时刻处于应激防御状态，得以将更多的能量投入到身心疗愈之中。就如同春日暖阳轻柔照耀，滋养着疲惫的心灵，修复着受损的身体机能，让我们由内而外重焕活力，从容面对生活里的种种挑战 。"
     },
     'bciAp': {
-      "title": '愉悦度 AP',
+      "title": '愉悦感 AP',
       "short": "越愉悦，越接纳，这是吸纳外部能量的关键时刻。",
+      "state": "平常,舒心,畅快,欢喜,极乐",
       "long":
           "当内心被愉悦的情绪充盈，我们整个人都会变得柔和且开放。这种状态下，我们对自我与外界的接纳度也会随之达到峰值。此时，恰似为心灵开启了一扇宽广的大门，外界的积极能量得以长驱直入。愉悦的心境就像一块强大的磁石，吸引着美好的人和事向我们靠近。在每一个开怀大笑、满心欢喜的瞬间，我们不再对外部世界心存抵触，而是以一种全然接纳的姿态去拥抱。这正是吸纳外部能量的关键时刻，每一丝积极的气息、每一份温暖的善意，都能毫无阻碍地融入我们的生命，助力我们不断成长与蜕变。"
     },

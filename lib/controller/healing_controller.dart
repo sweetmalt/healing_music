@@ -41,10 +41,14 @@ class HealingController extends Ctrl {
   final RxDouble bciMiddleGamma = 0.0.obs;
   final RxDouble bciTemperature = 0.0.obs;
   final RxDouble bciHeartRate = 0.0.obs;
-  final RxString bciHrv = "0".obs; //hrv数组字符串
-  final RxString bciOygen = "0".obs; //血氧数组字符串
+  final RxDouble bciHrv = 0.0.obs;
+  final RxDouble bciOygen = 0.0.obs;
   final RxDouble bciGrind = 0.0.obs;
   final RxInt bciCurrentTimeMillis = 0.obs; //时间戳
+  /// 分析数据
+  final RxDouble curRelax = 0.0.obs;
+  final RxDouble curSharp = 0.0.obs;
+  final RxDouble curFlow = 0.0.obs;
 
   final HemController hemController = Get.put(HemController());
   final EnvController envController = Get.put(EnvController());
@@ -108,6 +112,21 @@ class HealingController extends Ctrl {
     }
   }
 
+  final curRelaxWaveController = WaveChartController(
+    maxDataPoints: 60,
+    minY: 0,
+    maxY: 100,
+  );
+  final curSharpWaveController = WaveChartController(
+    maxDataPoints: 60,
+    minY: 0,
+    maxY: 100,
+  );
+  final curFlowWaveController = WaveChartController(
+    maxDataPoints: 60,
+    minY: 0,
+    maxY: 100,
+  );
   final bciAttWaveController = WaveChartController(
     maxDataPoints: 60,
     minY: 0,
@@ -173,13 +192,30 @@ class HealingController extends Ctrl {
     minY: 0,
     maxY: 200,
   );
+  final bciHrvWaveController = WaveChartController(
+    maxDataPoints: 60,
+    minY: 300,
+    maxY: 1500,
+  );
   final bciGrindWaveController = WaveChartController(
     maxDataPoints: 60,
     minY: 0,
     maxY: 2,
   );
 
+  void _dataAnalysis() {
+    curRelax.value = 0.5 * (100 - bciAtt.value) + 0.5 * bciMed.value;
+    curSharp.value = 0.5 * bciAtt.value + 0.5 * (100 - bciMed.value);
+    curFlow.value = 0.5 * bciAtt.value + 0.5 * bciMed.value;
+  }
+
   void _showRealData() {
+    ///
+    curRelaxWaveController.addDataPoint(curRelax.value);
+    curSharpWaveController.addDataPoint(curSharp.value);
+    curFlowWaveController.addDataPoint(curFlow.value);
+
+    ///
     bciAttWaveController.addDataPoint(bciAtt.value);
     bciMedWaveController.addDataPoint(bciMed.value);
     bciApWaveController.addDataPoint(bciAp.value);
@@ -193,6 +229,7 @@ class HealingController extends Ctrl {
     bciMiddleGammaWaveController.addDataPoint(bciMiddleGamma.value);
     bciTemperatureWaveController.addDataPoint(bciTemperature.value);
     bciHeartRateWaveController.addDataPoint(bciHeartRate.value);
+    bciHrvWaveController.addDataPoint(bciHrv.value);
     bciGrindWaveController.addDataPoint(bciGrind.value);
   }
 
@@ -217,11 +254,12 @@ class HealingController extends Ctrl {
         bciMiddleGamma.value = double.parse(temp[10]);
         bciTemperature.value = double.parse(temp[11]);
         bciHeartRate.value = double.parse(temp[12]);
-        bciHrv.value = temp[13];
-        bciOygen.value = temp[14];
+        bciHrv.value = double.parse(temp[13].split('_')[0]);
+        bciOygen.value = double.parse(temp[14]);
         bciGrind.value = double.parse(temp[15]);
         bciCurrentTimeMillis.value = int.parse(temp[16]);
         bciCurrentTwoTimeMillis[1] = bciCurrentTimeMillis.value;
+        _dataAnalysis();
         _showRealData();
         _ctrlByDevice();
       }
