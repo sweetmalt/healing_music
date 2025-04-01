@@ -389,10 +389,10 @@ class BrainWaveView extends StatelessWidget {
           Container(
             height: 40,
             alignment: Alignment.center,
-            child: Text(
-              '【${healingController.bciHrv.value}】',
-              style: const TextStyle(color: Colors.grey),
-            ),
+            child: Obx(() => Text(
+                  '【${healingController.bciHrv.value}】',
+                  style: const TextStyle(color: Colors.grey),
+                )),
           ),
           const SizedBox(
             height: 40,

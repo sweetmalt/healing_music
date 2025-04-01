@@ -42,6 +42,7 @@ class HealingController extends Ctrl {
   final RxDouble bciTemperature = 0.0.obs;
   final RxDouble bciHeartRate = 0.0.obs;
   final RxString bciHrv = "0".obs; //hrv数组字符串
+  final RxString bciOygen = "0".obs; //血氧数组字符串
   final RxDouble bciGrind = 0.0.obs;
   final RxInt bciCurrentTimeMillis = 0.obs; //时间戳
 
@@ -202,7 +203,7 @@ class HealingController extends Ctrl {
     _streamSubscription = eventChannel.receiveBroadcastStream().listen((data) {
       receivedData.value = data.toString();
       List<String> temp = data.toString().split(',');
-      if (temp.length == 16) {
+      if (temp.length == 17) {
         bciAtt.value = double.parse(temp[0]);
         bciMed.value = double.parse(temp[1]);
         bciAp.value = double.parse(temp[2]);
@@ -217,8 +218,9 @@ class HealingController extends Ctrl {
         bciTemperature.value = double.parse(temp[11]);
         bciHeartRate.value = double.parse(temp[12]);
         bciHrv.value = temp[13];
-        bciGrind.value = double.parse(temp[14]);
-        bciCurrentTimeMillis.value = int.parse(temp[15]);
+        bciOygen.value = temp[14];
+        bciGrind.value = double.parse(temp[15]);
+        bciCurrentTimeMillis.value = int.parse(temp[16]);
         bciCurrentTwoTimeMillis[1] = bciCurrentTimeMillis.value;
         _showRealData();
         _ctrlByDevice();
