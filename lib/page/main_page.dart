@@ -6,6 +6,7 @@ import 'package:healing_music/page/face_page.dart';
 import 'package:healing_music/page/music_page.dart';
 import 'package:healing_music/page/healing_page.dart';
 import 'package:healing_music/page/depot_page.dart';
+import 'package:healing_music/page/report_list_page.dart';
 import 'package:healing_music/widget/app_bar_title.dart';
 import 'package:healing_music/widget/circular_button.dart';
 
@@ -25,7 +26,9 @@ class MainPage extends StatelessWidget {
         title: AppBarTitle('AI音疗 HealingMusic'),
         centerTitle: true,
         shadowColor: ThemeData().colorScheme.primary,
-        leading: IconButton(onPressed: () => {}, icon: const Icon(Icons.menu)),
+        leading: IconButton(
+            onPressed: () => {Get.to(() => ReportList())},
+            icon: const Icon(Icons.menu)),
         actions: [
           CircularIconButton(
             onPressed: () => {showConfirmationDialog(context)},

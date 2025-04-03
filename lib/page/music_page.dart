@@ -21,6 +21,7 @@ class MusicPage extends StatelessWidget {
         centerTitle: true,
       ),
       body: ListView(
+        padding: const EdgeInsets.all(10),
         children: [
           for (int i = 0; i < _audios.txt.length; i++)
             MusicBox(

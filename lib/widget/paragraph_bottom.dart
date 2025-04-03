@@ -24,7 +24,6 @@ class ParagraphBottomListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(left: 10, right: 10),
       decoration: BoxDecoration(
         color: ThemeData().colorScheme.secondaryContainer,
         border: Border(

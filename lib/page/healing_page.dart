@@ -10,12 +10,14 @@ import 'package:healing_music/widget/item.dart';
 import 'package:healing_music/widget/page_title.dart';
 import 'package:healing_music/widget/paragraph.dart';
 import 'package:healing_music/widget/paragraph_bottom.dart';
+import 'package:healing_music/widget/report_view.dart';
 import 'package:healing_music/widget/volume_view.dart';
 
 class HealingPage extends GetView<HealingController> {
   HealingPage({super.key});
   final MainController mainController = Get.find();
   final HealingController healingController = Get.put(HealingController());
+  final ReportViewController reportViewController = Get.put(ReportViewController());
   final HemController hemController = Get.put(HemController());
   final EnvController envController = Get.put(EnvController());
   final BgmController bgmController = Get.put(BgmController());
@@ -25,7 +27,7 @@ class HealingPage extends GetView<HealingController> {
   final List<String> currentPlayers = [
     "",
   ];
-  void onTimePlanRun() {
+  Future<void> onTimePlanRun() async {
     int usedTimeSeconds = healingController.usedTimeSeconds.value;
     List<Map<String, dynamic>> htd = healingController.healingTimePlanData;
     for (var i = 0; i < htd.length; i++) {
@@ -70,7 +72,7 @@ class HealingPage extends GetView<HealingController> {
     }
   }
 
-  void onTimePlanEnd() {
+  Future<void> onTimePlanEnd() async {
     ScaffoldMessenger.of(Get.context!).showSnackBar(
       const SnackBar(
         content: Text('结束预编排音疗服务'),
@@ -86,7 +88,7 @@ class HealingPage extends GetView<HealingController> {
     //healingController.isCtrlByPlan.value = false;
   }
 
-  void ctrlByTimePlan() {
+  Future<void> ctrlByTimePlan() async {
     ScaffoldMessenger.of(Get.context!).showSnackBar(
       const SnackBar(
         content: Text('启动预编排音疗服务'),
@@ -94,7 +96,7 @@ class HealingPage extends GetView<HealingController> {
         backgroundColor: Colors.deepPurple,
       ),
     );
-    healingController.startTimer(onTimePlanRun, onTimePlanEnd);
+    await healingController.startTimer(onTimePlanRun, onTimePlanEnd);
     if (currentPlayers[0].isNotEmpty) {
       switch (currentPlayers[0]) {
         case "脑波音频":
@@ -113,7 +115,7 @@ class HealingPage extends GetView<HealingController> {
     }
   }
 
-  void pauseCtrlByTimePlan() {
+  Future<void> pauseCtrlByTimePlan() async {
     ScaffoldMessenger.of(Get.context!).showSnackBar(
       const SnackBar(
         content: Text('暂停预编排音疗服务'),
@@ -128,7 +130,7 @@ class HealingPage extends GetView<HealingController> {
     bbmController.pause();
   }
 
-  void quitCtrlByTimePlan() {
+  Future<void> quitCtrlByTimePlan() async {
     ScaffoldMessenger.of(Get.context!).showSnackBar(
       const SnackBar(
         content: Text('退出预编排音疗服务'),
@@ -155,12 +157,52 @@ class HealingPage extends GetView<HealingController> {
       ),
       body: Center(
         child: SingleChildScrollView(
+          padding: const EdgeInsets.all(10),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Obx(
-                () => CircularIconButton(
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Obx(
+                  () => CircularIconButton(
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        showDragHandle: true,
+                        useRootNavigator: true,
+                        isScrollControlled: true,
+                        constraints: BoxConstraints(
+                          maxHeight: MediaQuery.of(context).size.height * 0.8,
+                        ),
+                        builder: (context) {
+                          return BrainWaveView();
+                        },
+                      );
+                    },
+                    icon: healingController.isCtrlByDevice.value
+                        ? Icons.sensors_rounded
+                        : Icons.sensors_off_rounded,
+                    backgroundColor: healingController.isDeviceLinking.value
+                        ? Colors.green
+                        : ThemeData().colorScheme.primaryContainer,
+                    foregroundColor: healingController.isDeviceLinking.value
+                        ? Colors.white
+                        : ThemeData().colorScheme.primary,
+                  ),
+                ),
+                CircularIconButton(
                   onPressed: () {
+                    if (healingController.receivedDataCount < 60) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('数据太少，请确保设备连接正常后，过一分钟再试'),
+                          duration: Duration(seconds: 2),
+                          backgroundColor: Colors.deepPurple,
+                        ),
+                      );
+                      return;
+                    }
+                    healingController.createReport();
+                    reportViewController.energyScaling();
                     showModalBottomSheet(
                       context: context,
                       showDragHandle: true,
@@ -170,21 +212,15 @@ class HealingPage extends GetView<HealingController> {
                         maxHeight: MediaQuery.of(context).size.height * 0.8,
                       ),
                       builder: (context) {
-                        return BrainWaveView();
+                        return ReportView();
                       },
                     );
                   },
-                  icon: healingController.isCtrlByDevice.value
-                      ? Icons.sensors_rounded
-                      : Icons.sensors_off_rounded,
-                  backgroundColor: healingController.isDeviceLinking.value
-                      ? Colors.green
-                      : ThemeData().colorScheme.primaryContainer,
-                  foregroundColor: healingController.isDeviceLinking.value
-                      ? Colors.white
-                      : ThemeData().colorScheme.primary,
+                  icon: Icons.menu_book_rounded,
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
                 ),
-              ),
+              ]),
               const SizedBox(
                 height: 10,
               ),
@@ -195,26 +231,42 @@ class HealingPage extends GetView<HealingController> {
                           radius: 120,
                           value:
                               hemController.pos.value / hemController.dur.value,
-                          backgroundColor: hemController.backgroundColor.value,
-                          valueColor: hemController.valueColor.value),
+                          backgroundColor: hemController.colorSwitch.value
+                              ? hemController.switchColors[0]
+                              : hemController.switchColors[1],
+                          valueColor: hemController.colorSwitch.value
+                              ? hemController.switchColors[1]
+                              : hemController.switchColors[0]),
                       CircularProgress(
                           radius: 100,
                           value:
                               envController.pos.value / envController.dur.value,
-                          backgroundColor: envController.backgroundColor.value,
-                          valueColor: envController.valueColor.value),
+                          backgroundColor: envController.colorSwitch.value
+                              ? envController.switchColors[0]
+                              : envController.switchColors[1],
+                          valueColor: envController.colorSwitch.value
+                              ? envController.switchColors[1]
+                              : envController.switchColors[0]),
                       CircularProgress(
                           radius: 80,
                           value:
                               bgmController.pos.value / bgmController.dur.value,
-                          backgroundColor: bgmController.backgroundColor.value,
-                          valueColor: bgmController.valueColor.value),
+                          backgroundColor: bgmController.colorSwitch.value
+                              ? bgmController.switchColors[0]
+                              : bgmController.switchColors[1],
+                          valueColor: bgmController.colorSwitch.value
+                              ? bgmController.switchColors[1]
+                              : bgmController.switchColors[0]),
                       CircularProgress(
                           radius: 60,
                           value:
                               bbmController.pos.value / bbmController.dur.value,
-                          backgroundColor: bbmController.backgroundColor.value,
-                          valueColor: bbmController.valueColor.value),
+                          backgroundColor: bbmController.colorSwitch.value
+                              ? bbmController.switchColors[0]
+                              : bbmController.switchColors[1],
+                          valueColor: bbmController.colorSwitch.value
+                              ? bbmController.switchColors[1]
+                              : bbmController.switchColors[0]),
                       Obx(
                         () => CircularIconButton(
                           onPressed: () {
@@ -365,7 +417,7 @@ class CircularProgress extends StatelessWidget {
         backgroundColor: backgroundColor,
         valueColor: AlwaysStoppedAnimation<Color>(valueColor),
         value: value,
-        strokeWidth: 4,
+        strokeWidth: 1,
       ),
     );
   }
@@ -447,7 +499,8 @@ class AudiosRow extends StatelessWidget {
 class PlayBox extends StatelessWidget {
   final MyAudioCtrl controller;
   final String title;
-  const PlayBox({
+  final RxBool repeatAll = false.obs;
+  PlayBox({
     super.key,
     required this.controller,
     required this.title,
@@ -465,8 +518,13 @@ class PlayBox extends StatelessWidget {
         children: [
           IconButton(
             color: ThemeData().colorScheme.secondary,
-            onPressed: () {},
-            icon: const Icon(Icons.headphones),
+            onPressed: () {
+              //repeatAll.value = !repeatAll.value;
+            },
+            icon: Obx(() => repeatAll.value
+                ? const Icon(Icons.repeat_rounded)
+                : const Icon(Icons
+                    .repeat_one_rounded)), //const Icon(Icons.repeat_one_rounded),
           ),
           Text(title),
           const SizedBox(
@@ -613,7 +671,6 @@ class PlanZone extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: healingTimeText.map((healingTime) {
-                    //取字符串healingTime内第一个冒号前的数字子串,并转换成数字
                     int i = getNumberBeforeColon(healingTime);
                     return Text(
                       healingTime,

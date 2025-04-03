@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:healing_music/style/style.dart';
 
-class ParagraphTitle extends Text {
-  ParagraphTitle(super.data, {super.key})
-      : super(
-          style: MyStyle.paragraphTitleTextStyle,
-        );
+class ParagraphTitle extends StatelessWidget {
+  final String title;
+  const ParagraphTitle(this.title, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      title,
+      style: MyStyle.paragraphTitleTextStyle,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
 }
 
 class ParagraphListTile extends StatelessWidget {
@@ -27,7 +35,6 @@ class ParagraphListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(left: 10, right: 10),
       decoration: BoxDecoration(
         color: ThemeData().colorScheme.primaryContainer,
         border: Border(
@@ -44,22 +51,29 @@ class ParagraphListTile extends StatelessWidget {
         ),
       ),
       child: ListTile(
-        leading: IconButton(
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-            onPressed: onLeadingTap,
-            icon: Icon(
-              leadingIcon,
-              size: 15,
-            )),
+        horizontalTitleGap: 0,
+        leading: leadingIcon != null
+            ? IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: onLeadingTap,
+                icon: Icon(
+                  leadingIcon,
+                  size: 15,
+                ))
+            : null,
         title: ParagraphTitle(title),
-        trailing: IconButton(
-          onPressed: onTap,
-          icon: Icon(
-            icon,
-            size: 15,
-          ), //Icons.attach_file,
-        ),
+        trailing: icon != null
+            ? IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: onTap,
+                icon: Icon(
+                  icon,
+                  size: 15,
+                ), //Icons.attach_file,
+              )
+            : null,
       ),
     );
   }

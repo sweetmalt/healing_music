@@ -47,7 +47,6 @@ class ItemListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(left: 10, right: 10),
       decoration: BoxDecoration(
         border: Border(
           left: BorderSide(
@@ -82,7 +81,6 @@ class HealingItemListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(left: 10, right: 10),
       padding: const EdgeInsets.only(left: 20,top: 10, bottom: 10),
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(

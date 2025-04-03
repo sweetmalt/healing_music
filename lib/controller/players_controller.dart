@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:rxdart/rxdart.dart';
 
 class MyAudioCtrl extends GetxController {
   final AudioPlayer player = AudioPlayer();
@@ -10,23 +11,19 @@ class MyAudioCtrl extends GetxController {
   final RxBool isPlaying = false.obs;
   final RxDouble pos = 0.0.obs;
   final RxDouble dur = 1.0.obs;
-  final Rx<Color> backgroundColor =
-      ThemeData().colorScheme.primaryContainer.obs;
-  final Rx<Color> valueColor = ThemeData().colorScheme.primary.obs;
+  final RxBool colorSwitch = false.obs;
+  List<Color> switchColors = [
+    ThemeData().colorScheme.primaryContainer,
+    ThemeData().colorScheme.primary
+  ];
   bool permitSwitchColor = false;
   final RxDouble maxVol = 0.5.obs;
   double _vol = 0.5;
   double _volTemp = 0.5;
   late final StreamSubscription<Duration> _listenerPos;
 
-  setTitle(String title) {
+  Future<void> setTitle(String title) async {
     audioTitle.value = title;
-  }
-
-  switchColor() {
-    Color temp = backgroundColor.value;
-    backgroundColor.value = valueColor.value;
-    valueColor.value = temp;
   }
 
   Future<void> initPlayer({required String audio, bool isLoop = true}) async {
@@ -36,7 +33,9 @@ class MyAudioCtrl extends GetxController {
   }
 
   Future<void> startListen({bool isLoop = true}) async {
-    _listenerPos = player.positionStream.listen((position) {
+    _listenerPos = Stream.periodic(const Duration(milliseconds: 100))
+        .switchMap((_) => player.positionStream)
+        .listen((position) async {
       pos.value = position.inMilliseconds.toDouble();
       if (isLoop) {
         if (pos.value < 5000) {
@@ -44,20 +43,20 @@ class MyAudioCtrl extends GetxController {
           if (p < 0.1) {
             p = 0.1;
           }
-          player.setVolume(p * _vol);
+          await player.setVolume(p * _vol);
           if (permitSwitchColor) {
             permitSwitchColor = false;
-            switchColor();
+            colorSwitch.value = !colorSwitch.value;
           }
         } else if (pos.value > dur.value - 5000) {
           double p = (dur.value - pos.value) / 5000;
           if (p < 0.1) {
             p = 0.1;
           }
-          player.setVolume(p * _vol);
+          await player.setVolume(p * _vol);
           permitSwitchColor = true;
         } else {
-          player.setVolume(_vol);
+          await player.setVolume(_vol);
         }
       }
     });
@@ -85,7 +84,7 @@ class MyAudioCtrl extends GetxController {
     }
   }
 
-  void setVol(double mv) {
+  Future<void> setVol(double mv) async {
     if (mv < 0 || mv > 1.0) {
       return;
     }
@@ -93,7 +92,7 @@ class MyAudioCtrl extends GetxController {
     player.setVolume(_vol);
   }
 
-  void setVolMute(bool isMute) {
+  Future<void> setVolMute(bool isMute) async {
     if (isMute) {
       _volTemp = _vol;
       setVol(0.01);
@@ -102,7 +101,7 @@ class MyAudioCtrl extends GetxController {
     }
   }
 
-  void setMaxVol(double mv) {
+  Future<void> setMaxVol(double mv) async {
     if (mv < 0 || mv > 1.0) {
       return;
     }
@@ -110,25 +109,25 @@ class MyAudioCtrl extends GetxController {
     setVol(maxVol.value);
   }
 
-  void play() {
+  Future<void> play() async {
     isPlaying.value = true;
     player.play();
   }
 
-  void pause() {
+  Future<void> pause() async {
     isPlaying.value = false;
     player.pause();
   }
 
-  void stop() {
+  Future<void> stop() async {
     isPlaying.value = false;
     player.stop();
   }
 
   @override
-  void onClose() {
-    _listenerPos.cancel();
-    player.dispose();
+  void onClose() async {
+    await _listenerPos.cancel();
+    await player.dispose();
     super.onClose();
   }
 }

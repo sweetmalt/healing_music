@@ -13,19 +13,19 @@ class Ctrl extends GetxController {
   final RxString textTimeSeconds = "00:00".obs;
   late Timer _timer;
   final RxBool isTimerRunning = false.obs;
-  void setTimer(int sec) {
+  Future<void> setTimer(int sec) async{
     clearTimer();
     timeSeconds.value = sec;
   }
 
 
-  void startTimer(VoidCallback onTimerRunning, VoidCallback onTimerEnd) {
+  Future<void> startTimer(VoidCallback onTimerRunning, VoidCallback onTimerEnd) async{
     if (timeSeconds.value <= 0) {
       return;
     }
     isTimerRunning.value = true;
     const oneSec = Duration(seconds: 1);
-    _timer = Timer.periodic(oneSec, (Timer timer) {
+    _timer = Timer.periodic(oneSec, (Timer timer) async {
       if (timeSeconds.value > 0) {
         onTimerRunning();
         usedTimeSeconds.value++;
@@ -38,14 +38,14 @@ class Ctrl extends GetxController {
     });
   }
 
-  void pauseTimer() {
+  Future<void> pauseTimer()async {
     if (isTimerRunning.value && timeSeconds.value > 0) {
       isTimerRunning.value = false;
       _timer.cancel();
     }
   }
 
-  void clearTimer() {
+  Future<void> clearTimer() async{
     if (timeSeconds.value > 0 || usedTimeSeconds.value > 0) {
       isTimerRunning.value = false;
       _timer.cancel();
@@ -55,49 +55,49 @@ class Ctrl extends GetxController {
     }
   }
 
-  void play() {
+  Future<void> play() async{
     isPlaying.value = true;
-    player.play();
+    await player.play();
   }
 
-  void pause() {
+  Future<void> pause() async{
     isPlaying.value = false;
-    player.pause();
+    await player.pause();
   }
 
-  void stop() {
+  Future<void> stop() async{
     isPlaying.value = false;
-    player.stop();
+    await player.stop();
   }
 
-  void changeAudio(String audio, {bool autoPlay = false, bool isLoop = false}) {
+  Future<void> changeAudio(String audio, {bool autoPlay = false, bool isLoop = false})async {
     isPlaying.value = false;
-    player.stop();
+    await player.stop();
     _audio.value = audio;
-    player.setAsset(_audio.value);
+    await player.setAsset(_audio.value);
     if (isLoop) {
-      player.setLoopMode(LoopMode.all);
+      await player.setLoopMode(LoopMode.all);
     } else {
-      player.setLoopMode(LoopMode.off);
+      await player.setLoopMode(LoopMode.off);
     }
     if (autoPlay) {
-      player.play();
+      await player.play();
       isPlaying.value = true;
     }
   }
 
   @override
-  void onInit() {
+  void onInit() async{
     super.onInit();
-    player.setLoopMode(LoopMode.off);
-    player.setAsset(_audio.value);
+    await player.setLoopMode(LoopMode.off);
+    await player.setAsset(_audio.value);
   }
 
   @override
-  void onClose() {
-    clearTimer();
-    stop();
-    player.dispose();
+  void onClose()async {
+    await clearTimer();
+    await stop();
+    await player.dispose();
     super.onClose();
   }
 }
