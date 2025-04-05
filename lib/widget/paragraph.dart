@@ -70,7 +70,7 @@ class ParagraphListTile extends StatelessWidget {
                 onPressed: onTap,
                 icon: Icon(
                   icon,
-                  size: 15,
+                  size: 30,
                 ), //Icons.attach_file,
               )
             : null,

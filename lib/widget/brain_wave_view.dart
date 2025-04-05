@@ -22,7 +22,6 @@ class BrainWaveView extends StatelessWidget {
       child: ListView(
         children: [
           ListTile(
-
             title: Text('是否让设备参与音乐控制？', style: MyStyle.paragraphTitleTextStyle),
             subtitle: const Text(
                 '是否将疗愈音乐的播放控制权交给脑波设备？具体来说，软件将根据用户的脑波数据变化，实时调节音乐组内各元素的编排、节奏、音量等，以达到最佳疗愈效果。例如，当用户逐渐进入睡眠状态时，软件将逐步调低音量，反之则调高。'),
@@ -40,7 +39,7 @@ class BrainWaveView extends StatelessWidget {
                             : ThemeData().colorScheme.primary,
                       )
                     : Icon(Icons.media_bluetooth_off_rounded,
-                    size: 30,
+                        size: 30,
                         color: healingController.isDeviceLinking.value
                             ? Colors.green
                             : ThemeData().colorScheme.primary))),
@@ -49,8 +48,11 @@ class BrainWaveView extends StatelessWidget {
             height: 40,
           ),
           ParagraphListTile(
-            title: "生命体征数据实时看板",
-            onTap: () {},
+            title: "实时数据看板（点击刷新：清除历史记录）",
+            icon: Icons.refresh_rounded,
+            onTap: () async {
+              await healingController.clearData();
+            },
           ),
           const SizedBox(
             height: 40,

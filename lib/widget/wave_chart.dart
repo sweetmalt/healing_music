@@ -48,8 +48,13 @@ class WaveChartController extends GetxController {
     _data.clear();
   }
 
-  void initStatistics() {
+  Future<void> clearData() async{
     _data.clear();
+    statisticsCount = 0;
+    dataFlSpot.clear();
+    dataFlSpot.add(const FlSpot(0, 0));
+    minX = 0;
+    maxX = 0;
   }
 
   List<double> data() {

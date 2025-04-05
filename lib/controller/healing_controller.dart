@@ -28,6 +28,7 @@ class HealingController extends Ctrl {
   static const eventChannel = EventChannel('top.healingAI.brainlink/receiver');
   StreamSubscription? _streamSubscription;
   final RxString receivedData = "等待设备连接...".obs;
+  final List<String> _data = <String>[];
   int receivedDataCount = 0;
   final RxDouble bciAtt = 0.0.obs;
   final RxDouble bciMed = 0.0.obs;
@@ -236,6 +237,29 @@ class HealingController extends Ctrl {
     await bciGrindWaveController.addDataPoint(bciGrind.value);
   }
 
+  Future<void> clearData() async {
+    _data.clear();
+    await curRelaxWaveController.clearData();
+    await curSharpWaveController.clearData();
+    await curFlowWaveController.clearData();
+    await bciAttWaveController.clearData();
+    await bciMedWaveController.clearData();
+    await bciApWaveController.clearData();
+    await bciDeltaWaveController.clearData();
+    await bciThetaWaveController.clearData();
+    await bciLowAlphaWaveController.clearData();
+    await bciHighAlphaWaveController.clearData();
+    await bciLowBetaWaveController.clearData();
+    await bciHighBetaWaveController.clearData();
+    await bciLowGammaWaveController.clearData();
+    await bciMiddleGammaWaveController.clearData();
+    await bciTemperatureWaveController.clearData();
+    await bciHeartRateWaveController.clearData();
+    await bciHrvWaveController.clearData();
+    await bciGrindWaveController.clearData();
+    receivedDataCount = 0;
+  }
+
   Future<void> createReport() async {
 /**
     if (receivedDataCount >= 300 && receivedDataCount < 600) {
@@ -308,6 +332,8 @@ class HealingController extends Ctrl {
         await _dataAnalysis();
         await _showRealData();
         await _ctrlByDevice();
+
+        _data.add(receivedData.value);
         receivedDataCount++;
       }
     }, onError: (error) {});
@@ -326,17 +352,20 @@ class HealingController extends Ctrl {
     'curRelax': {
       "title": '松弛感 RELAX',
       "short": "松弛感，是一场灵魂的深海潜游",
-      "long": "在能量驿站，我们相信真正的疗愈始于对紧绷感的松绑。当城市喧嚣成为刺耳的噪音，请将自己浸入这片被光晕包裹的静谧场域。专业疗愈师以呼吸频率为锚点，引导你卸下防御铠甲，让每寸肌肤重新感知温度，让每根神经学会在安全结界里舒展。在这里，允许思绪像水母般自由游弋，允许情绪如退潮后的沙滩自然裸露。当肌肉记忆开始遗忘「紧绷」的姿势，你会听见细胞重启时发出的簌簌声——那是生命回归出厂设置的诚实回响。"
+      "long":
+          "在能量驿站，我们相信真正的疗愈始于对紧绷感的松绑。当城市喧嚣成为刺耳的噪音，请将自己浸入这片被光晕包裹的静谧场域。专业疗愈师以呼吸频率为锚点，引导你卸下防御铠甲，让每寸肌肤重新感知温度，让每根神经学会在安全结界里舒展。在这里，允许思绪像水母般自由游弋，允许情绪如退潮后的沙滩自然裸露。当肌肉记忆开始遗忘「紧绷」的姿势，你会听见细胞重启时发出的簌簌声——那是生命回归出厂设置的诚实回响。"
     },
     'curSharp': {
       "title": '敏锐度 SHARP',
       "short": "唤醒清醒力，掌控动态平衡",
-      "long": "当感官褪去麻木，当直觉穿透表象，真正的敏锐力便成为连接世界的天线——它不意味着焦虑，而是让阳光下的尘埃与暗夜里的萤火都清晰可辨。在动态呼吸冥想中，您将训练大脑捕捉细微的情绪波动；通过环境音波解析课程，唤醒听觉对频率的精准解码；触觉感知矩阵则让指尖读懂温度变化的密语。这些并非超能力，而是人类与生俱来的觉察本能。"
+      "long":
+          "当感官褪去麻木，当直觉穿透表象，真正的敏锐力便成为连接世界的天线——它不意味着焦虑，而是让阳光下的尘埃与暗夜里的萤火都清晰可辨。在动态呼吸冥想中，您将训练大脑捕捉细微的情绪波动；通过环境音波解析课程，唤醒听觉对频率的精准解码；触觉感知矩阵则让指尖读懂温度变化的密语。这些并非超能力，而是人类与生俱来的觉察本能。"
     },
     'curFlow': {
       "title": '心流指数 FLOW',
       "short": "沉浸心流之境，唤醒内在能量",
-      "long": "我们深谙现代人的困境：思绪如星火跳跃却难以凝聚，身体时刻紧绷难觅安宁。通过定制化疗愈方案，能量驿站助您开启专注力的潜能开关：在音波疗愈中感受意识的聚焦，在呼吸冥想里培育当下的觉察力。同时，我们以安全感为疗愈基石，通过零压漂浮舱消解肌肉记忆的紧张，用芳疗SPA唤醒肌肤的松弛本能，让您如回归母体般卸下防御。当专注力化为穿透迷雾的灯塔，安全感成为滋养心灵的温床，您将体验真正的「心流感」：时间流速仿佛改变，创造力自然流淌，每个细胞都浸润在平和愉悦中。"
+      "long":
+          "我们深谙现代人的困境：思绪如星火跳跃却难以凝聚，身体时刻紧绷难觅安宁。通过定制化疗愈方案，能量驿站助您开启专注力的潜能开关：在音波疗愈中感受意识的聚焦，在呼吸冥想里培育当下的觉察力。同时，我们以安全感为疗愈基石，通过零压漂浮舱消解肌肉记忆的紧张，用芳疗SPA唤醒肌肤的松弛本能，让您如回归母体般卸下防御。当专注力化为穿透迷雾的灯塔，安全感成为滋养心灵的温床，您将体验真正的「心流感」：时间流速仿佛改变，创造力自然流淌，每个细胞都浸润在平和愉悦中。"
     },
     'bciAtt': {
       "title": '专注度 ATT',
