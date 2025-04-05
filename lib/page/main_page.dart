@@ -27,8 +27,9 @@ class MainPage extends StatelessWidget {
         centerTitle: true,
         shadowColor: ThemeData().colorScheme.primary,
         leading: IconButton(
+          color: ThemeData().colorScheme.primary,
             onPressed: () => {Get.to(() => ReportList())},
-            icon: const Icon(Icons.menu)),
+            icon: const Icon(Icons.menu_book_rounded)),
         actions: [
           CircularIconButton(
             onPressed: () => {showConfirmationDialog(context)},

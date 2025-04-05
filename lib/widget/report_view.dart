@@ -14,6 +14,7 @@ class ReportView extends GetView<ReportViewController> {
   final Map<String, Map<String, String>> _dataDoc = HealingController.dataDoc;
 
   @override
+  @override
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width,
@@ -133,7 +134,7 @@ class ReportView extends GetView<ReportViewController> {
           const SizedBox(height: 40),
           ParagraphListTile(
             title:
-                "${_dataDoc['energyPhy']?['title'] ?? ''}（能效 ${(controller.energyPhyScaling * 10000).toInt() / 100}%）",
+                "${_dataDoc['energyPhy']?['title'] ?? ''}（${(controller.energyPhyScaling * 10000).toInt() / 100}%）",
             onTap: () {},
           ),
           ListTile(

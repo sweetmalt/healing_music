@@ -57,7 +57,6 @@ class HealingController extends Ctrl {
   final BbmController bbmController = Get.put(BbmController());
 
   final RxString customerNickname = ''.obs;
-  final RxBool isEditCustomerNickname = false.obs;
 
   Future<void> startTimePlan(String k, int v) async {
     isCtrlByTimePlan.value = true;
@@ -273,9 +272,9 @@ class HealingController extends Ctrl {
     await curFlowWaveController.statistics();
     await bciAttWaveController.statistics();
     await bciMedWaveController.statistics();
-    bciHeartRateWaveController.setBestLimits(55, 70);
+    bciHeartRateWaveController.setBestLimits(55, 75);
     await bciHeartRateWaveController.statistics();
-    bciHrvWaveController.setBestLimits(857, 1090);
+    bciHrvWaveController.setBestLimits(800, 1091);
     await bciHrvWaveController.statistics();
   }
 
@@ -326,18 +325,18 @@ class HealingController extends Ctrl {
     'energyPhy': {"title": '生理能量 EPH', "short": "生理能量 EPH", "long": "生理能量 EPH"},
     'curRelax': {
       "title": '松弛感 RELAX',
-      "short": "RELAX = 0.5 ✖ (100 - ATT) + 0.5 ✖ MED",
-      "long": "宽宥，从容"
+      "short": "松弛感，是一场灵魂的深海潜游",
+      "long": "在能量驿站，我们相信真正的疗愈始于对紧绷感的松绑。当城市喧嚣成为刺耳的噪音，请将自己浸入这片被光晕包裹的静谧场域。专业疗愈师以呼吸频率为锚点，引导你卸下防御铠甲，让每寸肌肤重新感知温度，让每根神经学会在安全结界里舒展。在这里，允许思绪像水母般自由游弋，允许情绪如退潮后的沙滩自然裸露。当肌肉记忆开始遗忘「紧绷」的姿势，你会听见细胞重启时发出的簌簌声——那是生命回归出厂设置的诚实回响。"
     },
     'curSharp': {
       "title": '敏锐度 SHARP',
-      "short": "SHARP = 0.5 ✖ ATT + 0.5 ✖ (100 - MED)",
-      "long": "感受，觉察"
+      "short": "唤醒清醒力，掌控动态平衡",
+      "long": "当感官褪去麻木，当直觉穿透表象，真正的敏锐力便成为连接世界的天线——它不意味着焦虑，而是让阳光下的尘埃与暗夜里的萤火都清晰可辨。在动态呼吸冥想中，您将训练大脑捕捉细微的情绪波动；通过环境音波解析课程，唤醒听觉对频率的精准解码；触觉感知矩阵则让指尖读懂温度变化的密语。这些并非超能力，而是人类与生俱来的觉察本能。"
     },
     'curFlow': {
       "title": '心流指数 FLOW',
-      "short": "FLOW = 0.5 ✖ ATT + 0.5 ✖ MED",
-      "long": "思维，艺术"
+      "short": "沉浸心流之境，唤醒内在能量",
+      "long": "我们深谙现代人的困境：思绪如星火跳跃却难以凝聚，身体时刻紧绷难觅安宁。通过定制化疗愈方案，能量驿站助您开启专注力的潜能开关：在音波疗愈中感受意识的聚焦，在呼吸冥想里培育当下的觉察力。同时，我们以安全感为疗愈基石，通过零压漂浮舱消解肌肉记忆的紧张，用芳疗SPA唤醒肌肤的松弛本能，让您如回归母体般卸下防御。当专注力化为穿透迷雾的灯塔，安全感成为滋养心灵的温床，您将体验真正的「心流感」：时间流速仿佛改变，创造力自然流淌，每个细胞都浸润在平和愉悦中。"
     },
     'bciAtt': {
       "title": '专注度 ATT',
@@ -414,9 +413,9 @@ class HealingController extends Ctrl {
     },
     'bciHeartRate': {
       "title": '心率 HeartRate',
-      "short": "心跳是驱动生命活力的核心机制，60~80bpm的平稳静息心率是释放生命能量的最佳状态。",
+      "short": "心跳是驱动生命活力的核心机制，55~75bpm的平稳静息心率是释放生命能量的最佳状态。",
       "long":
-          "心跳，宛如生命乐章中那激昂而又稳健的鼓点，是驱动生命活力的核心机制。从生命最初的萌芽开始，心脏便不知疲倦地跳动，它如同一位忠诚的卫士，为全身各个器官与组织源源不断地输送着饱含氧气与营养的血液。在众多心率数值中，60 至 80bpm 的平稳静息心率堪称释放生命能量的最佳状态。当心率处于这一区间，心脏无需过度操劳，却能高效地完成血液循环任务。身体的新陈代谢有条不紊地进行，各个细胞如同被精准调校的机器部件，活力满满地运转。在这样的心率下，我们会感到精力充沛，思维清晰，无论是应对日常工作，还是投入休闲活动，都能轻松胜任，尽情释放生命蕴含的无限能量，享受健康活力的生活。"
+          "心跳，宛如生命乐章中那激昂而又稳健的鼓点，是驱动生命活力的核心机制。从生命最初的萌芽开始，心脏便不知疲倦地跳动，它如同一位忠诚的卫士，为全身各个器官与组织源源不断地输送着饱含氧气与营养的血液。在众多心率数值中，55 至 75bpm 的平稳静息心率堪称释放生命能量的最佳状态。当心率处于这一区间，心脏无需过度操劳，却能高效地完成血液循环任务。身体的新陈代谢有条不紊地进行，各个细胞如同被精准调校的机器部件，活力满满地运转。在这样的心率下，我们会感到精力充沛，思维清晰，无论是应对日常工作，还是投入休闲活动，都能轻松胜任，尽情释放生命蕴含的无限能量，享受健康活力的生活。"
     },
     'bciHrv': {
       "title": '心率变异性 HRV',

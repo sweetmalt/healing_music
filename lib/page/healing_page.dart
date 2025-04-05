@@ -170,6 +170,7 @@ class HealingPage extends GetView<HealingController> {
                         showDragHandle: true,
                         useRootNavigator: true,
                         isScrollControlled: true,
+                        useSafeArea: true,
                         constraints: BoxConstraints(
                           maxHeight: MediaQuery.of(context).size.height * 0.8,
                         ),
@@ -201,13 +202,6 @@ class HealingPage extends GetView<HealingController> {
                       );
                       return;
                     }
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('正在努力生成报告，请稍后……'),
-                          duration: Duration(seconds: 2),
-                          backgroundColor: Colors.deepPurple,
-                        ),
-                      );
                     healingController.createReport();
                     reportViewController.energyScaling();
                     showModalBottomSheet(
@@ -215,6 +209,7 @@ class HealingPage extends GetView<HealingController> {
                       showDragHandle: true,
                       useRootNavigator: true,
                       isScrollControlled: true,
+                      useSafeArea: true,
                       constraints: BoxConstraints(
                         maxHeight: MediaQuery.of(context).size.height * 0.8,
                       ),
@@ -282,6 +277,7 @@ class HealingPage extends GetView<HealingController> {
                               showDragHandle: true,
                               useRootNavigator: true,
                               isScrollControlled: true,
+                              useSafeArea: true,
                               constraints: BoxConstraints(
                                 maxHeight:
                                     MediaQuery.of(context).size.height * 0.6,
