@@ -33,14 +33,14 @@ class BrainWaveView extends StatelessWidget {
                 },
                 icon: Obx(() => healingController.isCtrlByDevice.value
                     ? Icon(
-                        Icons.toggle_on_rounded,
-                        size: 40,
+                        Icons.media_bluetooth_on_rounded,
+                        size: 30,
                         color: healingController.isDeviceLinking.value
                             ? Colors.green
                             : ThemeData().colorScheme.primary,
                       )
-                    : Icon(Icons.toggle_off_rounded,
-                    size: 40,
+                    : Icon(Icons.media_bluetooth_off_rounded,
+                    size: 30,
                         color: healingController.isDeviceLinking.value
                             ? Colors.green
                             : ThemeData().colorScheme.primary))),

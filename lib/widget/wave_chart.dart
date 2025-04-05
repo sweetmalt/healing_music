@@ -10,7 +10,7 @@ class WaveChartController extends GetxController {
   final double maxY;
   final RxList<FlSpot> dataFlSpot = <FlSpot>[].obs;
   final List<double> _data = [];
-  final List<double> bestLimits = [75, 100]; //最佳值范围
+  final List<double> bestLimits = [60, 100]; //最佳值范围
   double statisticsBestScaling = 0; //最佳值占比
   double statisticsMin = 0; //最小值
   double statisticsMax = 0; //最大值
@@ -140,79 +140,134 @@ class WaveChartStatistics extends StatelessWidget {
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.white),
-        color: ThemeData().colorScheme.primaryContainer,
+        border: Border.all(color: Colors.white, width: 3),
+        //color: ThemeData().colorScheme.primaryContainer,
       ),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         ListTile(
           title: Text(
-              "常规值占比 ${(controller.statisticsBestScaling * 10000).toInt() / 10000}"),
-          subtitle: const Text("bestScaling = count(x in bestLimits) / count"),
+              "高光时段占比 ${(controller.statisticsBestScaling * 10000).toInt() / 10000}"),
+          subtitle: const Text("bestScaling"),
         ),
-        StatisticsContainerCircle("常规值占比", controller.statisticsBestScaling),
-        ListTile(
-          title: Text("最小值 ${controller.statisticsMin}"),
-          subtitle: const Text("min"),
+        StatisticsContainerCircle("高光时刻", controller.statisticsBestScaling),
+        Container(
+          height: 40,
+          alignment: Alignment.center,
+          margin: const EdgeInsets.only(top: 20, bottom: 40),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: Colors.white,
+          ),
+          child: const Text("高光时段占比越大，对疗愈的价值贡献越高"),
         ),
-        ListTile(
-          title: Text("最大值 ${controller.statisticsMax}"),
-          subtitle: const Text("max"),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            StatisticsContainerCircleMini(
+              "最小值",
+              controller.statisticsMin,
+              false,
+            ),
+            StatisticsContainerCircleMini(
+              "最大值",
+              controller.statisticsMax,
+              false,
+            ),
+            StatisticsContainerCircleMini(
+              "波动范围",
+              controller.statisticsRange,
+              false,
+            )
+          ],
         ),
-        ListTile(
-          title: Text("大小差 ${controller.statisticsRange}"),
-          subtitle: const Text("range = max - min"),
+        Container(
+          height: 40,
+          alignment: Alignment.center,
+          margin: const EdgeInsets.only(top: 20, bottom: 40),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: Colors.white,
+          ),
+          child: const Text("波动范围越小，表示越稳定"),
         ),
-        ListTile(
-          title:
-              Text("均值 ${(controller.statisticsMean * 10000).toInt() / 10000}"),
-          subtitle: const Text("mean = sum / count"),
+        Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+          Column(
+            children: [
+              StatisticsContainerCircleMini(
+                "均值",
+                controller.statisticsMean,
+                false,
+              ),
+              StatisticsContainerCircleMini(
+                "均值排位",
+                controller.statisticsMeanPosition,
+                true,
+              ),
+            ],
+          ),
+          Column(children: [
+            StatisticsContainerCircleMini(
+              "众数",
+              controller.statisticsMode,
+              false,
+            ),
+            StatisticsContainerCircleMini(
+              "众数排位",
+              controller.statisticsModePosition,
+              true,
+            ),
+            StatisticsContainerCircleMini(
+              "众数占比",
+              controller.statisticsModeScaling,
+              true,
+            ),
+          ]),
+          Column(children: [
+            StatisticsContainerCircleMini(
+              "中位数",
+              controller.statisticsMedian,
+              false,
+            ),
+            StatisticsContainerCircleMini(
+              "中位数排位",
+              controller.statisticsMedianPosition,
+              true,
+            ),
+          ]),
+        ]),
+        Container(
+          height: 40,
+          alignment: Alignment.center,
+          margin: const EdgeInsets.only(top: 20, bottom: 40),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: Colors.white,
+          ),
+          child: const Text("众数占比越大，表示越稳定"),
         ),
-        ListTile(
-          title: Text(
-              "均值排位 ${(controller.statisticsMeanPosition * 10000).toInt() / 10000}"),
-          subtitle: const Text("meanPosition = (mean - min) / range"),
-        ),
-        StatisticsContainerCircle("均值排位", controller.statisticsMeanPosition),
-        ListTile(
-          title: Text(
-              "标准差 ${(controller.statisticsMeanDifference * 10000).toInt() / 10000}"),
-          subtitle: const Text("meanDifference"),
-        ),
-        ListTile(
-          title: Text(
-              "均方根 ${(controller.statisticsMeanInterfacingDifference * 10000).toInt() / 10000}"),
-          subtitle: const Text("meanInterfacingDifference"),
-        ),
-        ListTile(
-          title: Text("众数 ${controller.statisticsMode}"),
-          subtitle: const Text("mode = x with max count"),
-        ),
-        ListTile(
-          title: Text(
-              "众数排位 ${(controller.statisticsModePosition * 10000).toInt() / 10000}"),
-          subtitle: const Text("modePosition = (mode - min) / range"),
-        ),
-        StatisticsContainerCircle("众数排位", controller.statisticsModePosition),
-        ListTile(
-          title: Text(
-              "众数占比 ${(controller.statisticsModeScaling * 10000).toInt() / 10000}"),
-          subtitle: const Text("modeScaling = count(x == mode) / count"),
-        ),
-        StatisticsContainerCircle("众数占比", controller.statisticsModeScaling),
-        ListTile(
-          title: Text("中位数 ${controller.statisticsMedian}"),
-          subtitle: const Text("median = x with median index"),
-        ),
-        ListTile(
-          title: Text(
-              "中位数排位 ${(controller.statisticsMedianPosition * 10000).toInt() / 10000}"),
-          subtitle: const Text("medianPosition = (median - min) / range"),
-        ),
-        StatisticsContainerCircle("中位数排位", controller.statisticsMedianPosition),
-        ListTile(
-          title: Text(
-              "记录时长 ${(controller.statisticsCount / 60).toInt()}分${(controller.statisticsCount % 60).toInt()}秒"),
-          subtitle: const Text("count = data.length"),
+        Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+          StatisticsContainerCircleMini(
+            "标准差",
+            controller.statisticsMeanDifference,
+            false,
+          ),
+          StatisticsContainerCircleMini(
+            "均方根",
+            controller.statisticsMeanInterfacingDifference,
+            false,
+          ),
+          StatisticsContainerCircleMini(
+              "数据量", controller.statisticsCount, false),
+        ]),
+        Container(
+          height: 40,
+          alignment: Alignment.center,
+          margin: const EdgeInsets.only(top: 20, bottom: 40),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: Colors.white,
+          ),
+          child: const Text("标准差和均方根越小，表示越稳定"),
         ),
       ]),
     );
@@ -243,13 +298,59 @@ class StatisticsContainerCircle extends Container {
       Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Text('${(value * 10000).toInt() / 100}%',
+              style: const TextStyle(
+                fontSize: 40,
+                fontWeight: FontWeight.bold,
+              )),
           Text(
-            '${(value * 10000).toInt() / 100}%',
-            style: const TextStyle(
-              fontSize: 40,
-              fontWeight: FontWeight.bold, 
-            )
+            title,
           ),
+        ],
+      ),
+    ]);
+  }
+}
+
+class StatisticsContainerCircleMini extends Container {
+  final String title;
+  final double value;
+  final bool isShowAsScaling;
+  StatisticsContainerCircleMini(this.title, this.value, this.isShowAsScaling,
+      {super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Stack(alignment: Alignment.center, children: [
+      Container(
+        width: 100,
+        height: 100,
+        margin: const EdgeInsets.all(5),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(50),
+        ),
+        child: CircularProgressIndicator(
+          backgroundColor: Colors.white,
+          valueColor:
+              AlwaysStoppedAnimation<Color>(ThemeData().colorScheme.primary),
+          value: 1,
+          strokeWidth: 2,
+        ),
+      ),
+      Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (isShowAsScaling == true)
+            Text('${(value * 10000).toInt() / 100}%',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ))
+          else
+            Text('${(value * 100).toInt() / 100}',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                )),
           Text(
             title,
           ),

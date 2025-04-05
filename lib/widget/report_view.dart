@@ -23,21 +23,30 @@ class ReportView extends GetView<ReportViewController> {
           Container(
             alignment: Alignment.center,
             padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-                color: ThemeData().colorScheme.secondaryContainer,
-                borderRadius: const BorderRadius.all(Radius.circular(10))),
+            decoration: const BoxDecoration(
+                //color: ThemeData().colorScheme.secondaryContainer,
+                borderRadius: BorderRadius.all(Radius.circular(10))),
             child: Column(
               children: [
                 ListTile(
-                  title: Text("能量报告", style: MyStyle.paragraphTitleTextStyle),
-                  subtitle: const Text("总能效，是指一个服务时段内，顾客对整体能量疗愈服务的有效利用率。"),
-                  trailing: IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.save_rounded), 
-                  )
-                ),
+                    title: Text("能量报告", style: MyStyle.paragraphTitleTextStyle),
+                    subtitle: const Text("总能量 = 心理能量 ✖ 生理能量"),
+                    trailing: IconButton(
+                      onPressed: () {},
+                      icon: const Icon(Icons.save_alt_rounded),
+                    )),
+                ListTile(
+                    tileColor: Colors.white,
+                    title: Obx(() => Text(
+                        "顾客昵称：${healingController.customerNickname.value}",
+                        style: MyStyle.paragraphTitleTextStyle)),
+                    trailing: IconButton(
+                        onPressed: () {
+                          showEditCustomerNicknameDialog(context);
+                        },
+                        icon: const Icon(Icons.edit_rounded))),
                 const SizedBox(height: 40),
-                StatisticsContainerCircle("总能效",
+                StatisticsContainerCircle("总能量",
                     controller.energyPsyScaling * controller.energyPhyScaling),
                 const SizedBox(height: 20),
                 Text(
@@ -49,7 +58,7 @@ class ReportView extends GetView<ReportViewController> {
           ),
           ParagraphListTile(
             title:
-                "${_dataDoc['energyPsy']?['title'] ?? ''}（能效 ${(controller.energyPsyScaling * 10000).toInt() / 100}%）",
+                "${_dataDoc['energyPsy']?['title'] ?? ''}（${(controller.energyPsyScaling * 10000).toInt() / 100}%）",
             onTap: () {},
           ),
           ListTile(
@@ -172,6 +181,52 @@ class ReportView extends GetView<ReportViewController> {
         icon: _showShortDoc.value
             ? const Icon(Icons.keyboard_double_arrow_down)
             : const Icon(Icons.keyboard_double_arrow_up));
+  }
+
+  Future<void> showEditCustomerNicknameDialog(BuildContext context) async {
+    final TextEditingController controller = TextEditingController();
+    controller.text = healingController.customerNickname.value;
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // 用户必须点击按钮才能关闭对话框
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('顾客昵称'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                TextField(
+                  autofocus: true,
+                  decoration: const InputDecoration(
+                    hintText: '请输入顾客昵称',
+                  ),
+                  controller: controller,
+                  onChanged: (value) {
+                    controller.text = value;
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('取消'),
+              onPressed: () {
+                Navigator.of(context).pop(); // 关闭对话框
+              },
+            ),
+            TextButton(
+              child: const Text('确认'),
+              onPressed: () {
+                // 在这里执行确认后的操作
+                healingController.customerNickname.value = controller.text;
+                Navigator.of(context).pop(); // 关闭对话框
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 

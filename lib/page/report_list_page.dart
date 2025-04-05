@@ -23,6 +23,12 @@ class ReportList extends GetView<ReportListController> {
               icon: const Icon(Icons.select_all),
               onPressed: () {},
             ),
+            IconButton(
+              icon: const Icon(Icons.arrow_back_ios_rounded),
+              onPressed: () {
+                Get.back();
+              },
+            ),
           ],
         ),
         body: SingleChildScrollView(
@@ -42,8 +48,9 @@ class ReportList extends GetView<ReportListController> {
                       controller.datas[controller.items[i]]!;
                   Get.to(() => ReportPage());
                 },
-                trailing: const Icon(Icons.menu_book_rounded),
+                trailing: const Icon(Icons.delete_outline_rounded),
               ),
+              
           ],
         )));
   }
@@ -79,6 +86,12 @@ class ReportPage extends GetView<ReporPageController> {
             IconButton(
               icon: const Icon(Icons.share),
               onPressed: () {},
+            ),
+            IconButton(
+              icon: const Icon(Icons.arrow_back_ios_rounded),
+              onPressed: () {
+                Get.back();
+              },
             ),
           ],
         ),

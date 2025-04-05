@@ -56,6 +56,9 @@ class HealingController extends Ctrl {
   final BgmController bgmController = Get.put(BgmController());
   final BbmController bbmController = Get.put(BbmController());
 
+  final RxString customerNickname = ''.obs;
+  final RxBool isEditCustomerNickname = false.obs;
+
   Future<void> startTimePlan(String k, int v) async {
     isCtrlByTimePlan.value = true;
     isPauseCtrlByTimePlan.value = false;
@@ -235,6 +238,7 @@ class HealingController extends Ctrl {
   }
 
   Future<void> createReport() async {
+/**
     if (receivedDataCount >= 300 && receivedDataCount < 600) {
       curRelaxWaveController.setBestLimits(70, 100);
       curSharpWaveController.setBestLimits(70, 100);
@@ -263,14 +267,15 @@ class HealingController extends Ctrl {
       bciAttWaveController.setBestLimits(60, 100);
       bciMedWaveController.setBestLimits(60, 100);
     }
+*/
     await curRelaxWaveController.statistics();
     await curSharpWaveController.statistics();
     await curFlowWaveController.statistics();
     await bciAttWaveController.statistics();
     await bciMedWaveController.statistics();
-    bciHeartRateWaveController.setBestLimits(60, 75);
+    bciHeartRateWaveController.setBestLimits(55, 70);
     await bciHeartRateWaveController.statistics();
-    bciHrvWaveController.setBestLimits(800, 1000);
+    bciHrvWaveController.setBestLimits(857, 1090);
     await bciHrvWaveController.statistics();
   }
 
@@ -317,10 +322,10 @@ class HealingController extends Ctrl {
   }
 
   static final Map<String, Map<String, String>> dataDoc = {
-    'energyPsy': {"title": '心理能效 EPS', "short": "心理能效 EPS", "long": "心理能效 EPS"},
-    'energyPhy': {"title": '生理能效 EPH', "short": "生理能效 EPH", "long": "生理能效 EPH"},
+    'energyPsy': {"title": '心理能量 EPS', "short": "心理能量 EPS", "long": "心理能量 EPS"},
+    'energyPhy': {"title": '生理能量 EPH', "short": "生理能量 EPH", "long": "生理能量 EPH"},
     'curRelax': {
-      "title": '松弛度 RELAX',
+      "title": '松弛感 RELAX',
       "short": "RELAX = 0.5 ✖ (100 - ATT) + 0.5 ✖ MED",
       "long": "宽宥，从容"
     },
@@ -347,7 +352,7 @@ class HealingController extends Ctrl {
           "安全感，宛如心灵的坚固护盾，深刻影响着我们的身心状态。当安全感充足，我们周身紧绷的神经便会慢慢舒缓，整个人呈现出松弛自在的模样。在这一状态下，主导身体放松与恢复的副交感神经，所承受的压力也随之显著降低。副交感神经压力的减轻，意味着身体不再时刻处于应激防御状态，得以将更多的能量投入到身心疗愈之中。就如同春日暖阳轻柔照耀，滋养着疲惫的心灵，修复着受损的身体机能，让我们由内而外重焕活力，从容面对生活里的种种挑战 。"
     },
     'bciAp': {
-      "title": '愉悦感 AP',
+      "title": '愉悦度 AP',
       "short": "越愉悦，越接纳，这是吸纳外部能量的关键时刻。",
       "state": "平常,舒心,畅快,欢喜,极乐",
       "long":

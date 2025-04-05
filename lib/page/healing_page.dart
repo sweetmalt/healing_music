@@ -179,8 +179,8 @@ class HealingPage extends GetView<HealingController> {
                       );
                     },
                     icon: healingController.isCtrlByDevice.value
-                        ? Icons.sensors_rounded
-                        : Icons.sensors_off_rounded,
+                        ? Icons.media_bluetooth_on_rounded
+                        : Icons.media_bluetooth_off_rounded,
                     backgroundColor: healingController.isDeviceLinking.value
                         ? Colors.green
                         : ThemeData().colorScheme.primaryContainer,
@@ -194,13 +194,20 @@ class HealingPage extends GetView<HealingController> {
                     if (healingController.receivedDataCount < 60) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('数据太少，请确保设备连接正常后，过一分钟再试'),
-                          duration: Duration(seconds: 2),
+                          content: Text('数据量太少，请确保设备连接正常后，过一分钟再试'),
+                          duration: Duration(seconds: 3),
                           backgroundColor: Colors.deepPurple,
                         ),
                       );
                       return;
                     }
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('正在努力生成报告，请稍后……'),
+                          duration: Duration(seconds: 2),
+                          backgroundColor: Colors.deepPurple,
+                        ),
+                      );
                     healingController.createReport();
                     reportViewController.energyScaling();
                     showModalBottomSheet(
