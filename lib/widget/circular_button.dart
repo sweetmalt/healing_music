@@ -58,7 +58,7 @@ class CircularIconButton extends StatelessWidget {
         backgroundColor: backgroundColor,
         foregroundColor: foregroundColor,
       ),
-      child: Icon(icon),
+      child: Icon(icon, size: 30),
     );
   }
 }

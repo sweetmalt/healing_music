@@ -22,11 +22,12 @@ class MainPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 50,
+        toolbarHeight: 60,
         title: AppBarTitle('AI音疗 HealingMusic'),
         centerTitle: true,
         shadowColor: ThemeData().colorScheme.primary,
         leading: IconButton(
+          iconSize: 30,
           color: ThemeData().colorScheme.primary,
             onPressed: () => {Get.to(() => ReportList())},
             icon: const Icon(Icons.menu_book_rounded)),

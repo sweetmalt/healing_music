@@ -41,7 +41,7 @@ class Data extends Object {
     }
   }
 
-  Future<List<String>> readFileList(String start) async {
+  static Future<List<String>> readFileList(String start) async {
     try {
       final directory = await getApplicationDocumentsDirectory();
       // 获取目录下以start开头的的所有文件
@@ -64,7 +64,41 @@ class Data extends Object {
     return [];
   }
 
-  Future<void> write(Map<String, dynamic> data) async {
+  static Future<bool> delete(String fileName) async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final file = File('${directory.path}/$fileName');
+      await file.delete();
+      if (kDebugMode) {
+        print('删除JSON文件: ${directory.path}/$fileName');
+      }
+      return true;
+    } catch (e) {
+      if (kDebugMode) {
+        print('删除JSON文件时出错: $e');
+      }
+      return false;
+    }
+  }
+
+  static Future<bool> rename(String fileName, String newname) async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final file = File('${directory.path}/$fileName');
+      await file.rename('${directory.path}/$newname');
+      if (kDebugMode) {
+        print('重命名JSON文件: ${directory.path}/$fileName');
+      }
+      return true;
+    } catch (e) {
+      if (kDebugMode) {
+        print('重命名JSON文件时出错: $e');
+      }
+      return false;
+    }
+  }
+
+  Future<bool> write(Map<String, dynamic> data) async {
     try {
       final directory = await getApplicationDocumentsDirectory();
       final file = File('${directory.path}/$jsonFileName');
@@ -73,10 +107,12 @@ class Data extends Object {
       if (kDebugMode) {
         print('写入JSON文件: ${directory.path}/$jsonFileName');
       }
+      return true;
     } catch (e) {
       if (kDebugMode) {
         print('写入JSON文件时出错: $e');
       }
+      return false;
     }
   }
 }
