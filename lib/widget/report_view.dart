@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:healing_music/controller/ctrl.dart';
 import 'package:healing_music/controller/healing_controller.dart';
+import 'package:healing_music/data/data.dart';
 import 'package:healing_music/style/style.dart';
 import 'package:healing_music/widget/paragraph.dart';
 import 'package:healing_music/widget/wave_chart.dart';
@@ -31,9 +33,32 @@ class ReportView extends GetView<ReportViewController> {
               children: [
                 ListTile(
                     title: Text("能量报告", style: MyStyle.paragraphTitleTextStyle),
-                    subtitle: const Text("总能量 = 心理能量 ✖ 生理能量"),
+                    subtitle: const Text("自身能效 = 心理能效 ✖ 生理能效"),
                     trailing: IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        if (healingController.customerNickname.value.isEmpty) {
+                          showEditCustomerNicknameDialog(context);
+                        } else {
+                          String nickname =
+                              healingController.customerNickname.value;
+                          int timestamp = DateTime.now().millisecondsSinceEpoch;
+                          Data dataFile = Data(
+                            jsonFileName: 'report_${nickname}_$timestamp.json',
+                          );
+                          if (healingController.receivedDataCount > 60) {
+                            dataFile.write({
+                              "nickname":
+                                  healingController.customerNickname.value,
+                              "timestamp": timestamp.toString(),
+                              "data": healingController.data,
+                            });
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('数据样本量太少，不值得保存！')),
+                            );
+                          }
+                        }
+                      },
                       icon: const Icon(Icons.save_alt_rounded),
                     )),
                 ListTile(
@@ -47,7 +72,7 @@ class ReportView extends GetView<ReportViewController> {
                         },
                         icon: const Icon(Icons.edit_rounded))),
                 const SizedBox(height: 40),
-                StatisticsContainerCircle("总能量",
+                StatisticsContainerCircle("自身能效",
                     controller.energyPsyScaling * controller.energyPhyScaling),
                 const SizedBox(height: 20),
                 Text(
@@ -197,15 +222,21 @@ class ReportView extends GetView<ReportViewController> {
             child: ListBody(
               children: <Widget>[
                 TextField(
+                  maxLength: 32,
                   autofocus: true,
                   decoration: const InputDecoration(
-                    hintText: '请输入顾客昵称',
+                    hintText: '请输入顾客昵称（4-32个字符）',
                   ),
                   controller: controller,
                   onChanged: (value) {
                     controller.text = value;
                   },
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(
+                        RegExp(r'[\u4e00-\u9fa5a-zA-Z0-9]')),
+                  ],
                 ),
+                const Text("仅允许中文英文和数字，最少4位，最多32位"),
               ],
             ),
           ),
@@ -219,9 +250,15 @@ class ReportView extends GetView<ReportViewController> {
             TextButton(
               child: const Text('确认'),
               onPressed: () {
-                // 在这里执行确认后的操作
-                healingController.customerNickname.value = controller.text;
-                Navigator.of(context).pop(); // 关闭对话框
+                if (controller.text.length >= 4 &&
+                    controller.text.length <= 32) {
+                  healingController.customerNickname.value = controller.text;
+                  Navigator.of(context).pop();
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('昵称长度必须在4到32个字符之间')),
+                  );
+                }
               },
             ),
           ],

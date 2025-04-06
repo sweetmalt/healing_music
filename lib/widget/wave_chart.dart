@@ -17,8 +17,9 @@ class WaveChartController extends GetxController {
   double statisticsRange = 0; //大小差
   double statisticsMean = 0; //均值
   double statisticsMeanPosition = 0; //均值排位
-  double statisticsMeanDifference = 0; //均差
-  double statisticsMeanInterfacingDifference = 0; //均邻差
+  double statisticsMeanDifference = 0; //标准差
+  double statisticsMeanInterfacingDifference = 0; //邻差均方根
+  double statisticsMeanInterfacing50Scaling = 0; //邻差>50的占比
   double statisticsMode = 0; //众数
   double statisticsModePosition = 0; //众数排位
   double statisticsModeScaling = 0; //众数占比
@@ -48,7 +49,7 @@ class WaveChartController extends GetxController {
     _data.clear();
   }
 
-  Future<void> clearData() async{
+  Future<void> clearData() async {
     _data.clear();
     statisticsCount = 0;
     dataFlSpot.clear();
@@ -64,6 +65,24 @@ class WaveChartController extends GetxController {
   void setBestLimits(double min, double max) {
     bestLimits[0] = min;
     bestLimits[1] = max;
+  }
+
+  /// 基于rr间期值数组的心率变异性hrv数据的频域分析（Frequency-Domain Analysis）
+  /// 通过功率谱密度（PSD）计算不同频段的能量分布：
+  /// 总功率（TP）
+  /// 总频段（通常 ≤0.4 Hz）的功率：
+  /// TP=∫00.4P(f)dfTP=∫00.4P(f)df
+  /// 低频功率（LF, 0.04–0.15 Hz）
+  /// LF=∫0.040.15P(f)dfLF=∫0.040.15P(f)df
+  /// 高频功率（HF, 0.15–0.4 Hz）
+  /// HF=∫0.150.4P(f)dfHF=∫0.150.4P(f)df
+  /// LF/HF 比值
+  /// 反映交感与副交感神经平衡：
+  /// LFHF=LF功率HF功率HFLF=HF功率LF功率
+  Future<void> statisticsHrv() async {
+    if (_data.length < 60) {
+      return;
+    }
   }
 
   Future<void> statistics() async {
@@ -91,7 +110,14 @@ class WaveChartController extends GetxController {
     }
     statisticsMeanInterfacingDifference =
         math.sqrt(sumOfDifferences / (_data.length - 1));
-
+    //邻差>50的占比
+    sumOfDifferences = 0.0;
+    for (int i = 1; i < _data.length; i++) {
+      if (_data[i] - _data[i - 1] > 50 || _data[i] - _data[i - 1] < -50) {
+        sumOfDifferences++;
+      }
+    }
+    statisticsMeanInterfacing50Scaling = sumOfDifferences / (_data.length - 1);
     statisticsMode = _data.reduce((a, b) =>
         _data.where((x) => x == a).length > _data.where((x) => x == b).length
             ? a
@@ -119,14 +145,13 @@ class WaveChartController extends GetxController {
       _data.add(value);
       dataFlSpot.add(FlSpot(maxX, value));
       maxX += 1;
-      if (dataFlSpot.length > maxDataPoints) {
+      if (dataFlSpot.length >= maxDataPoints) {
         minX += 1;
       }
-      if (maxX > 300) {
-        dataFlSpot.clear();
-        dataFlSpot.add(const FlSpot(0, 0));
-        minX = 0;
-        maxX = 0;
+      int len = _data.length;
+      if (len >= 900) {
+        _data.removeRange(0, 600);
+        dataFlSpot.removeRange(0, 600);
       }
       update();
     }
@@ -252,17 +277,22 @@ class WaveChartStatistics extends StatelessWidget {
         ),
         Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
           StatisticsContainerCircleMini(
-            "标准差",
+            "标准差SDNN",
             controller.statisticsMeanDifference,
             false,
           ),
+          controller.statisticsMeanInterfacing50Scaling > 0
+              ? StatisticsContainerCircleMini(
+                  "NN50",
+                  controller.statisticsMeanInterfacing50Scaling,
+                  true,
+                )
+              : Container(),
           StatisticsContainerCircleMini(
-            "均方根",
+            "均方根RMSSD",
             controller.statisticsMeanInterfacingDifference,
             false,
           ),
-          StatisticsContainerCircleMini(
-              "数据量", controller.statisticsCount, false),
         ]),
         Container(
           height: 40,
@@ -274,6 +304,10 @@ class WaveChartStatistics extends StatelessWidget {
           ),
           child: const Text("标准差和均方根越小，表示越稳定"),
         ),
+        Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+          StatisticsContainerCircleMini(
+              "数据样本量", controller.statisticsCount, false),
+        ]),
       ]),
     );
   }

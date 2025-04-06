@@ -20,10 +20,15 @@ class Data extends Object {
       final directory = await getApplicationDocumentsDirectory();
       final file = File('${directory.path}/$jsonFileName');
       if (!await file.exists()) {
-        final jsonString =
-            await rootBundle.loadString("assets/json/$jsonFileName");
-        await file.writeAsString(jsonString);
-        return json.decode(jsonString);
+        final tempFile = File("assets/json/$jsonFileName");
+        if (await tempFile.exists()) {
+          final jsonString =
+              await rootBundle.loadString("assets/json/$jsonFileName");
+          await file.writeAsString(jsonString);
+          return json.decode(jsonString);
+        } else {
+          return {};
+        }
       } else {
         final contents = await file.readAsString();
         return json.decode(contents);
@@ -34,6 +39,29 @@ class Data extends Object {
       }
       return {};
     }
+  }
+
+  Future<List<String>> readFileList(String start) async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      // 获取目录下以start开头的的所有文件
+      final files = directory.listSync().where((file) {
+        return file is File && file.path.startsWith('${directory.path}/$start');
+      }).toList();
+      // 将文件列表转换为文件名列表
+      if (files.isNotEmpty) {
+        final fileNames =
+            files.map((file) => file.path.split('/').last).toList();
+        return fileNames;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('读取JSON文件时出错: $e');
+      }
+    }
+    return [];
   }
 
   Future<void> write(Map<String, dynamic> data) async {

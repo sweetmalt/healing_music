@@ -29,7 +29,7 @@ class HealingController extends Ctrl {
   StreamSubscription? _streamSubscription;
   final RxString receivedData = "等待设备连接...".obs;
   final List<String> _data = <String>[];
-  int receivedDataCount = 0;
+  final List<double> _hrvData = <double>[];
   final RxDouble bciAtt = 0.0.obs;
   final RxDouble bciMed = 0.0.obs;
   final RxDouble bciAp = 0.0.obs;
@@ -43,10 +43,10 @@ class HealingController extends Ctrl {
   final RxDouble bciMiddleGamma = 0.0.obs;
   final RxDouble bciTemperature = 0.0.obs;
   final RxDouble bciHeartRate = 0.0.obs;
-  final RxDouble bciHrv = 0.0.obs;
-  final RxDouble bciOygen = 0.0.obs;
   final RxDouble bciGrind = 0.0.obs;
   final RxInt bciCurrentTimeMillis = 0.obs; //时间戳
+  final RxList<double> bciHrv = <double>[].obs;
+
   /// 分析数据
   final RxDouble curRelax = 0.0.obs;
   final RxDouble curSharp = 0.0.obs;
@@ -233,12 +233,15 @@ class HealingController extends Ctrl {
     await bciMiddleGammaWaveController.addDataPoint(bciMiddleGamma.value);
     await bciTemperatureWaveController.addDataPoint(bciTemperature.value);
     await bciHeartRateWaveController.addDataPoint(bciHeartRate.value);
-    await bciHrvWaveController.addDataPoint(bciHrv.value);
     await bciGrindWaveController.addDataPoint(bciGrind.value);
+    for (double item in bciHrv) {
+      await bciHrvWaveController.addDataPoint(item);
+    }
   }
 
   Future<void> clearData() async {
     _data.clear();
+    _hrvData.clear();
     await curRelaxWaveController.clearData();
     await curSharpWaveController.clearData();
     await curFlowWaveController.clearData();
@@ -255,10 +258,20 @@ class HealingController extends Ctrl {
     await bciMiddleGammaWaveController.clearData();
     await bciTemperatureWaveController.clearData();
     await bciHeartRateWaveController.clearData();
-    await bciHrvWaveController.clearData();
     await bciGrindWaveController.clearData();
-    receivedDataCount = 0;
+    await bciHrvWaveController.clearData();
   }
+
+  Future<List<String>> get data async {
+    return _data;
+  }
+
+  Future<List<double>> get hrvData async {
+    return _hrvData;
+  }
+
+  get receivedDataCount => _data.length;
+  get receivedHrvDataCount => _hrvData.length;
 
   Future<void> createReport() async {
 /**
@@ -298,7 +311,7 @@ class HealingController extends Ctrl {
     await bciMedWaveController.statistics();
     bciHeartRateWaveController.setBestLimits(55, 75);
     await bciHeartRateWaveController.statistics();
-    bciHrvWaveController.setBestLimits(800, 1091);
+    bciHrvWaveController.setBestLimits(750, 1200);
     await bciHrvWaveController.statistics();
   }
 
@@ -309,32 +322,51 @@ class HealingController extends Ctrl {
     _streamSubscription =
         eventChannel.receiveBroadcastStream().listen((data) async {
       receivedData.value = data.toString();
-      List<String> temp = data.toString().split(',');
-      if (temp.length == 17) {
-        bciAtt.value = double.parse(temp[0]);
-        bciMed.value = double.parse(temp[1]);
-        bciAp.value = double.parse(temp[2]);
-        bciDelta.value = double.parse(temp[3]);
-        bciTheta.value = double.parse(temp[4]);
-        bciLowAlpha.value = double.parse(temp[5]);
-        bciHighAlpha.value = double.parse(temp[6]);
-        bciLowBeta.value = double.parse(temp[7]);
-        bciHighBeta.value = double.parse(temp[8]);
-        bciLowGamma.value = double.parse(temp[9]);
-        bciMiddleGamma.value = double.parse(temp[10]);
-        bciTemperature.value = double.parse(temp[11]);
-        bciHeartRate.value = double.parse(temp[12]);
-        bciHrv.value = double.parse(temp[13].split('_')[0]);
-        bciOygen.value = double.parse(temp[14]);
-        bciGrind.value = double.parse(temp[15]);
-        bciCurrentTimeMillis.value = int.parse(temp[16]);
-        bciCurrentTwoTimeMillis[1] = bciCurrentTimeMillis.value;
+      List<String> temp = data.toString().split('_');
+      if (temp.length == 2) {
+        if (temp[0] == "bci") {
+          temp = temp[1].split(',');
+          if (temp.length == 15) {
+            bciAtt.value = double.parse(temp[0]);
+            bciMed.value = double.parse(temp[1]);
+            bciAp.value = double.parse(temp[2]);
+            bciDelta.value = double.parse(temp[3]);
+            bciTheta.value = double.parse(temp[4]);
+            bciLowAlpha.value = double.parse(temp[5]);
+            bciHighAlpha.value = double.parse(temp[6]);
+            bciLowBeta.value = double.parse(temp[7]);
+            bciHighBeta.value = double.parse(temp[8]);
+            bciLowGamma.value = double.parse(temp[9]);
+            bciMiddleGamma.value = double.parse(temp[10]);
+            bciTemperature.value = double.parse(temp[11]);
+            bciHeartRate.value = double.parse(temp[12]);
+            bciGrind.value = double.parse(temp[13]);
+            bciCurrentTimeMillis.value = int.parse(temp[14]);
+            bciCurrentTwoTimeMillis[1] = bciCurrentTimeMillis.value;
+
+            _data.add(receivedData.value);
+            if (_data.length > 3600) {
+              _data.removeRange(0, 1800);
+            }
+          }
+        }
+        if (temp[0] == "hrv") {
+          temp = temp[1].split(',');
+          if (temp.isNotEmpty) {
+            List<double> x = [];
+            for (String item in temp) {
+              x.add(double.parse(item));
+            }
+            bciHrv.value = x;
+            _hrvData.addAll(x);
+            if (_hrvData.length > 3600) {
+              _hrvData.removeRange(0, 1800); 
+            }
+          }
+        }
         await _dataAnalysis();
         await _showRealData();
         await _ctrlByDevice();
-
-        _data.add(receivedData.value);
-        receivedDataCount++;
       }
     }, onError: (error) {});
   }
@@ -347,8 +379,8 @@ class HealingController extends Ctrl {
   }
 
   static final Map<String, Map<String, String>> dataDoc = {
-    'energyPsy': {"title": '心理能量 EPS', "short": "心理能量 EPS", "long": "心理能量 EPS"},
-    'energyPhy': {"title": '生理能量 EPH', "short": "生理能量 EPH", "long": "生理能量 EPH"},
+    'energyPsy': {"title": '心理能效 EPS', "short": "心理能效 EPS", "long": "心理能效 EPS"},
+    'energyPhy': {"title": '生理能效 EPH', "short": "生理能效 EPH", "long": "生理能效 EPH"},
     'curRelax': {
       "title": '松弛感 RELAX',
       "short": "松弛感，是一场灵魂的深海潜游",

@@ -17,7 +17,8 @@ class HealingPage extends GetView<HealingController> {
   HealingPage({super.key});
   final MainController mainController = Get.find();
   final HealingController healingController = Get.put(HealingController());
-  final ReportViewController reportViewController = Get.put(ReportViewController());
+  final ReportViewController reportViewController =
+      Get.put(ReportViewController());
   final HemController hemController = Get.put(HemController());
   final EnvController envController = Get.put(EnvController());
   final BgmController bgmController = Get.put(BgmController());
@@ -202,8 +203,19 @@ class HealingPage extends GetView<HealingController> {
                       );
                       return;
                     }
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (BuildContext context) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      },
+                    );
                     healingController.createReport();
                     reportViewController.energyScaling();
+                    Navigator.of(context).pop();
+
                     showModalBottomSheet(
                       context: context,
                       showDragHandle: true,

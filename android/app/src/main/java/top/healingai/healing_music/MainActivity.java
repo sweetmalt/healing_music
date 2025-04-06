@@ -32,8 +32,10 @@ public class MainActivity extends FlutterActivity {
                                 @Override
                                 public void onReceive(Context context, Intent intent) {
                                     if (BCI_ACTION.equals(intent.getAction())) { // 添加action校验
-                                        String data = intent.getStringExtra("bci_data");
-                                        if (data != null) events.success(data);
+                                        String bci = intent.getStringExtra("bci_data");
+                                        if (bci != null) events.success("bci_"+bci);
+                                        String hrv = intent.getStringExtra("hrv_data");
+                                        if (hrv != null) events.success("hrv_"+hrv);
                                     }
                                 }
                             };
