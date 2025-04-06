@@ -117,92 +117,74 @@ class HealingController extends Ctrl {
   }
 
   final curRelaxWaveController = WaveChartController(
-    maxDataPoints: 60,
     minY: 0,
     maxY: 100,
   );
   final curSharpWaveController = WaveChartController(
-    maxDataPoints: 60,
     minY: 0,
     maxY: 100,
   );
   final curFlowWaveController = WaveChartController(
-    maxDataPoints: 60,
     minY: 0,
     maxY: 100,
   );
   final bciAttWaveController = WaveChartController(
-    maxDataPoints: 60,
     minY: 0,
     maxY: 100,
   );
   final bciMedWaveController = WaveChartController(
-    maxDataPoints: 60,
     minY: 0,
     maxY: 100,
   );
   final bciApWaveController = WaveChartController(
-    maxDataPoints: 60,
     minY: 0,
     maxY: 4,
   );
   final bciDeltaWaveController = WaveChartController(
-    maxDataPoints: 60,
     minY: 0,
     maxY: 100000,
   );
   final bciThetaWaveController = WaveChartController(
-    maxDataPoints: 60,
     minY: 0,
     maxY: 100000,
   );
   final bciLowAlphaWaveController = WaveChartController(
-    maxDataPoints: 60,
     minY: 0,
     maxY: 100000,
   );
   final bciHighAlphaWaveController = WaveChartController(
-    maxDataPoints: 60,
     minY: 0,
     maxY: 100000,
   );
   final bciLowBetaWaveController = WaveChartController(
-    maxDataPoints: 60,
     minY: 0,
     maxY: 100000,
   );
   final bciHighBetaWaveController = WaveChartController(
-    maxDataPoints: 60,
     minY: 0,
     maxY: 100000,
   );
   final bciLowGammaWaveController = WaveChartController(
-    maxDataPoints: 60,
     minY: 0,
     maxY: 100000,
   );
   final bciMiddleGammaWaveController = WaveChartController(
-    maxDataPoints: 60,
     minY: 0,
     maxY: 100000,
   );
   final bciTemperatureWaveController = WaveChartController(
-    maxDataPoints: 60,
     minY: 0,
     maxY: 50,
   );
   final bciHeartRateWaveController = WaveChartController(
-    maxDataPoints: 60,
     minY: 0,
     maxY: 200,
   );
   final bciHrvWaveController = WaveChartController(
-    maxDataPoints: 60,
-    minY: 300,
+    minY: 0,
     maxY: 1500,
   );
   final bciGrindWaveController = WaveChartController(
-    maxDataPoints: 60,
     minY: 0,
     maxY: 2,
   );
@@ -360,7 +342,7 @@ class HealingController extends Ctrl {
             bciHrv.value = x;
             _hrvData.addAll(x);
             if (_hrvData.length > 3600) {
-              _hrvData.removeRange(0, 1800); 
+              _hrvData.removeRange(0, 1800);
             }
           }
         }

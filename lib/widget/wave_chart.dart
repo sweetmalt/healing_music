@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class WaveChartController extends GetxController {
-  final int maxDataPoints;
+  static const int maxDataPoints = 60;
   final double minY;
   final double maxY;
   final RxList<FlSpot> dataFlSpot = <FlSpot>[].obs;
@@ -28,10 +28,9 @@ class WaveChartController extends GetxController {
   double statisticsCount = 0; //数据点数量，记录时长
 
   double minX = 0;
-  double maxX = 0;
+  double maxX = 1;
 
   WaveChartController({
-    required this.maxDataPoints,
     required this.minY,
     required this.maxY,
   });
@@ -40,6 +39,8 @@ class WaveChartController extends GetxController {
   void onInit() {
     super.onInit();
     dataFlSpot.add(const FlSpot(0, 0));
+    minX = 0;
+    maxX = 1;
   }
 
   @override
@@ -55,7 +56,7 @@ class WaveChartController extends GetxController {
     dataFlSpot.clear();
     dataFlSpot.add(const FlSpot(0, 0));
     minX = 0;
-    maxX = 0;
+    maxX = 1;
   }
 
   List<double> data() {
@@ -144,14 +145,18 @@ class WaveChartController extends GetxController {
     if (value >= minY && value <= maxY) {
       _data.add(value);
       dataFlSpot.add(FlSpot(maxX, value));
-      maxX += 1;
-      if (dataFlSpot.length >= maxDataPoints) {
-        minX += 1;
+      maxX = dataFlSpot.length.toDouble();
+      if (maxX - minX > maxDataPoints) {
+        minX = maxX - maxDataPoints;
       }
-      int len = _data.length;
-      if (len >= 900) {
+      if (dataFlSpot.length >= 900) {
         _data.removeRange(0, 600);
         dataFlSpot.removeRange(0, 600);
+        for (int i = 0; i < dataFlSpot.length; i++) {
+          dataFlSpot[i] = FlSpot(i.toDouble(), dataFlSpot[i].y);
+        }
+        maxX = dataFlSpot.length.toDouble();
+        minX = maxX - maxDataPoints;
       }
       update();
     }
@@ -408,7 +413,7 @@ class WaveChart extends StatelessWidget {
     super.key,
     required this.controller,
     this.lineColor = Colors.blue,
-    this.lineWidth = 2,
+    this.lineWidth = 1,
   });
 
   @override
