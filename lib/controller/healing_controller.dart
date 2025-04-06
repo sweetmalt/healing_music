@@ -193,6 +193,7 @@ class HealingController extends Ctrl {
     curRelax.value = 0.5 * (100 - bciAtt.value) + 0.5 * bciMed.value;
     curSharp.value = 0.5 * bciAtt.value + 0.5 * (100 - bciMed.value);
     curFlow.value = 0.5 * bciAtt.value + 0.5 * bciMed.value;
+
   }
 
   Future<void> _showRealData() async {
@@ -291,9 +292,9 @@ class HealingController extends Ctrl {
     await curFlowWaveController.statistics();
     await bciAttWaveController.statistics();
     await bciMedWaveController.statistics();
-    bciHeartRateWaveController.setBestLimits(55, 75);
+    await bciHeartRateWaveController.setBestLimits(55, 75);
     await bciHeartRateWaveController.statistics();
-    bciHrvWaveController.setBestLimits(750, 1200);
+    await bciHrvWaveController.setBestLimits(750, 1200);
     await bciHrvWaveController.statistics();
   }
 

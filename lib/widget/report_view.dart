@@ -72,8 +72,8 @@ class ReportView extends GetView<ReportViewController> {
                         },
                         icon: const Icon(Icons.edit_rounded))),
                 const SizedBox(height: 40),
-                StatisticsContainerCircle("自身能效",
-                    controller.energyPsyScaling * controller.energyPhyScaling),
+                StatisticsContainerCircle(
+                    "自身能效", controller.energyPsyAndPhyScaling.value),
                 const SizedBox(height: 20),
                 Text(
                   "计时 ${(healingController.receivedDataCount / 60).toInt()}分${healingController.receivedDataCount % 60}秒",
@@ -84,7 +84,7 @@ class ReportView extends GetView<ReportViewController> {
           ),
           ParagraphListTile(
             title:
-                "${_dataDoc['energyPsy']?['title'] ?? ''}（${(controller.energyPsyScaling * 10000).toInt() / 100}%）",
+                "${_dataDoc['energyPsy']?['title'] ?? ''}（${(controller.energyPsyScaling.value * 10000).toInt() / 100}%）",
             onTap: () {},
           ),
           ListTile(
@@ -159,7 +159,7 @@ class ReportView extends GetView<ReportViewController> {
           const SizedBox(height: 40),
           ParagraphListTile(
             title:
-                "${_dataDoc['energyPhy']?['title'] ?? ''}（${(controller.energyPhyScaling * 10000).toInt() / 100}%）",
+                "${_dataDoc['energyPhy']?['title'] ?? ''}（${(controller.energyPhyScaling.value * 10000).toInt() / 100}%）",
             onTap: () {},
           ),
           ListTile(
@@ -270,23 +270,26 @@ class ReportView extends GetView<ReportViewController> {
 
 class ReportViewController extends Ctrl {
   final HealingController healingController = Get.find();
-  double energyPsyScaling = 0; //心理能量占比
-  double energyPhyScaling = 0; //生理能量占比
+  final RxDouble energyPsyScaling = 1.0.obs; //心理能量占比
+  final RxDouble energyPhyScaling = 1.0.obs; //生理能量占比
+  final RxDouble energyPsyAndPhyScaling = 1.0.obs; //生理能量占比
   Future<void> energyScaling() async {
-    double temp = 0;
-    temp = healingController.curRelaxWaveController.statisticsBestScaling +
-        healingController.curSharpWaveController.statisticsBestScaling +
-        healingController.curFlowWaveController.statisticsBestScaling;
-    temp = temp > 1 ? 1 : temp;
-    energyPsyScaling = temp;
-    energyPhyScaling =
-        healingController.bciHeartRateWaveController.statisticsBestScaling;
+    await healingController.createReport();
+    double temp =
+        healingController.curRelaxWaveController.statisticsBestScaling +
+            healingController.curSharpWaveController.statisticsBestScaling +
+            healingController.curFlowWaveController.statisticsBestScaling;
+    temp = temp >= 1 ? 1 : temp;
+    energyPsyScaling.value = temp;
 
-    temp = 0;
-    temp = healingController
+    temp = healingController.bciHeartRateWaveController.statisticsBestScaling *
+        healingController
             .bciHrvWaveController.statisticsMeanInterfacingDifference /
         50;
-    temp = temp > 1 ? 1 : temp;
-    energyPhyScaling *= temp;
+    temp = temp >= 1 ? 1 : temp;
+    energyPhyScaling.value = temp;
+
+    energyPsyAndPhyScaling.value =
+        energyPsyScaling.value * energyPhyScaling.value;
   }
 }

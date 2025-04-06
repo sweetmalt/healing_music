@@ -25,7 +25,7 @@ class WaveChartController extends GetxController {
   double statisticsModeScaling = 0; //众数占比
   double statisticsMedian = 0; //中位数
   double statisticsMedianPosition = 0; //中位数排位
-  double statisticsCount = 0; //数据点数量，记录时长
+  double statisticsCount = 0; //数据样本点数量，记录时长
 
   double minX = 0;
   double maxX = 1;
@@ -63,7 +63,7 @@ class WaveChartController extends GetxController {
     return _data;
   }
 
-  void setBestLimits(double min, double max) {
+  Future<void> setBestLimits(double min, double max) async {
     bestLimits[0] = min;
     bestLimits[1] = max;
   }
@@ -80,16 +80,12 @@ class WaveChartController extends GetxController {
   /// LF/HF 比值
   /// 反映交感与副交感神经平衡：
   /// LFHF=LF功率HF功率HFLF=HF功率LF功率
-  Future<void> statisticsHrv() async {
-    if (_data.length < 60) {
-      return;
-    }
-  }
+  Future<void> statisticsHrv() async {}
 
   Future<void> statistics() async {
-    if (_data.length < 60) {
-      return;
-    }
+    // if (_data.length < 60) {
+    //   return;
+    // }
     statisticsBestScaling =
         _data.where((x) => (x >= bestLimits[0] && x <= bestLimits[1])).length /
             _data.length;
