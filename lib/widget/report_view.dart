@@ -33,31 +33,15 @@ class ReportView extends GetView<ReportViewController> {
               children: [
                 ListTile(
                     title: Text("能量报告", style: MyStyle.paragraphTitleTextStyle),
-                    subtitle: const Text("自身能效 = 心理能效 ✖ 生理能效"),
+                    subtitle: const Text("人体能量 = 心理能效 ✖ 生理能效"),
                     trailing: IconButton(
                       onPressed: () {
-                        if (healingController.customerNickname.value.isEmpty) {
-                          showEditCustomerNicknameDialog(context);
-                        } else {
-                          String nickname =
-                              healingController.customerNickname.value;
-                          int timestamp = DateTime.now().millisecondsSinceEpoch;
-                          Data dataFile = Data(
-                            jsonFileName: 'report_${nickname}_$timestamp.json',
-                          );
-                          if (healingController.receivedDataCount > 60) {
-                            dataFile.write({
-                              "nickname":
-                                  healingController.customerNickname.value,
-                              "timestamp": timestamp.toString(),
-                              "data": healingController.data,
-                            });
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('数据样本量太少，不值得保存！')),
-                            );
-                          }
-                        }
+                        healingController.customerNickname.value.isEmpty
+                            ? showEditCustomerNicknameDialog(context,
+                                callBack: () {
+                                showSaveConfirmationDialog(context);
+                              })
+                            : showSaveConfirmationDialog(context);
                       },
                       icon: const Icon(Icons.save_alt_rounded),
                     )),
@@ -73,7 +57,7 @@ class ReportView extends GetView<ReportViewController> {
                         icon: const Icon(Icons.edit_rounded))),
                 const SizedBox(height: 40),
                 StatisticsContainerCircle(
-                    "自身能效", controller.energyPsyAndPhyScaling.value),
+                    "人体能量", controller.energyPsyAndPhyScaling.value),
                 const SizedBox(height: 20),
                 Text(
                   "计时 ${(healingController.receivedDataCount / 60).toInt()}分${healingController.receivedDataCount % 60}秒",
@@ -209,7 +193,8 @@ class ReportView extends GetView<ReportViewController> {
             : const Icon(Icons.keyboard_double_arrow_up));
   }
 
-  Future<void> showEditCustomerNicknameDialog(BuildContext context) async {
+  Future<void> showEditCustomerNicknameDialog(BuildContext context,
+      {VoidCallback? callBack}) async {
     final TextEditingController controller = TextEditingController();
     controller.text = healingController.customerNickname.value;
     return showDialog<void>(
@@ -225,7 +210,7 @@ class ReportView extends GetView<ReportViewController> {
                   maxLength: 32,
                   autofocus: true,
                   decoration: const InputDecoration(
-                    hintText: '请输入顾客昵称（4-32个字符）',
+                    hintText: '请输入顾客昵称（2-32个字）',
                   ),
                   controller: controller,
                   onChanged: (value) {
@@ -236,7 +221,7 @@ class ReportView extends GetView<ReportViewController> {
                         RegExp(r'[\u4e00-\u9fa5a-zA-Z0-9]')),
                   ],
                 ),
-                const Text("仅允许中文英文和数字，最少4位，最多32位"),
+                const Text("仅允许中文英文和数字，最少2个字"),
               ],
             ),
           ),
@@ -250,15 +235,64 @@ class ReportView extends GetView<ReportViewController> {
             TextButton(
               child: const Text('确认'),
               onPressed: () {
-                if (controller.text.length >= 4 &&
+                if (controller.text.length >= 2 &&
                     controller.text.length <= 32) {
                   healingController.customerNickname.value = controller.text;
                   Navigator.of(context).pop();
+                  callBack?.call();
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('昵称长度必须在4到32个字符之间')),
                   );
+                  Navigator.of(context).pop();
                 }
+                
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> showSaveConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // 用户必须点击按钮才能关闭对话框
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('为顾客保存一份能量报告'),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('您确定要执行此操作吗？'),
+                Text('此操作不可撤销。'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('取消'),
+              onPressed: () {
+                Navigator.of(context).pop(); // 关闭对话框
+              },
+            ),
+            TextButton(
+              child: const Text('确认'),
+              onPressed: () {
+                // 在这里执行确认后的操作
+                String nickname = healingController.customerNickname.value;
+                int timestamp = DateTime.now().millisecondsSinceEpoch;
+                Data dataFile = Data(
+                  jsonFileName: 'report_${nickname}_$timestamp.json',
+                );
+                dataFile.write({
+                  "nickname": healingController.customerNickname.value,
+                  "timestamp": timestamp.toString(),
+                  "data":  healingController.data,
+                  "hrvData": healingController.hrvData,
+                });
+                Navigator.of(context).pop(); // 关闭对话框
               },
             ),
           ],

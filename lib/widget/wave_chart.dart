@@ -39,6 +39,7 @@ class WaveChartController extends GetxController {
   void onInit() {
     super.onInit();
     dataFlSpot.add(const FlSpot(0, 0));
+    statisticsCount = 0;
     minX = 0;
     maxX = 1;
   }
@@ -372,8 +373,8 @@ class StatisticsContainerCircleMini extends Container {
           backgroundColor: Colors.white,
           valueColor:
               AlwaysStoppedAnimation<Color>(ThemeData().colorScheme.primary),
-          value: 1,
-          strokeWidth: 2,
+          value: isShowAsScaling ? value : 1,
+          strokeWidth: 4,
         ),
       ),
       Column(

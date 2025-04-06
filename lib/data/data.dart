@@ -70,6 +70,9 @@ class Data extends Object {
       final file = File('${directory.path}/$jsonFileName');
       final jsonString = json.encode(data);
       await file.writeAsString(jsonString);
+      if (kDebugMode) {
+        print('写入JSON文件: ${directory.path}/$jsonFileName');
+      }
     } catch (e) {
       if (kDebugMode) {
         print('写入JSON文件时出错: $e');

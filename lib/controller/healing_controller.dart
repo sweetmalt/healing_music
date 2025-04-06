@@ -14,7 +14,7 @@ class HealingController extends Ctrl {
   final RxString audioSubTitle = ''.obs;
   final RxBool isMute = false.obs; //是否静音
   final RxBool isCtrlByDevice = true.obs;
-  final RxBool isDeviceLinking = true.obs;
+  final RxBool isDeviceLinking = false.obs;
   final List<int> bciCurrentTwoTimeMillis = [0, 0]; //用于判断连接状态
   late Timer _whileTrue;
   final RxString healingTimePlanKey = ''.obs;
@@ -28,7 +28,7 @@ class HealingController extends Ctrl {
   static const eventChannel = EventChannel('top.healingAI.brainlink/receiver');
   StreamSubscription? _streamSubscription;
   final RxString receivedData = "等待设备连接...".obs;
-  final List<String> _data = <String>[];
+  final List<String> _data = <String>[""];
   final List<double> _hrvData = <double>[];
   final RxDouble bciAtt = 0.0.obs;
   final RxDouble bciMed = 0.0.obs;
@@ -193,7 +193,6 @@ class HealingController extends Ctrl {
     curRelax.value = 0.5 * (100 - bciAtt.value) + 0.5 * bciMed.value;
     curSharp.value = 0.5 * bciAtt.value + 0.5 * (100 - bciMed.value);
     curFlow.value = 0.5 * bciAtt.value + 0.5 * bciMed.value;
-
   }
 
   Future<void> _showRealData() async {
@@ -245,11 +244,11 @@ class HealingController extends Ctrl {
     await bciHrvWaveController.clearData();
   }
 
-  Future<List<String>> get data async {
+  List<String> get data {
     return _data;
   }
 
-  Future<List<double>> get hrvData async {
+  List<double> get hrvData {
     return _hrvData;
   }
 
@@ -292,7 +291,7 @@ class HealingController extends Ctrl {
     await curFlowWaveController.statistics();
     await bciAttWaveController.statistics();
     await bciMedWaveController.statistics();
-    await bciHeartRateWaveController.setBestLimits(55, 75);
+    await bciHeartRateWaveController.setBestLimits(50, 80);
     await bciHeartRateWaveController.statistics();
     await bciHrvWaveController.setBestLimits(750, 1200);
     await bciHrvWaveController.statistics();
@@ -362,8 +361,8 @@ class HealingController extends Ctrl {
   }
 
   static final Map<String, Map<String, String>> dataDoc = {
-    'energyPsy': {"title": '心理能效 EPS', "short": "心理能效 EPS", "long": "心理能效 EPS"},
-    'energyPhy': {"title": '生理能效 EPH', "short": "生理能效 EPH", "long": "生理能效 EPH"},
+    'energyPsy': {"title": '心理能量 EPS', "short": "心理能量 EPS", "long": "心理能量 EPS"},
+    'energyPhy': {"title": '生理能量 EPH', "short": "生理能量 EPH", "long": "生理能量 EPH"},
     'curRelax': {
       "title": '松弛感 RELAX',
       "short": "松弛感，是一场灵魂的深海潜游",

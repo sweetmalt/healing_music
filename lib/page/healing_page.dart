@@ -193,16 +193,16 @@ class HealingPage extends GetView<HealingController> {
                 ),
                 CircularIconButton(
                   onPressed: () {
-                    // if (healingController.receivedDataCount < 60) {
-                    //   ScaffoldMessenger.of(context).showSnackBar(
-                    //     const SnackBar(
-                    //       content: Text('数据量太少，请确保设备连接正常后，过一分钟再试'),
-                    //       duration: Duration(seconds: 3),
-                    //       backgroundColor: Colors.deepPurple,
-                    //     ),
-                    //   );
-                    //   return;
-                    // }
+                    if (healingController.receivedDataCount < 10) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('数据量太少，请确保设备连接正常后，过一分钟再试'),
+                          duration: Duration(seconds: 3),
+                          backgroundColor: Colors.deepPurple,
+                        ),
+                      );
+                      return;
+                    }
 
                     reportViewController.energyScaling();
 
