@@ -549,10 +549,16 @@ class PlayBox extends StatelessWidget {
                       min: 0.0,
                       max: controller.dur.value.toDouble(),
                       value: controller.pos.value.toDouble(),
-                      onChanged: (value) {
-                        controller.player
-                            .seek(Duration(milliseconds: value.toInt()));
+                      onChangeStart: (value) => {
+                        controller.pause()
                       },
+                      onChanged: (value) {
+                        controller.pos.value = value.toDouble();
+                      },
+                      onChangeEnd: (value) {
+                        controller.player.seek(Duration(milliseconds: value.toInt()));
+                        controller.play(); 
+                      }
                     ),
                   ))),
           IconButton(

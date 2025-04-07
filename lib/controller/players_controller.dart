@@ -112,14 +112,17 @@ class MyAudioCtrl extends GetxController {
   Future<void> play() async {
     isPlaying.value = true;
     player.play();
+    _listenerPos.resume();
   }
 
   Future<void> pause() async {
+    _listenerPos.pause();
     isPlaying.value = false;
     player.pause();
   }
 
   Future<void> stop() async {
+    _listenerPos.pause();
     isPlaying.value = false;
     player.stop();
   }
