@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:healing_music/controller/ctrl.dart';
@@ -65,8 +66,11 @@ class HealingController extends Ctrl {
     healingTimePlanIndex.value = 0;
     healingTimePlanKey.value = k;
     await setTimer(v);
-    Data dataObj = Data(jsonFileName: "healing.json");
-    await dataObj.read().then((healingPlan) {
+    Map<String, dynamic> xxxx = await Data.read("healing.json");
+    if (kDebugMode) {
+      print('读取JSON文件: $xxxx');
+    }
+    await Data.read("healing.json").then((healingPlan) {
       if (k != "") {
         var pplData = healingPlan[k];
         if (pplData is List) {

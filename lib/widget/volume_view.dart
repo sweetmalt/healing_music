@@ -46,8 +46,7 @@ class VolumeViewState extends State<VolumeView> with WidgetsBindingObserver {
   }
 
   void _loadVolumes() {
-    Data dataObj = Data(jsonFileName: "volume.json");
-    dataObj.read().then((volumesData) {
+    Data.read("volume.json").then((volumesData) {
       _volumes['hem'] = volumesData['hem'];
       _volumes['env'] = volumesData['env'];
       _volumes['bgm'] = volumesData['bgm'];
@@ -60,8 +59,7 @@ class VolumeViewState extends State<VolumeView> with WidgetsBindingObserver {
   }
 
   void _saveVolumes() {
-    Data dataObj = Data(jsonFileName: "volume.json");
-    dataObj.write(_volumes);
+    Data.write(_volumes, "volume.json");
   }
 
   @override
@@ -100,7 +98,7 @@ class VolumeViewState extends State<VolumeView> with WidgetsBindingObserver {
                           min: 0,
                           max: 1,
                           onChanged: (value) {
-                             _volumes['hem'] = value;
+                            _volumes['hem'] = value;
                             hemController.setMaxVol(value);
                           },
                         ))),
@@ -117,7 +115,7 @@ class VolumeViewState extends State<VolumeView> with WidgetsBindingObserver {
                           min: 0,
                           max: 1,
                           onChanged: (value) {
-                             _volumes['env'] = value;
+                            _volumes['env'] = value;
                             envController.setMaxVol(value);
                           },
                         ))),

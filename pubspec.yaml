@@ -11,7 +11,6 @@ dependencies:
   fl_chart: ^0.70.0
   get: ^4.6.6
   just_audio: ^0.9.42
-  just_waveform: ^0.0.5
   audio_wave: ^0.1.5
   spectrum_lib: ^1.0.0
   path: ^1.9.0

@@ -33,7 +33,7 @@ class MyAudioCtrl extends GetxController {
   }
 
   Future<void> startListen({bool isLoop = true}) async {
-    _listenerPos = Stream.periodic(const Duration(milliseconds: 100))
+    _listenerPos = Stream.periodic(const Duration(milliseconds: 200))
         .switchMap((_) => player.positionStream)
         .listen((position) async {
       pos.value = position.inMilliseconds.toDouble();

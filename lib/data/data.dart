@@ -3,34 +3,34 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+
 import 'package:path_provider/path_provider.dart';
 
 class Data extends Object {
-  final String jsonFileName;
-  Data({
-    required this.jsonFileName,
-  });
+  Data();
   @override
   String toString() {
-    return 'Data(jsonFileName: $jsonFileName)';
+    return 'Data';
   }
 
-  Future<Map<String, dynamic>> read() async {
+  static Future<Map<String, dynamic>> read(String jsonFileName) async {
     try {
       final directory = await getApplicationDocumentsDirectory();
       final file = File('${directory.path}/$jsonFileName');
       if (!await file.exists()) {
-        final tempFile = File("assets/json/$jsonFileName");
-        if (await tempFile.exists()) {
-          final jsonString =
-              await rootBundle.loadString("assets/json/$jsonFileName");
-          await file.writeAsString(jsonString);
-          return json.decode(jsonString);
-        } else {
-          return {};
+        // 从assets目录读取JSON文件
+        final jsonString =
+            await rootBundle.loadString('assets/json/$jsonFileName');
+        if (kDebugMode) {
+          print('从assets读取JSON文件: $jsonString');
         }
+        await file.writeAsString(jsonString);
+        return json.decode(jsonString);
       } else {
         final contents = await file.readAsString();
+        if (kDebugMode) {
+          print('读取JSON文件: $contents');
+        }
         return json.decode(contents);
       }
     } catch (e) {
@@ -98,7 +98,8 @@ class Data extends Object {
     }
   }
 
-  Future<bool> write(Map<String, dynamic> data) async {
+  static Future<bool> write(
+      Map<String, dynamic> data, String jsonFileName) async {
     try {
       final directory = await getApplicationDocumentsDirectory();
       final file = File('${directory.path}/$jsonFileName');

@@ -283,15 +283,12 @@ class ReportView extends GetView<ReportViewController> {
                 // 在这里执行确认后的操作
                 String nickname = healingController.customerNickname.value;
                 int timestamp = DateTime.now().millisecondsSinceEpoch;
-                Data dataFile = Data(
-                  jsonFileName: 'report_${nickname}_$timestamp.json',
-                );
-                dataFile.write({
+                Data.write({
                   "nickname": healingController.customerNickname.value,
                   "timestamp": timestamp.toString(),
                   "data":  healingController.data,
                   "hrvData": healingController.hrvData,
-                });
+                },'report_${nickname}_$timestamp.json');
                 Navigator.of(context).pop(); // 关闭对话框
               },
             ),

@@ -220,8 +220,7 @@ class ReporPageController extends Ctrl {
   Future<void> getReport(String fileName) async {
     _fileName = fileName;
     _report['fileName'] = fileName;
-    Data data = Data(jsonFileName: fileName);
-    Map<String, dynamic> report = await data.read();
+    Map<String, dynamic> report = await Data.read(fileName);
     _report['nickname'] = report['nickname'];
     _report['timestamp'] = report['timestamp'];
     _report['data'] = report['data'];
