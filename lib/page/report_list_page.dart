@@ -137,27 +137,47 @@ class ReportPage extends GetView<ReporPageController> {
             child: Column(
           children: [
             ListTile(
-              title: const Text("顾客昵称"),
+              title: Text(
+                "顾客昵称",
+                style: TextStyle(
+                  fontSize: 20,
+                  color: ThemeData().colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               subtitle: Text(controller._report['nickname']),
             ),
             ListTile(
-              title: const Text("时间"),
+              title: Text(
+                "生成时间",
+                style: TextStyle(
+                  fontSize: 20,
+                  color: ThemeData().colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               subtitle: Text(_formatTimestamp(controller._report['timestamp'])),
             ),
             ListTile(
-              title: const Text("心理能量"),
+              title: Text(
+                "心理能量",
+                style: TextStyle(
+                  fontSize: 20,
+                  color: ThemeData().colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               subtitle: Text("数据集(${controller._report['data'].length})"),
             ),
             Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 for (int i = 1; i < controller._report['data'].length; i++)
-                  ListTile(
-                    title: Text(
-                      "$i: ${controller._report['data'][i]}",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: ThemeData().colorScheme.primary,
-                      ),
+                  Text(
+                    "$i: ${controller._report['data'][i]}",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: ThemeData().colorScheme.primary,
                     ),
                   ),
               ],
