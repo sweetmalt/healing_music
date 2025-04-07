@@ -14,11 +14,14 @@ class ReportList extends GetView<ReportListController> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(controller.title,style: TextStyle(
-            fontSize: 20,
-            color: ThemeData().colorScheme.primary,
-            fontWeight: FontWeight.bold,
-          ),),
+          title: Text(
+            controller.title,
+            style: TextStyle(
+              fontSize: 20,
+              color: ThemeData().colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           actions: [
             // IconButton(
             //   icon: const Icon(
@@ -139,19 +142,46 @@ class ReportPage extends GetView<ReporPageController> {
             ),
             ListTile(
               title: const Text("时间"),
-              subtitle: Text(controller._report['timestamp']),
+              subtitle: Text(_formatTimestamp(controller._report['timestamp'])),
             ),
-            const ListTile(
-              title: Text("心理能量"),
+            ListTile(
+              title: const Text("心理能量"),
+              subtitle: Text("数据集(${controller._report['data'].length})"),
+            ),
+            Column(
+              children: [
+                for (int i = 1; i < controller._report['data'].length; i++)
+                  ListTile(
+                    title: Text(
+                      "$i: ${controller._report['data'][i]}",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: ThemeData().colorScheme.primary,
+                      ),
+                    ),
+                  ),
+              ],
             ),
             const ListTile(
               title: Text("生理能量"),
+              subtitle: Text("hrv数据集(0)"),
             ),
             ListTile(
               title: Text(controller._report['fileName']),
             ),
           ],
         )));
+  }
+
+  String _formatTimestamp(String timestamp) {
+    if (timestamp.isEmpty) return '';
+
+    int milliseconds = int.tryParse(timestamp) ?? 0;
+    if (milliseconds == 0) return timestamp; // 如果解析失败，返回原始字符串
+
+    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(milliseconds);
+    return '${dateTime.year}年${dateTime.month.toString().padLeft(2, '0')}月${dateTime.day.toString().padLeft(2, '0')}日 '
+        '${dateTime.hour.toString().padLeft(2, '0')}点${dateTime.minute.toString().padLeft(2, '0')}分${dateTime.second.toString().padLeft(2, '0')}秒${dateTime.millisecond.toString().padLeft(3, '0')}毫秒';
   }
 }
 
@@ -170,5 +200,11 @@ class ReporPageController extends Ctrl {
   Future<void> getReport(String fileName) async {
     _fileName = fileName;
     _report['fileName'] = fileName;
+    Data data = Data(jsonFileName: fileName);
+    Map<String, dynamic> report = await data.read();
+    _report['nickname'] = report['nickname'];
+    _report['timestamp'] = report['timestamp'];
+    _report['data'] = report['data'];
+    _report['hrvData'] = report['hrvData'];
   }
 }
