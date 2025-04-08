@@ -73,7 +73,7 @@ class AlbumPage extends StatelessWidget {
                                     : Icons.check_box_outline_blank_rounded,
                             onPressed: () async {
                               healingController.healingTimePlanKeyIndex.value = i;
-                              await healingController.startTimePlan(
+                               healingController.startTimePlan(
                                   _pla[healingController
                                       .healingTimePlanKeyIndex.value][0],
                                   _pla[healingController

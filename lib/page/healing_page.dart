@@ -97,7 +97,7 @@ class HealingPage extends GetView<HealingController> {
         backgroundColor: Colors.deepPurple,
       ),
     );
-    await healingController.startTimer(onTimePlanRun, onTimePlanEnd);
+    healingController.startTimer(onTimePlanRun, onTimePlanEnd);
     if (currentPlayers[0].isNotEmpty) {
       switch (currentPlayers[0]) {
         case "脑波音频":
@@ -191,6 +191,7 @@ class HealingPage extends GetView<HealingController> {
                         : ThemeData().colorScheme.primary,
                   ),
                 ),
+                const SizedBox(width: 40),
                 CircularIconButton(
                   onPressed: () {
                     if (healingController.receivedDataCount < 10) {
@@ -545,21 +546,19 @@ class PlayBox extends StatelessWidget {
                       thumbColor: ThemeData().colorScheme.secondaryContainer,
                     ),
                     child: Slider(
-                      padding: EdgeInsets.zero,
-                      min: 0.0,
-                      max: controller.dur.value.toDouble(),
-                      value: controller.pos.value.toDouble(),
-                      onChangeStart: (value) => {
-                        controller.pause()
-                      },
-                      onChanged: (value) {
-                        controller.pos.value = value.toDouble();
-                      },
-                      onChangeEnd: (value) {
-                        controller.player.seek(Duration(milliseconds: value.toInt()));
-                        controller.play(); 
-                      }
-                    ),
+                        padding: EdgeInsets.zero,
+                        min: 0.0,
+                        max: controller.dur.value.toDouble(),
+                        value: controller.pos.value.toDouble(),
+                        onChangeStart: (value) => {controller.pause()},
+                        onChanged: (value) {
+                          controller.pos.value = value.toDouble();
+                        },
+                        onChangeEnd: (value) {
+                          controller.player
+                              .seek(Duration(milliseconds: value.toInt()));
+                          controller.play();
+                        }),
                   ))),
           IconButton(
             padding: EdgeInsets.zero,

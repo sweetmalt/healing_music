@@ -13,13 +13,13 @@ class Ctrl extends GetxController {
   final RxString textTimeSeconds = "00:00".obs;
   late Timer _timer;
   final RxBool isTimerRunning = false.obs;
-  Future<void> setTimer(int sec) async{
+  Future<void> setTimer(int sec) async {
     clearTimer();
     timeSeconds.value = sec;
   }
 
-
-  Future<void> startTimer(VoidCallback onTimerRunning, VoidCallback onTimerEnd) async{
+  Future<void> startTimer(
+      VoidCallback onTimerRunning, VoidCallback onTimerEnd) async {
     if (timeSeconds.value <= 0) {
       return;
     }
@@ -38,14 +38,14 @@ class Ctrl extends GetxController {
     });
   }
 
-  Future<void> pauseTimer()async {
+  Future<void> pauseTimer() async {
     if (isTimerRunning.value && timeSeconds.value > 0) {
       isTimerRunning.value = false;
       _timer.cancel();
     }
   }
 
-  Future<void> clearTimer() async{
+  Future<void> clearTimer() async {
     if (timeSeconds.value > 0 || usedTimeSeconds.value > 0) {
       isTimerRunning.value = false;
       _timer.cancel();
@@ -55,49 +55,50 @@ class Ctrl extends GetxController {
     }
   }
 
-  Future<void> play() async{
+  Future<void> play() async {
     isPlaying.value = true;
-    await player.play();
+    player.play();
   }
 
-  Future<void> pause() async{
+  Future<void> pause() async {
     isPlaying.value = false;
-    await player.pause();
+    player.pause();
   }
 
-  Future<void> stop() async{
+  Future<void> stop() async {
     isPlaying.value = false;
-    await player.stop();
+    player.stop();
   }
 
-  Future<void> changeAudio(String audio, {bool autoPlay = false, bool isLoop = false})async {
+  Future<void> changeAudio(String audio,
+      {bool autoPlay = false, bool isLoop = false}) async {
     isPlaying.value = false;
-    await player.stop();
+    player.stop();
     _audio.value = audio;
-    await player.setAsset(_audio.value);
+    player.setAsset(_audio.value);
     if (isLoop) {
-      await player.setLoopMode(LoopMode.all);
+      player.setLoopMode(LoopMode.all);
     } else {
-      await player.setLoopMode(LoopMode.off);
+      player.setLoopMode(LoopMode.off);
     }
     if (autoPlay) {
-      await player.play();
       isPlaying.value = true;
+      player.play();
     }
   }
 
   @override
-  void onInit() async{
+  void onInit() async {
     super.onInit();
-    await player.setLoopMode(LoopMode.off);
-    await player.setAsset(_audio.value);
+    player.setLoopMode(LoopMode.off);
+    player.setAsset(_audio.value);
   }
 
   @override
-  void onClose()async {
-    await clearTimer();
-    await stop();
-    await player.dispose();
+  void onClose() async {
+    clearTimer();
+    stop();
+    player.dispose();
     super.onClose();
   }
 }

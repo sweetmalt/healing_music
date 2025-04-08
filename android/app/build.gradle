@@ -11,12 +11,12 @@ android {
     ndkVersion = '28.0.13004108'
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_21
-        targetCompatibility JavaVersion.VERSION_21
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_21.toString()
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
     defaultConfig {
@@ -55,12 +55,15 @@ flutter {
 }
 dependencies {
     // Add your dependencies here
-    implementation 'androidx.media3:media3-session:1.5.1'
-    implementation 'androidx.media3:media3-ui:1.5.1'
-    implementation 'androidx.media3:media3-exoplayer:1.5.1'
-    implementation 'androidx.media3:media3-exoplayer-hls:1.5.1'
-    implementation 'androidx.media3:media3-exoplayer-rtsp:1.5.1'
-    implementation 'androidx.media3:media3-exoplayer-dash:1.5.1'
-    implementation 'androidx.media3:media3-exoplayer-smoothstreaming:1.5.1'
+def media3_version = "1.4.1"
+    implementation "androidx.media3:media3-exoplayer:$media3_version"
+    implementation "androidx.media3:media3-exoplayer-hls:$media3_version"
+    implementation "androidx.media3:media3-ui:$media3_version"
+    implementation "androidx.media3:media3-session:$media3_version"
+    implementation "androidx.media3:media3-common:$media3_version"
+    implementation "androidx.media3:media3-datasource:$media3_version"
+    implementation "androidx.media3:media3-exoplayer-dash:$media3_version"
+    implementation "androidx.media3:media3-exoplayer-rtsp:$media3_version"
+    implementation "androidx.media3:media3-extractor:$media3_version"
     // Other dependencies...
 }

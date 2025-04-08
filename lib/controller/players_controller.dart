@@ -22,28 +22,35 @@ class MyAudioCtrl extends GetxController {
   double _volTemp = 0.5;
   late final StreamSubscription<Duration> _listenerPos;
 
-  Future<void> setTitle(String title) async {
+  void setTitle(String title) {
     audioTitle.value = title;
   }
 
-  Future<void> initPlayer({required String audio, bool isLoop = true}) async {
-    await player.setLoopMode(isLoop ? LoopMode.all : LoopMode.off);
-    await changeAudio(audio: audio, autoPlay: false, isLoop: isLoop);
-    await startListen(isLoop: isLoop);
+  void initPlayer({required String audio, bool isLoop = true}) async {
+    await player.setAsset(audioName.value);
+    await player.load();
+    await player.setVolume(maxVol.value);
+    await player.setLoopMode(isLoop ? LoopMode.one : LoopMode.off);
+    changeAudio(audio: audio, autoPlay: false, isLoop: isLoop);
+    startListen(isLoop: isLoop);
   }
 
-  Future<void> startListen({bool isLoop = true}) async {
+  void startListen({bool isLoop = true}) {
+    player.setLoopMode(isLoop ? LoopMode.one : LoopMode.off);
     _listenerPos = Stream.periodic(const Duration(milliseconds: 200))
         .switchMap((_) => player.positionStream)
-        .listen((position) async {
-      pos.value = position.inMilliseconds.toDouble();
-      if (isLoop) {
+        .listen((position) {
+      double temp = position.inMilliseconds.toDouble();
+      if (temp >= 0 && temp <= dur.value) {
+        pos.value = temp;
+      }
+      if (isPlaying.value) {
         if (pos.value < 5000) {
           double p = pos.value / 5000;
           if (p < 0.1) {
             p = 0.1;
           }
-          await player.setVolume(p * _vol);
+          player.setVolume(p * _vol);
           if (permitSwitchColor) {
             permitSwitchColor = false;
             colorSwitch.value = !colorSwitch.value;
@@ -53,16 +60,16 @@ class MyAudioCtrl extends GetxController {
           if (p < 0.1) {
             p = 0.1;
           }
-          await player.setVolume(p * _vol);
+          player.setVolume(p * _vol);
           permitSwitchColor = true;
         } else {
-          await player.setVolume(_vol);
+          player.setVolume(_vol);
         }
       }
     });
   }
 
-  Future<void> changeAudio(
+  void changeAudio(
       {String audio = "", bool autoPlay = true, bool isLoop = true}) async {
     if (audio == "") {
       return;
@@ -72,19 +79,17 @@ class MyAudioCtrl extends GetxController {
     }
     audioName.value = audio;
     await player.setAsset(audioName.value);
-    if (player.duration != null) {
-      int durTemp = player.duration!.inMilliseconds;
-      if (durTemp > 0) {
-        dur.value = durTemp.toDouble();
-      }
-    }
+    await player.load();
+    await player.setLoopMode(isLoop ? LoopMode.one : LoopMode.off);
+    await player.setVolume(maxVol.value);
+    pos.value = 0.0;
+    dur.value = player.duration!.inMilliseconds.toDouble();
     if (autoPlay) {
-      player.setVolume(_vol);
       play();
     }
   }
 
-  Future<void> setVol(double mv) async {
+  void setVol(double mv) {
     if (mv < 0 || mv > 1.0) {
       return;
     }
@@ -92,7 +97,7 @@ class MyAudioCtrl extends GetxController {
     player.setVolume(_vol);
   }
 
-  Future<void> setVolMute(bool isMute) async {
+  void setVolMute(bool isMute) {
     if (isMute) {
       _volTemp = _vol;
       setVol(0.01);
@@ -101,7 +106,7 @@ class MyAudioCtrl extends GetxController {
     }
   }
 
-  Future<void> setMaxVol(double mv) async {
+  void setMaxVol(double mv) {
     if (mv < 0 || mv > 1.0) {
       return;
     }
@@ -109,60 +114,60 @@ class MyAudioCtrl extends GetxController {
     setVol(maxVol.value);
   }
 
-  Future<void> play() async {
+  void play() async {
+    _listenerPos.resume();
     isPlaying.value = true;
     player.play();
-    _listenerPos.resume();
   }
 
-  Future<void> pause() async {
+  void pause() {
     _listenerPos.pause();
     isPlaying.value = false;
     player.pause();
   }
 
-  Future<void> stop() async {
+  void stop() {
     _listenerPos.pause();
     isPlaying.value = false;
     player.stop();
   }
 
   @override
-  void onClose() async {
-    await _listenerPos.cancel();
-    await player.dispose();
+  void onClose() {
     super.onClose();
+    _listenerPos.cancel();
+    player.dispose();
   }
 }
 
 class BgmController extends MyAudioCtrl {
   @override
-  Future<void> onInit() async {
-    await initPlayer(audio: "assets/audio/BGM Flute.MP3", isLoop: true);
+  void onInit() {
     super.onInit();
+    initPlayer(audio: "assets/audio/BGM Flute.MP3", isLoop: true);
   }
 }
 
 class EnvController extends MyAudioCtrl {
   @override
-  Future<void> onInit() async {
-    await initPlayer(audio: "assets/audio/40s Fire.MP3", isLoop: true);
+  void onInit() {
     super.onInit();
+    initPlayer(audio: "assets/audio/40s Fire.MP3", isLoop: true);
   }
 }
 
 class BbmController extends MyAudioCtrl {
   @override
-  Future<void> onInit() async {
-    await initPlayer(audio: "assets/audio/60s 1HZ.MP3", isLoop: true);
+  void onInit() {
     super.onInit();
+    initPlayer(audio: "assets/audio/60s 1HZ.MP3", isLoop: true);
   }
 }
 
 class HemController extends MyAudioCtrl {
   @override
-  Future<void> onInit() async {
-    await initPlayer(audio: "assets/audio/90s 963HZ.MP3", isLoop: true);
+  void onInit() {
     super.onInit();
+    initPlayer(audio: "assets/audio/90s 963HZ.MP3", isLoop: true);
   }
 }
