@@ -25,50 +25,56 @@ class HealingPage extends GetView<HealingController> {
   final BbmController bbmController = Get.put(BbmController());
 
   static const Audios _audios = Audios();
-  final List<String> currentPlayers = [
-    "",
-  ];
+  final Map<String, dynamic> _currentOnTimePlanPlayer = {
+    "name": "",
+    "paused": false
+  };
   Future<void> onTimePlanRun() async {
-    int usedTimeSeconds = healingController.usedTimeSeconds.value;
     List<Map<String, dynamic>> htd = healingController.healingTimePlanData;
     for (var i = 0; i < htd.length; i++) {
       int start = htd[i]["start"] as int;
       int end = htd[i]["end"] as int;
       String interval = htd[i]["interval"] as String;
       Map<String, String> task = Map<String, String>.from(htd[i]["task"]);
-      String player = task["player"] ?? "";
-
+      String playerName = task["player"] ?? "";
       //String audio = task["audio"] ?? "";
       String healing = task["healing"] ?? "";
-      MyAudioCtrl audioCtrl = envController;
-      switch (player) {
+
+      void playOrPause(MyAudioCtrl audioCtrl, String currentPlayerName) {
+        if (healingController.usedTimeSeconds.value == start ||
+            (_currentOnTimePlanPlayer["paused"] &&
+                currentPlayerName == _currentOnTimePlanPlayer["name"])) {
+          healingController.healingTimePlanIndex.value = i;
+          audioCtrl.playAudio(() => {}, () => {});
+          ScaffoldMessenger.of(Get.context!).showSnackBar(
+            SnackBar(
+              content: Text('$interval : $playerName : $healing'),
+              duration: const Duration(seconds: 3),
+              backgroundColor: Colors.deepPurple,
+            ),
+          );
+          _currentOnTimePlanPlayer["name"] = currentPlayerName;
+          _currentOnTimePlanPlayer["paused"] = false;
+        }
+
+        if (healingController.usedTimeSeconds.value == end - 1) {
+          audioCtrl.pauseAudio();
+        }
+      }
+
+      switch (playerName) {
         case "脑波音频":
-          audioCtrl = hemController;
+          playOrPause(hemController, playerName);
           break;
         case "生境纯音":
-          audioCtrl = envController;
+          playOrPause(envController, playerName);
           break;
         case "经典器乐":
-          audioCtrl = bgmController;
+          playOrPause(bgmController, playerName);
           break;
         case "双耳节拍":
-          audioCtrl = bbmController;
+          playOrPause(bbmController, playerName);
           break;
-      }
-      if (usedTimeSeconds == start) {
-        healingController.healingTimePlanIndex.value = i;
-        audioCtrl.play();
-        currentPlayers[0] = player;
-        ScaffoldMessenger.of(Get.context!).showSnackBar(
-          SnackBar(
-            content: Text('$interval : $player : $healing'),
-            duration: const Duration(seconds: 3),
-            backgroundColor: Colors.deepPurple,
-          ),
-        );
-      }
-      if (usedTimeSeconds == end - 1) {
-        audioCtrl.pause();
       }
     }
   }
@@ -81,15 +87,14 @@ class HealingPage extends GetView<HealingController> {
         backgroundColor: Colors.deepPurple,
       ),
     );
-    healingController.clearTimer();
-    hemController.stop();
-    envController.stop();
-    bgmController.stop();
-    bbmController.stop();
-    //healingController.isCtrlByPlan.value = false;
+    hemController.pauseAudio();
+    envController.pauseAudio();
+    bgmController.pauseAudio();
+    bbmController.pauseAudio();
+    healingController.isCtrlByTimePlan.value = false;
   }
 
-  Future<void> ctrlByTimePlan() async {
+  Future<void> startTimePlan() async {
     ScaffoldMessenger.of(Get.context!).showSnackBar(
       const SnackBar(
         content: Text('启动预编排音疗服务'),
@@ -97,26 +102,14 @@ class HealingPage extends GetView<HealingController> {
         backgroundColor: Colors.deepPurple,
       ),
     );
-    healingController.startTimer(onTimePlanRun, onTimePlanEnd);
-    if (currentPlayers[0].isNotEmpty) {
-      switch (currentPlayers[0]) {
-        case "脑波音频":
-          hemController.play();
-          break;
-        case "生境纯音":
-          envController.play();
-          break;
-        case "经典器乐":
-          bgmController.play();
-          break;
-        case "双耳节拍":
-          bbmController.play();
-          break;
-      }
+    if (healingController.usedTimeSeconds.value == 0) {
+      _currentOnTimePlanPlayer["name"] = "";
+      _currentOnTimePlanPlayer["paused"] = false;
     }
+    healingController.startTimer(onTimePlanRun, onTimePlanEnd);
   }
 
-  Future<void> pauseCtrlByTimePlan() async {
+  Future<void> pauseTimePlan() async {
     ScaffoldMessenger.of(Get.context!).showSnackBar(
       const SnackBar(
         content: Text('暂停预编排音疗服务'),
@@ -124,14 +117,15 @@ class HealingPage extends GetView<HealingController> {
         backgroundColor: Colors.deepPurple,
       ),
     );
+    _currentOnTimePlanPlayer["paused"] = true;
     healingController.pauseTimer();
-    hemController.pause();
-    envController.pause();
-    bgmController.pause();
-    bbmController.pause();
+    hemController.pauseAudio();
+    envController.pauseAudio();
+    bgmController.pauseAudio();
+    bbmController.pauseAudio();
   }
 
-  Future<void> quitCtrlByTimePlan() async {
+  Future<void> quitTimePlan() async {
     ScaffoldMessenger.of(Get.context!).showSnackBar(
       const SnackBar(
         content: Text('退出预编排音疗服务'),
@@ -139,12 +133,12 @@ class HealingPage extends GetView<HealingController> {
         backgroundColor: Colors.deepPurple,
       ),
     );
-    healingController.clearTimer();
-    currentPlayers[0] = "";
-    hemController.stop();
-    envController.stop();
-    bgmController.stop();
-    bbmController.stop();
+    _currentOnTimePlanPlayer["name"] = "";
+    healingController.setTimer(0);
+    hemController.pauseAudio();
+    envController.pauseAudio();
+    bgmController.pauseAudio();
+    bbmController.pauseAudio();
     healingController.isCtrlByTimePlan.value = false;
   }
 
@@ -194,7 +188,7 @@ class HealingPage extends GetView<HealingController> {
                 const SizedBox(width: 40),
                 CircularIconButton(
                   onPressed: () {
-                    if (healingController.receivedDataCount < 10) {
+                    if (healingController.receivedBciDataCount < 10) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('数据量太少，请确保设备连接正常后，过一分钟再试'),
@@ -229,74 +223,57 @@ class HealingPage extends GetView<HealingController> {
               const SizedBox(
                 height: 10,
               ),
-              Obx(() => Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      CircularProgress(
-                          radius: 120,
-                          value:
-                              hemController.pos.value / hemController.dur.value,
-                          backgroundColor: hemController.colorSwitch.value
-                              ? hemController.switchColors[0]
-                              : hemController.switchColors[1],
-                          valueColor: hemController.colorSwitch.value
-                              ? hemController.switchColors[1]
-                              : hemController.switchColors[0]),
-                      CircularProgress(
-                          radius: 100,
-                          value:
-                              envController.pos.value / envController.dur.value,
-                          backgroundColor: envController.colorSwitch.value
-                              ? envController.switchColors[0]
-                              : envController.switchColors[1],
-                          valueColor: envController.colorSwitch.value
-                              ? envController.switchColors[1]
-                              : envController.switchColors[0]),
-                      CircularProgress(
-                          radius: 80,
-                          value:
-                              bgmController.pos.value / bgmController.dur.value,
-                          backgroundColor: bgmController.colorSwitch.value
-                              ? bgmController.switchColors[0]
-                              : bgmController.switchColors[1],
-                          valueColor: bgmController.colorSwitch.value
-                              ? bgmController.switchColors[1]
-                              : bgmController.switchColors[0]),
-                      CircularProgress(
-                          radius: 60,
-                          value:
-                              bbmController.pos.value / bbmController.dur.value,
-                          backgroundColor: bbmController.colorSwitch.value
-                              ? bbmController.switchColors[0]
-                              : bbmController.switchColors[1],
-                          valueColor: bbmController.colorSwitch.value
-                              ? bbmController.switchColors[1]
-                              : bbmController.switchColors[0]),
-                      Obx(
-                        () => CircularIconButton(
-                          onPressed: () {
-                            showModalBottomSheet(
-                              context: context,
-                              showDragHandle: true,
-                              useRootNavigator: true,
-                              isScrollControlled: true,
-                              useSafeArea: true,
-                              constraints: BoxConstraints(
-                                maxHeight:
-                                    MediaQuery.of(context).size.height * 0.6,
-                              ),
-                              builder: (context) {
-                                return const VolumeView();
-                              },
-                            );
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Obx(() => CircularProgress(
+                      radius: 120,
+                      value: hemController.positionInMilliseconds.value /
+                          hemController.durationInMilliseconds.value,
+                      backgroundColor: ThemeData().colorScheme.primaryContainer,
+                      valueColor: ThemeData().colorScheme.primary)),
+                  Obx(() => CircularProgress(
+                      radius: 100,
+                      value: envController.positionInMilliseconds.value /
+                          envController.durationInMilliseconds.value,
+                      backgroundColor: ThemeData().colorScheme.primaryContainer,
+                      valueColor: ThemeData().colorScheme.primary)),
+                  Obx(() => CircularProgress(
+                      radius: 80,
+                      value: bgmController.positionInMilliseconds.value /
+                          bgmController.durationInMilliseconds.value,
+                      backgroundColor: ThemeData().colorScheme.primaryContainer,
+                      valueColor: ThemeData().colorScheme.primary)),
+                  Obx(() => CircularProgress(
+                      radius: 60,
+                      value: bbmController.positionInMilliseconds.value /
+                          bbmController.durationInMilliseconds.value,
+                      backgroundColor: ThemeData().colorScheme.primaryContainer,
+                      valueColor: ThemeData().colorScheme.primary)),
+                  Obx(
+                    () => CircularIconButton(
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          showDragHandle: true,
+                          useRootNavigator: true,
+                          isScrollControlled: true,
+                          useSafeArea: true,
+                          constraints: BoxConstraints(
+                            maxHeight: MediaQuery.of(context).size.height * 0.6,
+                          ),
+                          builder: (context) {
+                            return const VolumeView();
                           },
-                          icon: healingController.isMute.value
-                              ? Icons.volume_off_sharp
-                              : Icons.volume_up_sharp,
-                        ),
-                      ),
-                    ],
-                  )),
+                        );
+                      },
+                      icon: healingController.isMute.value
+                          ? Icons.volume_off_sharp
+                          : Icons.volume_up_sharp,
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(
                 height: 10,
               ),
@@ -325,9 +302,9 @@ class HealingPage extends GetView<HealingController> {
                   : Container()),
               Obx(() => healingController.isCtrlByTimePlan.value
                   ? PlanZone(
-                      ctrlByTimePlan: ctrlByTimePlan,
-                      pauseCtrlByTimePlan: pauseCtrlByTimePlan,
-                      quitCtrlByTimePlan: quitCtrlByTimePlan,
+                      startTimePlan: startTimePlan,
+                      pauseTimePlan: pauseTimePlan,
+                      quitTimePlan: quitTimePlan,
                       title: healingController.title.value,
                       subTitle: healingController.subTitle.value,
                       audioTitle: healingController.audioTitle.value,
@@ -430,14 +407,14 @@ class CircularProgress extends StatelessWidget {
 }
 
 class AudioItem extends StatelessWidget {
-  final String title;
-  final String url;
+  final String audioName;
+  final String audio;
   final MyAudioCtrl controller;
 
   const AudioItem({
     super.key,
-    required this.title,
-    required this.url,
+    required this.audioName,
+    required this.audio,
     required this.controller,
   });
 
@@ -445,17 +422,17 @@ class AudioItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() => TextButton(
           style: ButtonStyle(
-            backgroundColor: controller.audioTitle.value == title
+            backgroundColor: controller.audioName.value == audioName
                 ? WidgetStateProperty.all(ThemeData().colorScheme.secondary)
                 : WidgetStateProperty.all(ThemeData().colorScheme.surface),
           ),
           onPressed: () {
-            controller.setTitle(title);
-            controller.changeAudio(audio: url);
+            controller.audioName.value = audioName;
+            controller.setAudio(audio, autoPlay: true, isLoop: true);
           },
-          child: Obx(() => Text(title,
+          child: Obx(() => Text(audioName,
               style: TextStyle(
-                  color: controller.audioTitle.value == title
+                  color: controller.audioName.value == audioName
                       ? ThemeData().colorScheme.surface
                       : ThemeData().colorScheme.secondary,
                   fontSize: 12,
@@ -490,8 +467,8 @@ class AudiosRow extends StatelessWidget {
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5),
               child: AudioItem(
-                title: entry.value,
-                url: "assets/audio/${entry.key}.MP3",
+                audioName: entry.value,
+                audio: "assets/audio/${entry.key}.MP3",
                 controller: controller,
               ),
             );
@@ -548,16 +525,18 @@ class PlayBox extends StatelessWidget {
                     child: Slider(
                         padding: EdgeInsets.zero,
                         min: 0.0,
-                        max: controller.dur.value.toDouble(),
-                        value: controller.pos.value.toDouble(),
-                        onChangeStart: (value) => {controller.pause()},
+                        max: controller.durationInMilliseconds.value.toDouble(),
+                        value:
+                            controller.positionInMilliseconds.value.toDouble(),
+                        onChangeStart: (value) => {controller.pauseAudio()},
                         onChanged: (value) {
-                          controller.pos.value = value.toDouble();
+                          controller.positionInMilliseconds.value =
+                              value.toInt();
                         },
                         onChangeEnd: (value) {
-                          controller.player
-                              .seek(Duration(milliseconds: value.toInt()));
-                          controller.play();
+                          controller
+                              .seekAudio(Duration(milliseconds: value.toInt()));
+                          controller.playAudio(() => {}, () => {});
                         }),
                   ))),
           IconButton(
@@ -565,8 +544,8 @@ class PlayBox extends StatelessWidget {
             constraints: const BoxConstraints(),
             onPressed: () {
               controller.isPlaying.value
-                  ? controller.pause()
-                  : controller.play();
+                  ? controller.pauseAudio()
+                  : controller.playAudio(() => {}, () => {});
             },
             icon: Obx(() => controller.isPlaying.value
                 ? const Icon(Icons.pause)
@@ -607,7 +586,7 @@ class ToolsRow extends StatelessWidget {
                 text: entry.value,
                 icon: Icons.ring_volume,
                 onPressed: () async {
-                  controller.changeAudio("assets/audio/${entry.key}.MP3",
+                  controller.setAudio("assets/audio/${entry.key}.MP3",
                       autoPlay: true);
                 },
               ),
@@ -620,9 +599,9 @@ class ToolsRow extends StatelessWidget {
 }
 
 class PlanZone extends StatelessWidget {
-  final VoidCallback ctrlByTimePlan;
-  final VoidCallback pauseCtrlByTimePlan;
-  final VoidCallback quitCtrlByTimePlan;
+  final VoidCallback startTimePlan;
+  final VoidCallback pauseTimePlan;
+  final VoidCallback quitTimePlan;
   final String title;
   final String subTitle;
   final String audioTitle;
@@ -635,9 +614,9 @@ class PlanZone extends StatelessWidget {
   final IconData leadingIcon;
   const PlanZone(
       {super.key,
-      required this.ctrlByTimePlan,
-      required this.pauseCtrlByTimePlan,
-      required this.quitCtrlByTimePlan,
+      required this.startTimePlan,
+      required this.pauseTimePlan,
+      required this.quitTimePlan,
       required this.title,
       required this.subTitle,
       required this.audioTitle,
@@ -659,7 +638,7 @@ class PlanZone extends StatelessWidget {
           title: title,
           icon: Icons.close,
           onTap: () {
-            showConfirmationDialog(context);
+            showCloseDialog(context);
           },
         ),
         isShowDetails
@@ -669,9 +648,9 @@ class PlanZone extends StatelessWidget {
                 icon: isTimerRunning ? Icons.pause : Icons.play_arrow,
                 onTap: () async {
                   if (isTimerRunning) {
-                    pauseCtrlByTimePlan();
+                    pauseTimePlan();
                   } else {
-                    ctrlByTimePlan();
+                    startTimePlan();
                   }
                 },
               )
@@ -718,7 +697,7 @@ class PlanZone extends StatelessWidget {
     }
   }
 
-  Future<void> showConfirmationDialog(BuildContext context) async {
+  Future<void> showCloseDialog(BuildContext context) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // 用户必须点击按钮才能关闭对话框
@@ -744,7 +723,7 @@ class PlanZone extends StatelessWidget {
               child: const Text('确认'),
               onPressed: () {
                 // 在这里执行确认后的操作
-                quitCtrlByTimePlan();
+                quitTimePlan();
                 Navigator.of(context).pop(); // 关闭对话框
               },
             ),

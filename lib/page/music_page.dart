@@ -77,27 +77,27 @@ class MusicBox extends StatelessWidget {
           title: '$hemTitle & $envTitle',
           subtitle: '$hemAudio,$envAudio',
           icon: Icons.play_arrow,
-          onTap: ()  {
+          onTap: () {
             healingController.title.value = title;
             healingController.subTitle.value = subTitle;
             healingController.audioTitle.value = audioTitle;
             healingController.audioSubTitle.value = audioSubTitle;
-             healingController.startTimePlan(
+            healingController.setTimePlan(
                 _pla[healingController.healingTimePlanKeyIndex.value][0],
                 _pla[healingController.healingTimePlanKeyIndex.value][1]);
 
-            hemController.setTitle(hemTitle);
-             hemController.changeAudio(
-                audio: "assets/audio/$hemAudio.MP3", autoPlay: false);
-            envController.setTitle(envTitle);
-             envController.changeAudio(
-                audio: "assets/audio/$envAudio.MP3", autoPlay: false);
-            bgmController.setTitle(bgmTitle);
-             bgmController.changeAudio(
-                audio: "assets/audio/$bgmAudio.MP3", autoPlay: false);
-            bbmController.setTitle(bbmTitle);
-             bbmController.changeAudio(
-                audio: "assets/audio/$bbmAudio.MP3", autoPlay: false);
+            hemController.audioName.value = hemTitle;
+            hemController.setAudio("assets/audio/$hemAudio.MP3",
+                autoPlay: false, isLoop: true);
+            envController.audioName.value = envTitle;
+            envController.setAudio("assets/audio/$envAudio.MP3",
+                autoPlay: false, isLoop: true);
+            bgmController.audioName.value = bgmTitle;
+            bgmController.setAudio("assets/audio/$bgmAudio.MP3",
+                autoPlay: false, isLoop: true);
+            bbmController.audioName.value = bbmTitle;
+            bbmController.setAudio("assets/audio/$bbmAudio.MP3",
+                autoPlay: false, isLoop: true);
             Get.to(AlbumPage());
           },
         ),

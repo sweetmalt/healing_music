@@ -51,10 +51,6 @@ class VolumeViewState extends State<VolumeView> with WidgetsBindingObserver {
       _volumes['env'] = volumesData['env'];
       _volumes['bgm'] = volumesData['bgm'];
       _volumes['bbm'] = volumesData['bbm'];
-      hemController.setMaxVol(_volumes['hem']!);
-      envController.setMaxVol(_volumes['env']!);
-      bgmController.setMaxVol(_volumes['bgm']!);
-      bbmController.setMaxVol(_volumes['bbm']!);
     });
   }
 

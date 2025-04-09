@@ -25,9 +25,8 @@ class HealingController extends Ctrl {
   final RxBool isPauseCtrlByTimePlan = false.obs;
   final RxBool isShowDetails = true.obs;
   static const eventChannel = EventChannel('top.healingAI.brainlink/receiver');
-  StreamSubscription? _streamSubscription;
-  final RxString receivedData = "等待设备连接...".obs;
-  final List<String> _data = <String>[""];
+  StreamSubscription? _bciAndHrvBroadcastListener;
+  final List<String> _bciData = <String>[""];
   final List<double> _hrvData = <double>[];
   final RxDouble bciAtt = 0.0.obs;
   final RxDouble bciMed = 0.0.obs;
@@ -44,7 +43,7 @@ class HealingController extends Ctrl {
   final RxDouble bciHeartRate = 0.0.obs;
   final RxDouble bciGrind = 0.0.obs;
   final RxInt bciCurrentTimeMillis = 0.obs; //时间戳
-  final RxList<double> bciHrv = <double>[].obs;
+  final RxList<double> hrvRR = <double>[].obs;
 
   /// 分析数据
   final RxDouble curRelax = 0.0.obs;
@@ -58,13 +57,13 @@ class HealingController extends Ctrl {
 
   final RxString customerNickname = ''.obs;
 
-  void startTimePlan(String k, int v)  {
+  void setTimePlan(String k, int v) {
     isCtrlByTimePlan.value = true;
     isPauseCtrlByTimePlan.value = false;
     healingTimePlanIndex.value = 0;
     healingTimePlanKey.value = k;
-     setTimer(v);
-     Data.read("healing.json").then((healingPlan) {
+    setTimer(v);
+    Data.read("healing.json").then((healingPlan) {
       if (k != "") {
         var pplData = healingPlan[k];
         if (pplData is List) {
@@ -88,7 +87,7 @@ class HealingController extends Ctrl {
     });
   }
 
-  void _initWhileTrue()  {
+  void _initWhileTrue() {
     const seconds = Duration(seconds: 3);
     _whileTrue = Timer.periodic(seconds, (Timer timer) {
       if (bciCurrentTwoTimeMillis[1] != bciCurrentTwoTimeMillis[0]) {
@@ -178,13 +177,13 @@ class HealingController extends Ctrl {
     minY: 0,
     maxY: 200,
   );
-  final bciHrvWaveController = WaveChartController(
-    minY: 0,
-    maxY: 1500,
-  );
   final bciGrindWaveController = WaveChartController(
     minY: 0,
     maxY: 2,
+  );
+  final hrvRRWaveController = WaveChartController(
+    minY: 0,
+    maxY: 1500,
   );
 
   Future<void> _dataAnalysis() async {
@@ -214,13 +213,13 @@ class HealingController extends Ctrl {
     await bciTemperatureWaveController.addDataPoint(bciTemperature.value);
     await bciHeartRateWaveController.addDataPoint(bciHeartRate.value);
     await bciGrindWaveController.addDataPoint(bciGrind.value);
-    for (double item in bciHrv) {
-      await bciHrvWaveController.addDataPoint(item);
+    for (double item in hrvRR) {
+      await hrvRRWaveController.addDataPoint(item);
     }
   }
 
   Future<void> clearData() async {
-    _data.clear();
+    _bciData.clear();
     _hrvData.clear();
     await curRelaxWaveController.clearData();
     await curSharpWaveController.clearData();
@@ -239,18 +238,19 @@ class HealingController extends Ctrl {
     await bciTemperatureWaveController.clearData();
     await bciHeartRateWaveController.clearData();
     await bciGrindWaveController.clearData();
-    await bciHrvWaveController.clearData();
+
+    await hrvRRWaveController.clearData();
   }
 
   List<String> get data {
-    return _data;
+    return _bciData;
   }
 
   List<double> get hrvData {
     return _hrvData;
   }
 
-  get receivedDataCount => _data.length;
+  get receivedBciDataCount => _bciData.length;
   get receivedHrvDataCount => _hrvData.length;
 
   Future<void> createReport() async {
@@ -291,17 +291,16 @@ class HealingController extends Ctrl {
     await bciMedWaveController.statistics();
     await bciHeartRateWaveController.setBestLimits(50, 80);
     await bciHeartRateWaveController.statistics();
-    await bciHrvWaveController.setBestLimits(750, 1200);
-    await bciHrvWaveController.statistics();
+    await hrvRRWaveController.setBestLimits(750, 1200);
+    await hrvRRWaveController.statistics();
   }
 
   @override
   void onInit() {
     super.onInit();
     _initWhileTrue();
-    _streamSubscription =
+    _bciAndHrvBroadcastListener =
         eventChannel.receiveBroadcastStream().listen((data) async {
-      receivedData.value = data.toString();
       List<String> temp = data.toString().split('_');
       if (temp.length == 2) {
         if (temp[0] == "bci") {
@@ -324,9 +323,9 @@ class HealingController extends Ctrl {
             bciCurrentTimeMillis.value = int.parse(temp[14]);
             bciCurrentTwoTimeMillis[1] = bciCurrentTimeMillis.value;
 
-            _data.add(receivedData.value);
-            if (_data.length > 3600) {
-              _data.removeRange(0, 1800);
+            _bciData.add(data.toString());
+            if (_bciData.length > 3600) {
+              _bciData.removeRange(0, 1800);
             }
           }
         }
@@ -337,7 +336,7 @@ class HealingController extends Ctrl {
             for (String item in temp) {
               x.add(double.parse(item));
             }
-            bciHrv.value = x;
+            hrvRR.value = x;
             _hrvData.addAll(x);
             if (_hrvData.length > 3600) {
               _hrvData.removeRange(0, 1800);
@@ -349,11 +348,22 @@ class HealingController extends Ctrl {
         await _ctrlByDevice();
       }
     }, onError: (error) {});
+
+    _loadVolumes();
+  }
+
+  void _loadVolumes() {
+    Data.read("volume.json").then((volumesData) {
+      hemController.setMaxVol(volumesData['hem']!);
+      envController.setMaxVol(volumesData['env']!);
+      bgmController.setMaxVol(volumesData['bgm']!);
+      bbmController.setMaxVol(volumesData['bbm']!);
+    });
   }
 
   @override
   void onClose() {
-    _streamSubscription?.cancel();
+    _bciAndHrvBroadcastListener?.cancel();
     _whileTrue.cancel();
     super.onClose();
   }

@@ -60,7 +60,7 @@ class ReportView extends GetView<ReportViewController> {
                     "人体能量", controller.energyPsyAndPhyScaling.value),
                 const SizedBox(height: 20),
                 Text(
-                  "计时 ${(healingController.receivedDataCount / 60).toInt()}分${healingController.receivedDataCount % 60}秒",
+                  "计时 ${(healingController.receivedBciDataCount / 60).toInt()}分${healingController.receivedBciDataCount % 60}秒",
                 ),
                 const SizedBox(height: 20),
               ],
@@ -171,7 +171,7 @@ class ReportView extends GetView<ReportViewController> {
             trailing: Obx(() => _showShortDocIconButton()),
           ),
           WaveChartStatistics(
-            controller: healingController.bciHrvWaveController,
+            controller: healingController.hrvRRWaveController,
           ),
           Container(
             alignment: Alignment.center,
@@ -315,7 +315,7 @@ class ReportViewController extends Ctrl {
 
     temp = healingController.bciHeartRateWaveController.statisticsBestScaling *
         healingController
-            .bciHrvWaveController.statisticsMeanInterfacingDifference /
+            .hrvRRWaveController.statisticsMeanInterfacingDifference /
         50;
     temp = temp >= 1 ? 1 : temp;
     energyPhyScaling.value = temp;

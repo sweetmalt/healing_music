@@ -480,7 +480,7 @@ class BrainWaveView extends StatelessWidget {
             trailing: Obx(() => _showShortDocIconButton()),
           ),
           WaveChart(
-            controller: healingController.bciHrvWaveController,
+            controller: healingController.hrvRRWaveController,
             lineColor: ThemeData().colorScheme.primary,
             lineWidth: 3,
           ),
