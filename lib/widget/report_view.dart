@@ -33,7 +33,8 @@ class ReportView extends GetView<ReportViewController> {
               children: [
                 ListTile(
                     title: Text("能量报告", style: MyStyle.paragraphTitleTextStyle),
-                    subtitle: const Text("人体能量 = 心理能效 ✖ 生理能效"),
+                    subtitle: Text(
+                        "综合得分 = 心理能量 & 生理能量（ LF/HF ${(healingController.hrvLFHF * 100).toInt() / 100} ）"),
                     trailing: IconButton(
                       onPressed: () {
                         healingController.customerNickname.value.isEmpty
@@ -57,7 +58,7 @@ class ReportView extends GetView<ReportViewController> {
                         icon: const Icon(Icons.edit_rounded))),
                 const SizedBox(height: 40),
                 StatisticsContainerCircle(
-                    "人体能量", controller.energyPsyAndPhyScaling.value),
+                    "综合得分", controller.energyPsyAndPhyScaling.value),
                 const SizedBox(height: 20),
                 Text(
                   "计时 ${(healingController.receivedBciDataCount / 60).toInt()}分${healingController.receivedBciDataCount % 60}秒",
@@ -68,7 +69,7 @@ class ReportView extends GetView<ReportViewController> {
           ),
           ParagraphListTile(
             title:
-                "${_dataDoc['energyPsy']?['title'] ?? ''}（${(controller.energyPsyScaling.value * 10000).toInt() / 100}%）",
+                "${_dataDoc['energyPsy']?['title'] ?? ''}（${(controller.energyPsyScaling.value * 10000).toInt() / 100}分）",
             onTap: () {},
           ),
           ListTile(
@@ -143,7 +144,7 @@ class ReportView extends GetView<ReportViewController> {
           const SizedBox(height: 40),
           ParagraphListTile(
             title:
-                "${_dataDoc['energyPhy']?['title'] ?? ''}（${(controller.energyPhyScaling.value * 10000).toInt() / 100}%）",
+                "${_dataDoc['energyPhy']?['title'] ?? ''}（${(controller.energyPhyScaling.value * 10000).toInt() / 100}分）",
             onTap: () {},
           ),
           ListTile(
@@ -172,6 +173,17 @@ class ReportView extends GetView<ReportViewController> {
           ),
           WaveChartStatistics(
             controller: healingController.hrvRRWaveController,
+          ),
+          Container(
+            height: 40,
+            alignment: Alignment.center,
+            margin: const EdgeInsets.only(top: 20, bottom: 40),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: Colors.white,
+            ),
+            child: Text(
+                "LF/HF ${(healingController.hrvLFHF * 100).toInt() / 100}"),
           ),
           Container(
             alignment: Alignment.center,
@@ -246,7 +258,6 @@ class ReportView extends GetView<ReportViewController> {
                   );
                   Navigator.of(context).pop();
                 }
-                
               },
             ),
           ],
@@ -286,9 +297,9 @@ class ReportView extends GetView<ReportViewController> {
                 Data.write({
                   "nickname": healingController.customerNickname.value,
                   "timestamp": timestamp.toString(),
-                  "data":  healingController.data,
+                  "data": healingController.bciData,
                   "hrvData": healingController.hrvData,
-                },'report_${nickname}_$timestamp.json');
+                }, 'report_${nickname}_$timestamp.json');
                 Navigator.of(context).pop(); // 关闭对话框
               },
             ),
@@ -313,15 +324,25 @@ class ReportViewController extends Ctrl {
     temp = temp >= 1 ? 1 : temp;
     energyPsyScaling.value = temp;
 
-
-    temp = healingController.bciHeartRateWaveController.statisticsBestScaling *
-        healingController
-            .hrvRRWaveController.statisticsMeanInterfacingDifference /
-        50;
+    temp = healingController.bciHeartRateWaveController.statisticsBestScaling;
+    if (temp <= 0) {
+      temp = 0.8 *
+          healingController.bciHeartRateWaveController.statisticsBetterScaling;
+    }
+    double temp2 = healingController.hrvRRWaveController.statisticsBestScaling;
+    if (temp2 <= 0) {
+      temp2 =
+          0.8 * healingController.hrvRRWaveController.statisticsBetterScaling;
+    }
+    temp = 0.5 * temp +
+        0.2 * temp2 +
+        0.3 *
+            healingController
+                .hrvRRWaveController.statisticsMeanInterfacing50Scaling;
     temp = temp >= 1 ? 1 : temp;
     energyPhyScaling.value = temp;
 
     energyPsyAndPhyScaling.value =
-        energyPsyScaling.value * energyPhyScaling.value;
+        0.5 * energyPsyScaling.value + 0.5 * energyPhyScaling.value;
   }
 }

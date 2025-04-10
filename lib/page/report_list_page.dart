@@ -182,10 +182,40 @@ class ReportPage extends GetView<ReporPageController> {
                   ),
               ],
             ),
-            const ListTile(
-              title: Text("生理能量"),
-              subtitle: Text("hrv数据集(0)"),
+            ListTile(
+              title: Text(
+                "生理能量",
+                style: TextStyle(
+                  fontSize: 20,
+                  color: ThemeData().colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              subtitle: Text("hrv数据集(${controller._report['hrvData'].length})"),
             ),
+            //网格布局显示数组数据
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 5, // 每行显示元素
+                childAspectRatio: 4, // 子元素宽高比
+              ),
+              itemCount: controller._report['hrvData'].length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "$index: ${controller._report['hrvData'][index]}",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: ThemeData().colorScheme.primary,
+                    ),
+                  ),
+                );
+              },
+            ),
+
             ListTile(
               title: Text(controller._report['fileName']),
             ),

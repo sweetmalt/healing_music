@@ -54,10 +54,7 @@ class BrainWaveView extends StatelessWidget {
               await healingController.clearData();
             },
           ),
-
-
-
-          
+          BciSliderBox(),
           const SizedBox(
             height: 40,
           ),
@@ -531,4 +528,127 @@ class BrainWaveView extends StatelessWidget {
 
   final RxBool _showShortDoc = true.obs;
   final Map<String, Map<String, String>> _dataDoc = HealingController.dataDoc;
+}
+
+class BciSliderBox extends StatelessWidget {
+  BciSliderBox({super.key});
+  final HealingController healingController = Get.put(HealingController());
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(top: 20, bottom: 20),
+      child: Column(
+        children: [
+          Obx(() => BciSlider(
+                title: "γ 波",
+                color: Colors.purple,
+                maxValue: 100000,
+                value: healingController.bciMiddleGamma.value +
+                            healingController.bciLowGamma.value >
+                        100000
+                    ? 100000
+                    : (healingController.bciMiddleGamma.value +
+                        healingController.bciLowGamma.value),
+              )),
+          Obx(() => BciSlider(
+                title: "β 波",
+                color: Colors.deepPurpleAccent,
+                maxValue: 100000,
+                value: healingController.bciHighBeta.value +
+                            healingController.bciLowBeta.value >
+                        100000
+                    ? 100000
+                    : healingController.bciHighBeta.value +
+                        healingController.bciLowBeta.value,
+              )),
+          Obx(() => BciSlider(
+                title: "α 波",
+                color: Colors.blue,
+                maxValue: 100000,
+                value: healingController.bciHighAlpha.value +
+                            healingController.bciLowAlpha.value >
+                        100000
+                    ? 100000
+                    : healingController.bciHighAlpha.value +
+                        healingController.bciLowAlpha.value,
+              )),
+          Obx(() => BciSlider(
+                title: "θ 波",
+                color: Colors.green,
+                maxValue: 100000,
+                value: healingController.bciTheta.value > 100000
+                    ? 100000
+                    : healingController.bciTheta.value,
+              )),
+              Obx(() => BciSlider(
+                title: "δ 波",
+                color: Colors.yellow,
+                maxValue: 100000,
+                value: healingController.bciDelta.value > 100000
+                    ? 100000
+                    : healingController.bciDelta.value,
+              )),
+              Obx(() => BciSlider(
+                title: "心率",
+                color: Colors.orange,
+                maxValue: 200,
+                value: healingController.bciHeartRate.value > 200
+                    ? 200
+                    : healingController.bciHeartRate.value,
+              )),
+              Obx(() => BciSlider(
+                title: "HRV",
+                color: Colors.red,
+                maxValue: 1500,
+                value: healingController.hrvRR[0] > 1500
+                    ? 1500
+                    : healingController.hrvRR[0],
+              )),
+        ],
+      ),
+    );
+  }
+}
+
+class BciSlider extends StatelessWidget {
+  final double value;
+  final double maxValue;
+  final String title;
+  final Color color;
+
+  const BciSlider(
+      {super.key,
+      required this.title,
+      required this.color,
+      required this.value,
+      required this.maxValue});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(left: 10, right: 10),
+      padding: const EdgeInsets.only(left: 10, right: 10),
+      child: Row(
+        children: [
+          Text(title),
+          Expanded(
+              child: SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    trackHeight: 10,
+                    activeTrackColor: color,
+                    thumbColor: color,
+                    inactiveTrackColor: ThemeData().colorScheme.surface,
+                  ),
+                  child: Slider(
+                    min: 0.0,
+                    max: maxValue,
+                    value: value,
+                    onChanged: (double value) {},
+                  ))),
+          Text("$value / $maxValue"),
+        ],
+      ),
+    );
+  }
 }

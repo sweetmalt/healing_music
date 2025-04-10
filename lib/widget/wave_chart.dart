@@ -9,9 +9,12 @@ class WaveChartController extends GetxController {
   final double minY;
   final double maxY;
   final RxList<FlSpot> dataFlSpot = <FlSpot>[].obs;
+  final RxDouble currentValue = 0.0.obs;
   final List<double> _data = [];
   final List<double> bestLimits = [60, 100]; //最佳值范围
+  final List<double> betterLimits = [50, 100]; //次佳值范围
   double statisticsBestScaling = 0; //最佳值占比
+  double statisticsBetterScaling = 0; //次佳值占比
   double statisticsMin = 0; //最小值
   double statisticsMax = 0; //最大值
   double statisticsRange = 0; //大小差
@@ -69,27 +72,22 @@ class WaveChartController extends GetxController {
     bestLimits[1] = max;
   }
 
-  /// 基于rr间期值数组的心率变异性hrv数据的频域分析（Frequency-Domain Analysis）
-  /// 通过功率谱密度（PSD）计算不同频段的能量分布：
-  /// 总功率（TP）
-  /// 总频段（通常 ≤0.4 Hz）的功率：
-  /// TP=∫00.4P(f)dfTP=∫00.4P(f)df
-  /// 低频功率（LF, 0.04–0.15 Hz）
-  /// LF=∫0.040.15P(f)dfLF=∫0.040.15P(f)df
-  /// 高频功率（HF, 0.15–0.4 Hz）
-  /// HF=∫0.150.4P(f)dfHF=∫0.150.4P(f)df
-  /// LF/HF 比值
-  /// 反映交感与副交感神经平衡：
-  /// LFHF=LF功率HF功率HFLF=HF功率LF功率
-  Future<void> statisticsHrv() async {}
+  Future<void> setBetterLimits(double min, double max) async {
+    betterLimits[0] = min;
+    betterLimits[1] = max;
+  }
 
   Future<void> statistics() async {
-    // if (_data.length < 60) {
-    //   return;
-    // }
+    if (_data.length < 10) {
+      return;
+    }
     statisticsBestScaling =
         _data.where((x) => (x >= bestLimits[0] && x <= bestLimits[1])).length /
             _data.length;
+    statisticsBetterScaling = _data
+            .where((x) => (x >= betterLimits[0] && x <= betterLimits[1]))
+            .length /
+        _data.length;
     statisticsMin = _data.reduce((a, b) => a < b ? a : b);
     statisticsMax = _data.reduce((a, b) => a > b ? a : b);
     statisticsRange = statisticsMax - statisticsMin;
@@ -116,30 +114,37 @@ class WaveChartController extends GetxController {
       }
     }
     statisticsMeanInterfacing50Scaling = sumOfDifferences / (_data.length - 1);
+    //众数
     statisticsMode = _data.reduce((a, b) =>
         _data.where((x) => x == a).length > _data.where((x) => x == b).length
             ? a
             : b);
+    //中位数
     statisticsMedian = _data[_data.length ~/ 2];
     if (statisticsRange > 0) {
       statisticsMeanPosition =
           (statisticsMean - statisticsMin) / statisticsRange;
     }
+    //众数排位
     if (statisticsRange > 0) {
       statisticsModePosition =
           (statisticsMode - statisticsMin) / statisticsRange;
     }
+    //众数占比
     statisticsModeScaling =
         _data.where((x) => x == statisticsMode).length / _data.length;
+    //中位数排位
     if (statisticsRange > 0) {
       statisticsMedianPosition =
           (statisticsMedian - statisticsMin) / statisticsRange;
     }
+    //数据样本点数量，记录时长
     statisticsCount = _data.length.toDouble();
   }
 
   Future<void> addDataPoint(double value) async {
     if (value >= minY && value <= maxY) {
+      currentValue.value = value;
       _data.add(value);
       dataFlSpot.add(FlSpot(maxX, value));
       maxX = dataFlSpot.length.toDouble();
@@ -181,7 +186,7 @@ class WaveChartStatistics extends StatelessWidget {
               "高光时段占比 ${(controller.statisticsBestScaling * 10000).toInt() / 10000}"),
           subtitle: const Text("bestScaling"),
         ),
-        StatisticsContainerCircle("高光时刻", controller.statisticsBestScaling),
+        StatisticsContainerCircle("高光时段", controller.statisticsBestScaling),
         Container(
           height: 40,
           alignment: Alignment.center,
@@ -339,7 +344,7 @@ class StatisticsContainerCircle extends Container {
       Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('${(value * 10000).toInt() / 100}%',
+          Text('${(value * 10000).toInt() / 100}分',
               style: const TextStyle(
                 fontSize: 40,
                 fontWeight: FontWeight.bold,

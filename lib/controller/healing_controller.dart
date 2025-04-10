@@ -1,4 +1,8 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
+import 'package:scidart/numdart.dart';
+import 'package:scidart/scidart.dart';
+
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:healing_music/controller/ctrl.dart';
@@ -43,6 +47,10 @@ class HealingController extends Ctrl {
   final RxDouble bciGrind = 0.0.obs;
   final RxInt bciCurrentTimeMillis = 0.obs; //时间戳
   final RxList<double> hrvRR = <double>[].obs;
+  final RxDouble hrvTP = 0.0.obs;
+  final RxDouble hrvLF = 0.0.obs;
+  final RxDouble hrvHF = 0.0.obs;
+  final RxDouble hrvLFHF = 0.0.obs;
 
   /// 分析数据
   final RxDouble curRelax = 0.0.obs;
@@ -241,7 +249,7 @@ class HealingController extends Ctrl {
     await hrvRRWaveController.clearData();
   }
 
-  List<String> get data {
+  List<String> get bciData {
     return _bciData;
   }
 
@@ -288,9 +296,11 @@ class HealingController extends Ctrl {
     await curFlowWaveController.statistics();
     await bciAttWaveController.statistics();
     await bciMedWaveController.statistics();
-    await bciHeartRateWaveController.setBestLimits(50, 80);
+    await bciHeartRateWaveController.setBestLimits(60, 80);
+    await bciHeartRateWaveController.setBetterLimits(50, 90);
     await bciHeartRateWaveController.statistics();
-    await hrvRRWaveController.setBestLimits(750, 1200);
+    await hrvRRWaveController.setBestLimits(750, 1000);
+    await hrvRRWaveController.setBetterLimits(666, 1200);
     await hrvRRWaveController.statistics();
   }
 
@@ -475,4 +485,78 @@ class HealingController extends Ctrl {
     },
     'bciGrind': {"title": '咬牙', "short": "可用于控制音乐。", "long": "可用于控制音乐。"},
   };
+
+  /// 基于rr间期值数组的心率变异性hrv数据的频域分析（Frequency-Domain Analysis）
+  /// 通过功率谱密度（PSD）计算不同频段的能量分布：
+  /// 总功率（TP）
+  /// 总频段（通常 ≤0.4 Hz）的功率：
+  /// TP = ∫0至0.4 P(f) df
+  /// 低频功率（LF, 0.04–0.15 Hz）
+  /// LF=∫0.040.15P(f)dfLF=∫0.040.15P(f)df
+  /// 高频功率（HF, 0.15–0.4 Hz）
+  /// HF=∫0.150.4P(f)dfHF=∫0.150.4P(f)df
+  /// LF/HF 比值
+  /// 反映交感与副交感神经平衡：
+  /// LFHF=LF功率HF功率HFLF=HF功率LF功率
+  Future<void> statisticsHrv() async {
+    if (_hrvData.length < 10) {
+      return;
+    }
+    List p = calculateTotalPower(_hrvData);
+    hrvTP.value = p[0];
+    hrvLF.value = p[1];
+    hrvHF.value = p[2];
+    hrvLFHF.value = p[3];
+    if (kDebugMode) {
+      print(' [tp, lf, hf, lfhf]: $p');
+    }
+  }
+
+  List<double> calculateTotalPower(List<double> hrvData) {
+    // 将HRV数据转换为数组
+    Array hrvArray = Array(hrvData);
+    ArrayComplex arrayComplex = ArrayComplex.empty();
+    for (int i = 0; i < hrvArray.length; i++) {
+      Complex c = Complex(real: hrvArray[i]);
+      arrayComplex.add(c);
+    }
+    // 进行傅里叶变换
+    ArrayComplex fftResult = fft(arrayComplex);
+    // 计算频率分辨率
+    double freqResolution = 1.0 / hrvData.length;
+    // 计算总功率（TP）
+    double tp = 0.0;
+    for (int i = 0; i < fftResult.length; i++) {
+      double freq = i * freqResolution;
+      if (freq <= 0.4) {
+        double abs = fftResult[i].real * fftResult[i].real +
+            fftResult[i].imaginary * fftResult[i].imaginary;
+        tp += abs;
+      }
+    }
+    double lf = 0.0;
+    for (int i = 0; i < fftResult.length; i++) {
+      double freq = i * freqResolution;
+      if (freq >= 0.04 && freq <= 0.15) {
+        double abs = fftResult[i].real * fftResult[i].real +
+            fftResult[i].imaginary * fftResult[i].imaginary;
+        lf += abs;
+      }
+    }
+    double hf = 0.0;
+    for (int i = 0; i < fftResult.length; i++) {
+      double freq = i * freqResolution;
+      if (freq >= 0.15 && freq <= 0.4) {
+        double abs = fftResult[i].real * fftResult[i].real +
+            fftResult[i].imaginary * fftResult[i].imaginary;
+        hf += abs;
+      }
+    }
+    double lfhf = 0.0;
+    if (hf > 0) {
+      lfhf = lf / hf;
+    }
+
+    return [tp, lf, hf, lfhf];
+  }
 }
