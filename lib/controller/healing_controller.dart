@@ -31,9 +31,10 @@ class HealingController extends Ctrl {
   StreamSubscription? _bciAndHrvBroadcastListener;
   final List<String> _bciData = <String>[""];
   final List<double> _hrvData = <double>[];
-  final RxDouble bciAtt = 0.0.obs;
-  final RxDouble bciMed = 0.0.obs;
-  final RxDouble bciAp = 0.0.obs;
+  //实时脑波数据
+  final RxDouble bciAtt = 0.0.obs; //专注度
+  final RxDouble bciMed = 0.0.obs; //安全感
+  final RxDouble bciAp = 0.0.obs; //愉悦度
   final RxDouble bciDelta = 0.0.obs;
   final RxDouble bciTheta = 0.0.obs;
   final RxDouble bciLowAlpha = 0.0.obs;
@@ -43,19 +44,37 @@ class HealingController extends Ctrl {
   final RxDouble bciLowGamma = 0.0.obs;
   final RxDouble bciMiddleGamma = 0.0.obs;
   final RxDouble bciTemperature = 0.0.obs;
-  final RxDouble bciHeartRate = 0.0.obs;
+  final RxDouble bciHeartRate = 0.0.obs; //心率
   final RxDouble bciGrind = 0.0.obs;
   final RxInt bciCurrentTimeMillis = 0.obs; //时间戳
+  //最近60条脑波数据
+  final List<double> _bciDeltaHistory60 = <double>[];
+  final RxDouble bciDeltaHistory60Mean = 0.0.obs; //1
+  final List<double> _bciThetaHistory60 = <double>[];
+  final RxDouble bciThetaHistory60Mean = 0.0.obs; //2
+  final List<double> _bciLowAlphaHistory60 = <double>[];
+  final RxDouble bciLowAlphaHistory60Mean = 0.0.obs; //3
+  final List<double> _bciHighAlphaHistory60 = <double>[];
+  final RxDouble bciHighAlphaHistory60Mean = 0.0.obs; //4
+  final List<double> _bciLowBetaHistory60 = <double>[];
+  final RxDouble bciLowBetaHistory60Mean = 0.0.obs; //5
+  final List<double> _bciHighBetaHistory60 = <double>[];
+  final RxDouble bciHighBetaHistory60Mean = 0.0.obs; //6
+  final List<double> _bciGammaHistory60 = <double>[];
+  final RxDouble bciGammaHistory60Mean = 0.0.obs; //7
+
+  //实时hrv数据
   final RxList<double> hrvRR = <double>[].obs;
+  //统计的hrv数据，基于_hrvData
   final RxDouble hrvTP = 0.0.obs;
   final RxDouble hrvLF = 0.0.obs;
   final RxDouble hrvHF = 0.0.obs;
   final RxDouble hrvLFHF = 0.0.obs;
 
-  /// 分析数据
-  final RxDouble curRelax = 0.0.obs;
-  final RxDouble curSharp = 0.0.obs;
-  final RxDouble curFlow = 0.0.obs;
+  /// 基于实时脑波数据的简单实时情绪数据（非统计）
+  final RxDouble curRelax = 0.0.obs; //松弛感
+  final RxDouble curSharp = 0.0.obs; //敏锐度
+  final RxDouble curFlow = 0.0.obs; //心流指数
 
   final HemController hemController = Get.put(HemController());
   final EnvController envController = Get.put(EnvController());
@@ -261,36 +280,6 @@ class HealingController extends Ctrl {
   get receivedHrvDataCount => _hrvData.length;
 
   Future<void> createReport() async {
-/**
-    if (receivedDataCount >= 300 && receivedDataCount < 600) {
-      curRelaxWaveController.setBestLimits(70, 100);
-      curSharpWaveController.setBestLimits(70, 100);
-      curFlowWaveController.setBestLimits(70, 100);
-      bciAttWaveController.setBestLimits(70, 100);
-      bciMedWaveController.setBestLimits(70, 100);
-    }
-    if (receivedDataCount >= 600 && receivedDataCount < 900) {
-      curRelaxWaveController.setBestLimits(67, 100);
-      curSharpWaveController.setBestLimits(67, 100);
-      curFlowWaveController.setBestLimits(67, 100);
-      bciAttWaveController.setBestLimits(67, 100);
-      bciMedWaveController.setBestLimits(67, 100);
-    }
-    if (receivedDataCount >= 900 && receivedDataCount < 1500) {
-      curRelaxWaveController.setBestLimits(63, 100);
-      curSharpWaveController.setBestLimits(63, 100);
-      curFlowWaveController.setBestLimits(63, 100);
-      bciAttWaveController.setBestLimits(63, 100);
-      bciMedWaveController.setBestLimits(63, 100);
-    }
-    if (receivedDataCount >= 1500) {
-      curRelaxWaveController.setBestLimits(60, 100);
-      curSharpWaveController.setBestLimits(60, 100);
-      curFlowWaveController.setBestLimits(60, 100);
-      bciAttWaveController.setBestLimits(60, 100);
-      bciMedWaveController.setBestLimits(60, 100);
-    }
-*/
     await curRelaxWaveController.statistics();
     await curSharpWaveController.statistics();
     await curFlowWaveController.statistics();
@@ -336,6 +325,77 @@ class HealingController extends Ctrl {
             if (_bciData.length > 3600) {
               _bciData.removeRange(0, 1800);
             }
+            //最近60条数据的平均值
+            //1 bciDelta
+            double x = bciDelta.value;
+            x = x > 50000 ? 50000 : x;
+            _bciDeltaHistory60.add(x);
+            if (_bciDeltaHistory60.length > 60) {
+              _bciDeltaHistory60.removeAt(0);
+            }
+            bciDeltaHistory60Mean.value =
+                _bciDeltaHistory60.reduce((a, b) => a + b) /
+                    _bciDeltaHistory60.length;
+            //2 bciTheta
+            x = bciTheta.value;
+            x = x > 50000 ? 50000 : x;
+            _bciThetaHistory60.add(x);
+            if (_bciThetaHistory60.length > 60) {
+              _bciThetaHistory60.removeAt(0);
+            }
+            bciThetaHistory60Mean.value =
+                _bciThetaHistory60.reduce((a, b) => a + b) /
+                    _bciThetaHistory60.length;
+            //3 bciLowAlpha
+            x = bciLowAlpha.value;
+            x = x > 50000 ? 50000 : x;
+            _bciLowAlphaHistory60.add(x);
+            if (_bciLowAlphaHistory60.length > 60) {
+              _bciLowAlphaHistory60.removeAt(0);
+            }
+            bciLowAlphaHistory60Mean.value =
+                _bciLowAlphaHistory60.reduce((a, b) => a + b) /
+                    _bciLowAlphaHistory60.length;
+            //4 bciHighAlpha
+            x = bciHighAlpha.value;
+            x = x > 50000 ? 50000 : x;
+            _bciHighAlphaHistory60.add(x);
+            if (_bciHighAlphaHistory60.length > 60) {
+              _bciHighAlphaHistory60.removeAt(0);
+            }
+            bciHighAlphaHistory60Mean.value =
+                _bciHighAlphaHistory60.reduce((a, b) => a + b) /
+                    _bciHighAlphaHistory60.length;
+            //5 bciLowBeta
+            x = bciLowBeta.value;
+            x = x > 50000 ? 50000 : x;
+            _bciLowBetaHistory60.add(x);
+            if (_bciLowBetaHistory60.length > 60) {
+              _bciLowBetaHistory60.removeAt(0);
+            }
+            bciLowBetaHistory60Mean.value =
+                _bciLowBetaHistory60.reduce((a, b) => a + b) /
+                    _bciLowBetaHistory60.length;
+            //6 bciHighBeta
+            x = bciHighBeta.value;
+            x = x > 50000 ? 50000 : x;
+            _bciHighBetaHistory60.add(x);
+            if (_bciHighBetaHistory60.length > 60) {
+              _bciHighBetaHistory60.removeAt(0);
+            }
+            bciHighBetaHistory60Mean.value =
+                _bciHighBetaHistory60.reduce((a, b) => a + b) /
+                    _bciHighBetaHistory60.length;
+            //7 bciLowGamma
+            x = bciLowGamma.value + bciMiddleGamma.value;
+            x = x > 50000 ? 50000 : x;
+            _bciGammaHistory60.add(x);
+            if (_bciGammaHistory60.length > 60) {
+              _bciGammaHistory60.removeAt(0);
+            }
+            bciGammaHistory60Mean.value =
+                _bciGammaHistory60.reduce((a, b) => a + b) /
+                    _bciGammaHistory60.length;
           }
         }
         if (temp[0] == "hrv") {
@@ -490,19 +550,19 @@ class HealingController extends Ctrl {
   /// 通过功率谱密度（PSD）计算不同频段的能量分布：
   /// 总功率（TP）
   /// 总频段（通常 ≤0.4 Hz）的功率：
-  /// TP = ∫0至0.4 P(f) df
+  /// TP = ∫0~0.4 P(f) df
   /// 低频功率（LF, 0.04–0.15 Hz）
-  /// LF=∫0.040.15P(f)dfLF=∫0.040.15P(f)df
+  /// LF=∫0.040.15P(f)df
   /// 高频功率（HF, 0.15–0.4 Hz）
-  /// HF=∫0.150.4P(f)dfHF=∫0.150.4P(f)df
+  /// HF=∫0.15~0.4P(f)df
   /// LF/HF 比值
   /// 反映交感与副交感神经平衡：
-  /// LFHF=LF功率HF功率HFLF=HF功率LF功率
+  /// LFHF=LF功率/HF功率
   Future<void> statisticsHrv() async {
     if (_hrvData.length < 10) {
       return;
     }
-    List p = calculateTotalPower(_hrvData);
+    List p = calculateLFHF(_hrvData);
     hrvTP.value = p[0];
     hrvLF.value = p[1];
     hrvHF.value = p[2];
@@ -512,12 +572,11 @@ class HealingController extends Ctrl {
     }
   }
 
-  List<double> calculateTotalPower(List<double> hrvData) {
+  List<double> calculateLFHF(List<double> hrvData) {
     // 将HRV数据转换为数组
-    Array hrvArray = Array(hrvData);
     ArrayComplex arrayComplex = ArrayComplex.empty();
-    for (int i = 0; i < hrvArray.length; i++) {
-      Complex c = Complex(real: hrvArray[i]);
+    for (int i = 0; i < hrvData.length; i++) {
+      Complex c = Complex(real: hrvData[i]);
       arrayComplex.add(c);
     }
     // 进行傅里叶变换
@@ -534,6 +593,7 @@ class HealingController extends Ctrl {
         tp += abs;
       }
     }
+    //计算低频功率（LF）
     double lf = 0.0;
     for (int i = 0; i < fftResult.length; i++) {
       double freq = i * freqResolution;
@@ -543,6 +603,7 @@ class HealingController extends Ctrl {
         lf += abs;
       }
     }
+    //计算高频功率（HF）
     double hf = 0.0;
     for (int i = 0; i < fftResult.length; i++) {
       double freq = i * freqResolution;
@@ -552,11 +613,11 @@ class HealingController extends Ctrl {
         hf += abs;
       }
     }
+    //计算 LF/HF 比值
     double lfhf = 0.0;
     if (hf > 0) {
       lfhf = lf / hf;
     }
-
     return [tp, lf, hf, lfhf];
   }
 }

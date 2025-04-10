@@ -541,69 +541,46 @@ class BciSliderBox extends StatelessWidget {
       child: Column(
         children: [
           Obx(() => BciSlider(
-                title: "γ 波",
+                title: "全息", //γ 波
                 color: Colors.purple,
-                maxValue: 100000,
-                value: healingController.bciMiddleGamma.value +
-                            healingController.bciLowGamma.value >
-                        100000
-                    ? 100000
-                    : (healingController.bciMiddleGamma.value +
-                        healingController.bciLowGamma.value),
+                maxValue: 50000,
+                value: healingController.bciGammaHistory60Mean.value,
               )),
           Obx(() => BciSlider(
-                title: "β 波",
+                title: "睡眠", //δ 波
                 color: Colors.deepPurpleAccent,
-                maxValue: 100000,
-                value: healingController.bciHighBeta.value +
-                            healingController.bciLowBeta.value >
-                        100000
-                    ? 100000
-                    : healingController.bciHighBeta.value +
-                        healingController.bciLowBeta.value,
+                maxValue: 50000,
+                value: healingController.bciDeltaHistory60Mean.value,
               )),
           Obx(() => BciSlider(
-                title: "α 波",
+                title: "代谢", //θ 波
                 color: Colors.blue,
-                maxValue: 100000,
-                value: healingController.bciHighAlpha.value +
-                            healingController.bciLowAlpha.value >
-                        100000
-                    ? 100000
-                    : healingController.bciHighAlpha.value +
-                        healingController.bciLowAlpha.value,
+                maxValue: 50000,
+                value: healingController.bciThetaHistory60Mean.value,
               )),
           Obx(() => BciSlider(
-                title: "θ 波",
+                title: "免疫", //高 α
                 color: Colors.green,
-                maxValue: 100000,
-                value: healingController.bciTheta.value > 100000
-                    ? 100000
-                    : healingController.bciTheta.value,
+                maxValue: 50000,
+                value: healingController.bciHighAlphaHistory60Mean.value,
               )),
-              Obx(() => BciSlider(
-                title: "δ 波",
+          Obx(() => BciSlider(
+                title: "消化", //低 α
                 color: Colors.yellow,
-                maxValue: 100000,
-                value: healingController.bciDelta.value > 100000
-                    ? 100000
-                    : healingController.bciDelta.value,
+                maxValue: 50000,
+                value: healingController.bciLowAlphaHistory60Mean.value,
               )),
-              Obx(() => BciSlider(
-                title: "心率",
+          Obx(() => BciSlider(
+                title: "幸福", //高 β
                 color: Colors.orange,
-                maxValue: 200,
-                value: healingController.bciHeartRate.value > 200
-                    ? 200
-                    : healingController.bciHeartRate.value,
+                maxValue: 50000,
+                value: healingController.bciHighBetaHistory60Mean.value,
               )),
-              Obx(() => BciSlider(
-                title: "HRV",
+          Obx(() => BciSlider(
+                title: "动力", //低 β
                 color: Colors.red,
-                maxValue: 1500,
-                value: healingController.hrvRR[0] > 1500
-                    ? 1500
-                    : healingController.hrvRR[0],
+                maxValue: 50000,
+                value: healingController.bciLowBetaHistory60Mean.value,
               )),
         ],
       ),
@@ -646,7 +623,7 @@ class BciSlider extends StatelessWidget {
                     value: value,
                     onChanged: (double value) {},
                   ))),
-          Text("$value / $maxValue"),
+          Text("${((value / maxValue) * 1000).toInt() / 10}"),
         ],
       ),
     );

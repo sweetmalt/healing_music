@@ -175,6 +175,8 @@ class ReportPage extends GetView<ReporPageController> {
                 for (int i = 1; i < controller._report['data'].length; i++)
                   Text(
                     "$i: ${controller._report['data'][i]}",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 12,
                       color: ThemeData().colorScheme.primary,
@@ -199,14 +201,14 @@ class ReportPage extends GetView<ReporPageController> {
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 5, // 每行显示元素
-                childAspectRatio: 4, // 子元素宽高比
+                childAspectRatio: 2, // 子元素宽高比
               ),
               itemCount: controller._report['hrvData'].length,
               itemBuilder: (context, index) {
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
-                    "$index: ${controller._report['hrvData'][index]}",
+                    "${controller._report['hrvData'][index]}",
                     style: TextStyle(
                       fontSize: 12,
                       color: ThemeData().colorScheme.primary,

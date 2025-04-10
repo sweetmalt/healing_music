@@ -33,8 +33,14 @@ class ReportView extends GetView<ReportViewController> {
               children: [
                 ListTile(
                     title: Text("能量报告", style: MyStyle.paragraphTitleTextStyle),
-                    subtitle: Text(
-                        "综合得分 = 心理能量 & 生理能量（ LF/HF ${(healingController.hrvLFHF * 100).toInt() / 100} ）"),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text("综合得分 = 心理能量 & 生理能量"),
+                        Text(
+                            "LF/HF ${(healingController.hrvLFHF * 100).toInt() / 100}")
+                      ],
+                    ),
                     trailing: IconButton(
                       onPressed: () {
                         healingController.customerNickname.value.isEmpty
