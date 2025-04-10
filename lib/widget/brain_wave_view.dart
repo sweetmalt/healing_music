@@ -54,6 +54,10 @@ class BrainWaveView extends StatelessWidget {
               await healingController.clearData();
             },
           ),
+
+
+
+          
           const SizedBox(
             height: 40,
           ),

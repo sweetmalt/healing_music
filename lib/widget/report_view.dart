@@ -303,7 +303,7 @@ class ReportViewController extends Ctrl {
   final HealingController healingController = Get.find();
   final RxDouble energyPsyScaling = 1.0.obs; //心理能量占比
   final RxDouble energyPhyScaling = 1.0.obs; //生理能量占比
-  final RxDouble energyPsyAndPhyScaling = 1.0.obs; //生理能量占比
+  final RxDouble energyPsyAndPhyScaling = 1.0.obs; //心理与生理
   Future<void> energyScaling() async {
     await healingController.createReport();
     double temp =
@@ -312,6 +312,7 @@ class ReportViewController extends Ctrl {
             healingController.curFlowWaveController.statisticsBestScaling;
     temp = temp >= 1 ? 1 : temp;
     energyPsyScaling.value = temp;
+
 
     temp = healingController.bciHeartRateWaveController.statisticsBestScaling *
         healingController

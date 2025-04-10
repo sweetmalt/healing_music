@@ -74,12 +74,11 @@ class VolumeViewState extends State<VolumeView> with WidgetsBindingObserver {
                 subtitle: const Text('限定各音乐元素的最高音量'),
                 trailing: IconButton(
                   onPressed: () {
-                    healingController.isMute.value =
-                        !healingController.isMute.value;
-                    hemController.setVolMute(healingController.isMute.value);
-                    envController.setVolMute(healingController.isMute.value);
-                    bgmController.setVolMute(healingController.isMute.value);
-                    bbmController.setVolMute(healingController.isMute.value);
+                    healingController.setVolMute(!healingController.isMute.value);
+                    hemController.setVolMute(!hemController.isMute.value);
+                    envController.setVolMute(!envController.isMute.value);
+                    bgmController.setVolMute(!bgmController.isMute.value);
+                    bbmController.setVolMute(!bbmController.isMute.value);
                   },
                   icon: Obx(() => healingController.isMute.value
                       ? const Icon(Icons.volume_off_sharp)

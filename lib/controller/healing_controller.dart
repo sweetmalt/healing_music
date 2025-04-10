@@ -11,7 +11,6 @@ class HealingController extends Ctrl {
   final RxString subTitle = ''.obs;
   final RxString audioTitle = ''.obs;
   final RxString audioSubTitle = ''.obs;
-  final RxBool isMute = false.obs; //是否静音
   final RxBool isCtrlByDevice = true.obs;
   final RxBool isDeviceLinking = false.obs;
   final List<int> bciCurrentTwoTimeMillis = [0, 0]; //用于判断连接状态

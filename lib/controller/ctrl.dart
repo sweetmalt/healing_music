@@ -58,6 +58,7 @@ class Ctrl extends GetxController {
   final RxInt durationInMilliseconds = 1.obs;
   final RxInt positionInMilliseconds = 0.obs;
   final RxBool isPlaying = false.obs;
+  final RxBool isMute = false.obs; //是否静音
   final RxBool isLoop = false.obs;
   late final StreamSubscription<Duration>? _positionListener;
 
@@ -90,12 +91,14 @@ class Ctrl extends GetxController {
       int p = position.inMilliseconds;
       if (p <= d) {
         positionInMilliseconds.value = p;
-        if (p < 4000) {
-          setVolume((p / 4000) * maxVol.value);
-        } else if (p > d - 4000) {
-          setVolume(((d - p) / 4000) * maxVol.value);
-        } else {
-          setVolume(maxVol.value);
+        if (isLoop.value && d > 8000 && !isMute.value) {
+          if (p < 4000) {
+            setVolume((p / 4000) * maxVol.value);
+          } else if (p > d - 4000) {
+            setVolume(((d - p) / 4000) * maxVol.value);
+          } else {
+            setVolume(maxVol.value);
+          }
         }
         onPlaying();
       }
@@ -121,6 +124,7 @@ class Ctrl extends GetxController {
 
   void setVolMute(bool isMute) {
     setVolume(isMute ? 0.01 : maxVol.value);
+    this.isMute.value = isMute;
   }
 
   void setMaxVol(double mv) {
