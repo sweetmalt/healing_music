@@ -72,11 +72,6 @@ class WaveChartController extends GetxController {
     bestLimits[1] = max;
   }
 
-  //计算平均值（统计）
-  double mean(dataList) {
-    return dataList.reduce((a, b) => a + b) / dataList.length;
-  }
-
   //统一计算全部数据（统计）
   Future<void> setBetterLimits(double min, double max) async {
     betterLimits[0] = min;
@@ -98,8 +93,7 @@ class WaveChartController extends GetxController {
     statisticsMax = _data.reduce((a, b) => a > b ? a : b);
     statisticsRange = statisticsMax - statisticsMin;
     //计算平均值
-    statisticsMean =
-        mean(_data); // _data.reduce((a, b) => a + b) / _data.length;
+    statisticsMean = _data.reduce((a, b) => a + b) / _data.length;
 
     double sumOfDifferences = 0.0;
     //计算标准差

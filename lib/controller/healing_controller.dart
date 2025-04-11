@@ -247,6 +247,14 @@ class HealingController extends Ctrl {
   Future<void> clearData() async {
     _bciData.clear();
     _hrvData.clear();
+    _bciDeltaHistory60.clear();
+    _bciThetaHistory60.clear();
+    _bciLowAlphaHistory60.clear();
+    _bciHighAlphaHistory60.clear();
+    _bciLowBetaHistory60.clear();
+    _bciHighBetaHistory60.clear();
+    _bciGammaHistory60.clear();
+
     await curRelaxWaveController.clearData();
     await curSharpWaveController.clearData();
     await curFlowWaveController.clearData();
@@ -327,75 +335,71 @@ class HealingController extends Ctrl {
             }
             //最近60条数据的平均值
             //1 bciDelta
-            double x = bciDelta.value;
-            x = x > 50000 ? 50000 : x;
-            _bciDeltaHistory60.add(x);
+            double sx = 100000;
+            _bciDeltaHistory60.add(bciDelta.value > sx ? sx : bciDelta.value);
             if (_bciDeltaHistory60.length > 60) {
               _bciDeltaHistory60.removeAt(0);
             }
-            bciDeltaHistory60Mean.value =
-                _bciDeltaHistory60.reduce((a, b) => a + b) /
-                    _bciDeltaHistory60.length;
+            double xBcidelta = _bciDeltaHistory60.reduce((a, b) => a + b);
             //2 bciTheta
-            x = bciTheta.value;
-            x = x > 50000 ? 50000 : x;
-            _bciThetaHistory60.add(x);
+            _bciThetaHistory60
+                .add((bciTheta.value > sx ? sx : bciTheta.value) * 2);
             if (_bciThetaHistory60.length > 60) {
               _bciThetaHistory60.removeAt(0);
             }
-            bciThetaHistory60Mean.value =
-                _bciThetaHistory60.reduce((a, b) => a + b) /
-                    _bciThetaHistory60.length;
+            double xBcitheta = _bciThetaHistory60.reduce((a, b) => a + b);
             //3 bciLowAlpha
-            x = bciLowAlpha.value;
-            x = x > 50000 ? 50000 : x;
-            _bciLowAlphaHistory60.add(x);
+            _bciLowAlphaHistory60
+                .add((bciLowAlpha.value > sx ? sx : bciLowAlpha.value) * 3);
             if (_bciLowAlphaHistory60.length > 60) {
               _bciLowAlphaHistory60.removeAt(0);
             }
-            bciLowAlphaHistory60Mean.value =
-                _bciLowAlphaHistory60.reduce((a, b) => a + b) /
-                    _bciLowAlphaHistory60.length;
+            double xBcilowalpha = _bciLowAlphaHistory60.reduce((a, b) => a + b);
             //4 bciHighAlpha
-            x = bciHighAlpha.value;
-            x = x > 50000 ? 50000 : x;
-            _bciHighAlphaHistory60.add(x);
+            _bciHighAlphaHistory60
+                .add((bciHighAlpha.value > sx ? sx : bciHighAlpha.value) * 4);
             if (_bciHighAlphaHistory60.length > 60) {
               _bciHighAlphaHistory60.removeAt(0);
             }
-            bciHighAlphaHistory60Mean.value =
-                _bciHighAlphaHistory60.reduce((a, b) => a + b) /
-                    _bciHighAlphaHistory60.length;
+            double xBcihighalpha =
+                _bciHighAlphaHistory60.reduce((a, b) => a + b);
             //5 bciLowBeta
-            x = bciLowBeta.value;
-            x = x > 50000 ? 50000 : x;
-            _bciLowBetaHistory60.add(x);
+            _bciLowBetaHistory60
+                .add((bciLowBeta.value > sx ? sx : bciLowBeta.value) * 7);
             if (_bciLowBetaHistory60.length > 60) {
               _bciLowBetaHistory60.removeAt(0);
             }
-            bciLowBetaHistory60Mean.value =
-                _bciLowBetaHistory60.reduce((a, b) => a + b) /
-                    _bciLowBetaHistory60.length;
+            double xBcilowbeta = _bciLowBetaHistory60.reduce((a, b) => a + b);
             //6 bciHighBeta
-            x = bciHighBeta.value;
-            x = x > 50000 ? 50000 : x;
-            _bciHighBetaHistory60.add(x);
+            _bciHighBetaHistory60
+                .add((bciHighBeta.value > sx ? sx : bciHighBeta.value) * 6);
             if (_bciHighBetaHistory60.length > 60) {
               _bciHighBetaHistory60.removeAt(0);
             }
-            bciHighBetaHistory60Mean.value =
-                _bciHighBetaHistory60.reduce((a, b) => a + b) /
-                    _bciHighBetaHistory60.length;
+            double xBcihighbeta = _bciHighBetaHistory60.reduce((a, b) => a + b);
             //7 bciLowGamma
-            x = bciLowGamma.value + bciMiddleGamma.value;
-            x = x > 50000 ? 50000 : x;
-            _bciGammaHistory60.add(x);
+            _bciGammaHistory60
+                .add((bciLowGamma.value > sx ? sx : bciLowGamma.value) * 13);
             if (_bciGammaHistory60.length > 60) {
               _bciGammaHistory60.removeAt(0);
             }
-            bciGammaHistory60Mean.value =
-                _bciGammaHistory60.reduce((a, b) => a + b) /
-                    _bciGammaHistory60.length;
+            double xBcigamma = _bciGammaHistory60.reduce((a, b) => a + b);
+            double xAll = xBcidelta +
+                xBcitheta +
+                xBcilowalpha +
+                xBcihighalpha +
+                xBcilowbeta +
+                xBcihighbeta +
+                xBcigamma;
+            if (xAll > 0) {
+              bciDeltaHistory60Mean.value = xBcidelta / xAll;
+              bciThetaHistory60Mean.value = xBcitheta / xAll;
+              bciLowAlphaHistory60Mean.value = xBcilowalpha / xAll;
+              bciHighAlphaHistory60Mean.value = xBcihighalpha / xAll;
+              bciLowBetaHistory60Mean.value = xBcilowbeta / xAll;
+              bciHighBetaHistory60Mean.value = xBcihighbeta / xAll;
+              bciGammaHistory60Mean.value = xBcigamma / xAll;
+            }
           }
         }
         if (temp[0] == "hrv") {
@@ -562,7 +566,7 @@ class HealingController extends Ctrl {
     if (_hrvData.length < 10) {
       return;
     }
-    List p = calculateLFHF(_hrvData);
+    List<double> p = calculateLFHF(_hrvData);
     hrvTP.value = p[0];
     hrvLF.value = p[1];
     hrvHF.value = p[2];

@@ -198,7 +198,7 @@ class HealingPage extends GetView<HealingController> {
                       );
                       return;
                     }
-
+                    
                     reportViewController.energyScaling();
 
                     showModalBottomSheet(
@@ -214,7 +214,6 @@ class HealingPage extends GetView<HealingController> {
                         return ReportView();
                       },
                     );
-                    healingController.statisticsHrv();
                   },
                   icon: Icons.menu_book_rounded,
                   backgroundColor: Colors.blue,

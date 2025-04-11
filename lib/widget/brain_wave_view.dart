@@ -543,43 +543,43 @@ class BciSliderBox extends StatelessWidget {
           Obx(() => BciSlider(
                 title: "全息", //γ 波
                 color: Colors.purple,
-                maxValue: 50000,
+                maxValue: 1,
                 value: healingController.bciGammaHistory60Mean.value,
               )),
           Obx(() => BciSlider(
                 title: "睡眠", //δ 波
                 color: Colors.deepPurpleAccent,
-                maxValue: 50000,
+                maxValue: 1,
                 value: healingController.bciDeltaHistory60Mean.value,
               )),
           Obx(() => BciSlider(
                 title: "代谢", //θ 波
                 color: Colors.blue,
-                maxValue: 50000,
+                maxValue: 1,
                 value: healingController.bciThetaHistory60Mean.value,
               )),
           Obx(() => BciSlider(
                 title: "免疫", //高 α
                 color: Colors.green,
-                maxValue: 50000,
+                maxValue: 1,
                 value: healingController.bciHighAlphaHistory60Mean.value,
               )),
           Obx(() => BciSlider(
                 title: "消化", //低 α
                 color: Colors.yellow,
-                maxValue: 50000,
+                maxValue: 1,
                 value: healingController.bciLowAlphaHistory60Mean.value,
               )),
           Obx(() => BciSlider(
                 title: "幸福", //高 β
                 color: Colors.orange,
-                maxValue: 50000,
+                maxValue: 1,
                 value: healingController.bciHighBetaHistory60Mean.value,
               )),
           Obx(() => BciSlider(
                 title: "动力", //低 β
                 color: Colors.red,
-                maxValue: 50000,
+                maxValue: 1,
                 value: healingController.bciLowBetaHistory60Mean.value,
               )),
         ],
@@ -623,7 +623,7 @@ class BciSlider extends StatelessWidget {
                     value: value,
                     onChanged: (double value) {},
                   ))),
-          Text("${((value / maxValue) * 1000).toInt() / 10}"),
+          Text("${((value / maxValue) * 100).toInt()}"),
         ],
       ),
     );

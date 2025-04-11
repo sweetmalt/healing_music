@@ -303,7 +303,7 @@ class ReportView extends GetView<ReportViewController> {
                 Data.write({
                   "nickname": healingController.customerNickname.value,
                   "timestamp": timestamp.toString(),
-                  "data": healingController.bciData,
+                  "bciData": healingController.bciData,
                   "hrvData": healingController.hrvData,
                 }, 'report_${nickname}_$timestamp.json');
                 Navigator.of(context).pop(); // 关闭对话框
@@ -322,6 +322,7 @@ class ReportViewController extends Ctrl {
   final RxDouble energyPhyScaling = 1.0.obs; //生理能量占比
   final RxDouble energyPsyAndPhyScaling = 1.0.obs; //心理与生理
   Future<void> energyScaling() async {
+    await healingController.statisticsHrv();
     await healingController.createReport();
     double temp =
         healingController.curRelaxWaveController.statisticsBestScaling +

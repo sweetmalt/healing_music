@@ -167,14 +167,14 @@ class ReportPage extends GetView<ReporPageController> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              subtitle: Text("数据集(${controller._report['data'].length})"),
+              subtitle: Text("脑电波bci数据集(${controller._report['bciData'].length})"),
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                for (int i = 1; i < controller._report['data'].length; i++)
+                for (int i = 1; i < controller._report['bciData'].length; i++)
                   Text(
-                    "$i: ${controller._report['data'][i]}",
+                    "$i: ${controller._report['bciData'][i]}",
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -193,29 +193,31 @@ class ReportPage extends GetView<ReporPageController> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              subtitle: Text("hrv数据集(${controller._report['hrvData'].length})"),
+              subtitle: Text("心率变异性hrv数据集(${controller._report['hrvData'].length})"),
             ),
             //网格布局显示数组数据
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 5, // 每行显示元素
-                childAspectRatio: 2, // 子元素宽高比
-              ),
-              itemCount: controller._report['hrvData'].length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
+            Container(
+              margin: const EdgeInsets.only(left: 20, right: 20),
+              alignment: Alignment.center,
+              child: GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 5, // 每行显示元素
+                  childAspectRatio: 3, // 子元素宽高比
+                ),
+                itemCount: controller._report['hrvData'].length,
+                itemBuilder: (context, index) {
+                  return Text(
+                    textAlign: TextAlign.center,
                     "${controller._report['hrvData'][index]}",
                     style: TextStyle(
                       fontSize: 12,
                       color: ThemeData().colorScheme.primary,
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
 
             ListTile(
@@ -243,7 +245,7 @@ class ReporPageController extends Ctrl {
   final Map<String, dynamic> _report = {
     "nickname": "顾客昵称",
     "timestamp": "时间",
-    "data": [],
+    "bciData": [],
     "hrvData": [],
     "fileName": "文件名",
   };
@@ -255,7 +257,7 @@ class ReporPageController extends Ctrl {
     Map<String, dynamic> report = await Data.read(fileName);
     _report['nickname'] = report['nickname'];
     _report['timestamp'] = report['timestamp'];
-    _report['data'] = report['data'];
+    _report['bciData'] = report['bciData'];
     _report['hrvData'] = report['hrvData'];
   }
 }
