@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:healing_music/controller/depot_controller.dart';
-import 'package:healing_music/controller/main_controller.dart';
-import 'package:healing_music/widget/edit_name_view.dart';
-import 'package:healing_music/widget/edit_nickname_view.dart';
+import 'package:healing_music/widget/edit_agencyname_view.dart';
+import 'package:healing_music/widget/edit_admininfo_view.dart';
 import 'package:healing_music/widget/item.dart';
 import 'package:healing_music/widget/login_view.dart';
 import 'package:healing_music/widget/page_title.dart';
@@ -15,19 +14,14 @@ import 'package:healing_music/widget/rotating_button.dart';
 class DepotPage extends StatelessWidget {
   DepotPage({super.key});
   final DepotController controller = Get.put(DepotController());
-  final MainController mainController = Get.find();
 
   @override
   Widget build(BuildContext context) {
-    mainController.synUserInfo();
-    mainController.agency.setLogTime(mainController.currentLogTime);
-    mainController.agency.update();
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         toolbarHeight: 25,
-        title: PageTitle('User & Report'),
+        title: PageTitle('User Center'),
         centerTitle: true,
       ),
       body: Container(
@@ -51,57 +45,52 @@ class DepotPage extends StatelessWidget {
                   onPressed: () {},
                   image: const AssetImage('assets/images/logo.png'),
                 ),
-                UserParagraphListTile(
-                  title: "机构：${mainController.userName.value}",
-                  onTap: () {
-                    showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        builder: (context) {
-                          return EditNameView();
-                        });
-                  },
-                ),
-                UserItemListTile(
-                  title: '工作机入网码（18位）',
-                  subtitle: " ${mainController.userCode.value}",
-                  onTap: () {},
-                ),
-                UserItemListTile(
-                  title: '注册时间',
-                  subtitle: " ${mainController.regTime.value}",
-                  onTap: () {},
-                ),
-                UserItemListTile(
-                  title: '上次登录',
-                  subtitle: " ${mainController.logTime.value}",
-                  onTap: () {},
-                ),
+                Obx(() => UserParagraphListTile(
+                      title: "机构：${controller.user.agencyName.value}",
+                      onTap: () {
+                        showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (context) {
+                              return EditAgencyNameView();
+                            });
+                      },
+                    )),
+                Obx(() => UserItemListTile(
+                      title: '注册时间',
+                      subtitle: " ${controller.user.registTimestamp.value}",
+                      onTap: () {},
+                    )),
+                Obx(() => UserItemListTile(
+                      title: '上次登录',
+                      subtitle: " ${controller.user.lastLoginTimestamp.value}",
+                      onTap: () {},
+                    )),
                 UserParagraphBottomListTile(
                   title: '.',
                   onTap: () {},
                 ),
-                UserParagraphListTile(
-                  title: "管理员：${mainController.userNickname.value}",
-                  onTap: () {
-                    showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        builder: (context) {
-                          return EditNicknameView();
-                        });
-                  },
-                ),
-                UserItemListTile(
-                  title: '联系电话',
-                  subtitle: " ${mainController.userPhoneNumber.value}",
-                  onTap: () {},
-                ),
-                UserItemListTile(
-                  title: '联系地址',
-                  subtitle: " ${mainController.userAddress.value}",
-                  onTap: () {},
-                ),
+                Obx(() => UserParagraphListTile(
+                      title: "联系人：${controller.user.adminNickname.value}",
+                      onTap: () {
+                        showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (context) {
+                              return EditAdminInfoView();
+                            });
+                      },
+                    )),
+                Obx(() => UserItemListTile(
+                      title: '联系电话',
+                      subtitle: " ${controller.user.adminPhonenumber.value}",
+                      onTap: () {},
+                    )),
+                Obx(() => UserItemListTile(
+                      title: '联系地址',
+                      subtitle: " ${controller.user.adminAddress.value}",
+                      onTap: () {},
+                    )),
                 UserParagraphBottomListTile(
                   title: '.',
                   onTap: () {},
@@ -122,26 +111,13 @@ class DepotPage extends StatelessWidget {
                                 context: context,
                                 isScrollControlled: true,
                                 builder: (context) {
-                                  if (!mainController.agency.getLogin()) {
-                                    if (!mainController.user.getRegister()) {
-                                      return RegisterView();
-                                    } else {
-                                      return LoginView();
-                                    }
-                                  } else {
-                                    return const SizedBox(
-                                      height: 200,
-                                      child: Center(
-                                        child: Text('您已登录'),
-                                      ),
-                                    );
-                                  }
+                                  return LoginView();
                                 });
                           },
                           child: const Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text('工作机登录/注册'),
+                              Text('登录'),
                               Icon(
                                 Icons.login,
                                 size: 15,
@@ -156,14 +132,19 @@ class DepotPage extends StatelessWidget {
                             foregroundColor: Colors.deepPurple,
                           ),
                           onPressed: () {
-                            //Get.to(ChatPage());
+                            showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                builder: (context) {
+                                  return RegisterView();
+                                });
                           },
                           child: const Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text('AI'),
+                              Text('注册'),
                               Icon(
-                                Icons.login,
+                                Icons.group,
                                 size: 15,
                                 color: Colors.deepPurple,
                               ),

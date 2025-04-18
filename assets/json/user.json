@@ -1,8 +1,11 @@
 {
-    "name": "",
-    "nickname": "",
-    "sex": 0,
-    "phone_number": "",
-    "address": "",
-    "code": "888888888888888888"
+    "id": 0,
+    "agency_name": "",
+    "tokens": 0.0,
+    "regist_timestamp": 0,
+    "last_login_timestamp": 0,
+    "admin_nickname": "",
+    "admin_phonenumber": "",
+    "admin_password": "88888888",
+    "admin_address": ""
 }

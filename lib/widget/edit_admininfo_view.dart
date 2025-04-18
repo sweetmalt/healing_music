@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:healing_music/controller/main_controller.dart';
+import 'package:healing_music/controller/depot_controller.dart';
 import 'package:healing_music/style/style.dart';
 
-class EditNicknameView extends StatelessWidget {
-  EditNicknameView({super.key});
-  final MainController mainController = Get.find();
-  void back() {
-    Get.back();
-  }
+class EditAdminInfoView extends StatelessWidget {
+  EditAdminInfoView({super.key});
+  final DepotController depotController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -42,12 +39,13 @@ class EditNicknameView extends StatelessWidget {
                   child: Column(
                     children: [
                       TextFormField(
-                          initialValue: mainController.user.getNickname(),
+                          initialValue:
+                              depotController.user.adminNickname.value,
                           decoration: const InputDecoration(
                             labelText: '常用昵称',
                           ),
                           onChanged: (value) {
-                            mainController.user.setNickname(value);
+                            depotController.user.adminNickname.value = value;
                           },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -58,9 +56,10 @@ class EditNicknameView extends StatelessWidget {
                             return null;
                           }),
                       TextFormField(
-                          initialValue: mainController.user.getPhoneNumber(),
+                          initialValue:
+                              depotController.user.adminPhonenumber.value,
                           decoration: const InputDecoration(
-                            labelText: '联系电话',
+                            labelText: '联系电话（手机号）',
                           ),
                           keyboardType: TextInputType.number,
                           inputFormatters: [
@@ -68,23 +67,23 @@ class EditNicknameView extends StatelessWidget {
                             LengthLimitingTextInputFormatter(11),
                           ],
                           onChanged: (value) {
-                            mainController.user.setPhoneNumber(value);
+                            depotController.user.adminPhonenumber.value = value;
                           },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return '请输入联系电话';
+                              return '请输入手机号';
                             } else if (value.length != 11) {
-                              return '只能是11位数字';
+                              return '手机号必须是11位数字';
                             }
                             return null;
                           }),
                       TextFormField(
-                          initialValue: mainController.user.getAddress(),
+                          initialValue: depotController.user.adminAddress.value,
                           decoration: const InputDecoration(
                             labelText: '联系地址',
                           ),
                           onChanged: (value) {
-                            mainController.user.setAddress(value);
+                            depotController.user.adminAddress.value = value;
                           },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -98,33 +97,24 @@ class EditNicknameView extends StatelessWidget {
                         margin: const EdgeInsets.only(top: 20),
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () async {
-                            if (mainController.user.getNickname().length >= 2 &&
-                                mainController.user.getPhoneNumber().length ==
-                                    11 &&
-                                mainController.user.getAddress().length >= 2) {
-                              if (await mainController.user.update()) {
-                                mainController.userNickname.value =
-                                    mainController.user.getNickname();
-                                mainController.userPhoneNumber.value =
-                                    mainController.user.getPhoneNumber();
-                                mainController.userAddress.value =
-                                    mainController.user.getAddress();
-                                back();
-                                Get.snackbar(
-                                  '成功！',
-                                  '修改成功',
-                                  snackPosition: SnackPosition.BOTTOM,
-                                  backgroundColor:
-                                      ThemeData().colorScheme.primary,
-                                  colorText:
-                                      ThemeData().colorScheme.primaryContainer,
-                                );
-                              }
+                          onPressed: () {
+                            Get.back();
+                            if (depotController.user.updateAdminInfo()) {
+                              Get.snackbar(
+                                '成功！',
+                                '修改成功',
+                                duration: const Duration(seconds: 1),
+                                snackPosition: SnackPosition.BOTTOM,
+                                backgroundColor:
+                                    ThemeData().colorScheme.primary,
+                                colorText:
+                                    ThemeData().colorScheme.primaryContainer,
+                              );
                             } else {
                               Get.snackbar(
                                 '失败！',
                                 '内容有误',
+                                duration: const Duration(seconds: 1),
                                 snackPosition: SnackPosition.BOTTOM,
                                 backgroundColor:
                                     ThemeData().colorScheme.secondary,

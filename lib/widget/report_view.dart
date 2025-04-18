@@ -7,6 +7,7 @@ import 'package:healing_music/data/data.dart';
 import 'package:healing_music/style/style.dart';
 import 'package:healing_music/widget/paragraph.dart';
 import 'package:healing_music/widget/wave_chart.dart';
+import 'package:uuid/uuid.dart';
 
 class ReportView extends GetView<ReportViewController> {
   ReportView({super.key});
@@ -300,12 +301,15 @@ class ReportView extends GetView<ReportViewController> {
                 // 在这里执行确认后的操作
                 String nickname = healingController.customerNickname.value;
                 int timestamp = DateTime.now().millisecondsSinceEpoch;
+                //生成UUId
+                String uuid = const Uuid().v1();
+
                 Data.write({
                   "nickname": healingController.customerNickname.value,
                   "timestamp": timestamp.toString(),
                   "bciData": healingController.bciData,
                   "hrvData": healingController.hrvData,
-                }, 'report_${nickname}_$timestamp.json');
+                }, 'report_${nickname}_$uuid.json');
                 Navigator.of(context).pop(); // 关闭对话框
               },
             ),

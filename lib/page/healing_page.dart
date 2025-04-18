@@ -189,16 +189,20 @@ class HealingPage extends GetView<HealingController> {
                 CircularIconButton(
                   onPressed: () {
                     if (healingController.receivedBciDataCount < 10) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('数据量太少，请确保设备连接正常后，过一分钟再试'),
-                          duration: Duration(seconds: 3),
-                          backgroundColor: Colors.deepPurple,
-                        ),
+                      Get.snackbar(
+                        "请稍后……",
+                        "数据量太少，请确保设备连接正常后，过一分钟再试",
+                        backgroundColor: ThemeData().colorScheme.primary,
+                        colorText: ThemeData().colorScheme.primaryContainer,
                       );
                       return;
                     }
-                    
+                    Get.snackbar(
+                      "报告生成中……",
+                      "请稍后",
+                      backgroundColor: ThemeData().colorScheme.primary,
+                      colorText: ThemeData().colorScheme.primaryContainer,
+                    );
                     reportViewController.energyScaling();
 
                     showModalBottomSheet(

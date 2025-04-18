@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:healing_music/controller/main_controller.dart';
+import 'package:healing_music/controller/depot_controller.dart';
 import 'package:healing_music/style/style.dart';
 
 class RegisterView extends StatelessWidget {
   RegisterView({super.key});
-  final MainController mainController = Get.find();
-  void back() {
-    Get.back();
-  }
-
-  final RxInt _sex = 0.obs;
+  final DepotController depotController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -44,12 +39,12 @@ class RegisterView extends StatelessWidget {
                   child: Column(
                     children: [
                       TextFormField(
-                          initialValue: mainController.user.getName(),
+                          initialValue: depotController.user.agencyName.value,
                           decoration: const InputDecoration(
                             labelText: '机构名称',
                           ),
                           onChanged: (value) {
-                            mainController.user.setName(value);
+                            depotController.user.agencyName.value = value;
                           },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -60,12 +55,13 @@ class RegisterView extends StatelessWidget {
                             return null;
                           }),
                       TextFormField(
-                          initialValue: mainController.user.getNickname(),
+                          initialValue:
+                              depotController.user.adminNickname.value,
                           decoration: const InputDecoration(
                             labelText: '联系人昵称',
                           ),
                           onChanged: (value) {
-                            mainController.user.setNickname(value);
+                            depotController.user.adminNickname.value = value;
                           },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -75,36 +71,9 @@ class RegisterView extends StatelessWidget {
                             }
                             return null;
                           }),
-                      //性别选择
-                      Row(
-                        children: [
-                          const Text('性别：'),
-                          Obx(() => Radio(
-                                value: 0,
-                                groupValue: _sex.value,
-                                onChanged: (value) {
-                                  if (value is int) {
-                                    _sex.value = value;
-                                    mainController.user.setSex(_sex.value);
-                                  }
-                                },
-                              )),
-                          const Text('女'),
-                          Obx(() => Radio(
-                                value: 1,
-                                groupValue: _sex.value,
-                                onChanged: (value) {
-                                  if (value is int) {
-                                    _sex.value = value;
-                                    mainController.user.setSex(_sex.value);
-                                  }
-                                },
-                              )),
-                          const Text('男'),
-                        ],
-                      ),
                       TextFormField(
-                          initialValue: mainController.user.getPhoneNumber(),
+                          initialValue:
+                              depotController.user.adminPhonenumber.value,
                           decoration: const InputDecoration(
                             labelText: '联系电话（手机号）',
                           ),
@@ -114,7 +83,7 @@ class RegisterView extends StatelessWidget {
                             LengthLimitingTextInputFormatter(11),
                           ],
                           onChanged: (value) {
-                            mainController.user.setPhoneNumber(value);
+                            depotController.user.adminPhonenumber.value = value;
                             if (value.length == 11) {
                               FocusScope.of(context).unfocus();
                               SystemChannels.textInput
@@ -123,19 +92,46 @@ class RegisterView extends StatelessWidget {
                           },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return '请输入联系电话';
+                              return '请输入手机号';
                             } else if (value.length != 11) {
-                              return '联系电话应为11位数字';
+                              return '手机号必须是11位数字';
                             }
                             return null;
                           }),
                       TextFormField(
-                          initialValue: mainController.user.getAddress(),
+                          initialValue:
+                              depotController.user.adminPassword.value,
+                          decoration: const InputDecoration(
+                            labelText: '登录密码',
+                          ),
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(8),
+                          ],
+                          onChanged: (value) {
+                            depotController.user.adminPassword.value = value;
+                            if (value.length == 8) {
+                              FocusScope.of(context).unfocus();
+                              SystemChannels.textInput
+                                  .invokeMethod('TextInput.hide');
+                            }
+                          },
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return '请输入登录密码';
+                            } else if (value.length != 8) {
+                              return '登录密码必须是8位数字';
+                            }
+                            return null;
+                          }),
+                      TextFormField(
+                          initialValue: depotController.user.adminAddress.value,
                           decoration: const InputDecoration(
                             labelText: '所在地址',
                           ),
                           onChanged: (value) {
-                            mainController.user.setAddress(value);
+                            depotController.user.adminAddress.value = value;
                           },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -149,24 +145,13 @@ class RegisterView extends StatelessWidget {
                         margin: const EdgeInsets.only(top: 20),
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () async {
-                            mainController.user.createCode();
-                            await mainController.user.update();
-                            if (await mainController.user.validate()) {
-                              await mainController.user.register();
-                              mainController.agency
-                                  .setCode(mainController.user.getCode());
-                              int timeStamp =
-                                  DateTime.now().millisecondsSinceEpoch;
-                              mainController.agency.setRegTime(timeStamp);
-                              mainController.agency.setLogTime(timeStamp);
-                              mainController.agency.update();
-                              mainController.agency.login();
-                              mainController.synUserInfo();
-                              back();
+                          onPressed: () {
+                            if (depotController.user.regist()) {
+                              Get.back();
                               Get.snackbar(
                                 '成功！',
                                 '注册 & 登录',
+                                duration: const Duration(seconds: 1),
                                 snackPosition: SnackPosition.BOTTOM,
                                 backgroundColor:
                                     ThemeData().colorScheme.primary,
@@ -177,6 +162,7 @@ class RegisterView extends StatelessWidget {
                               Get.snackbar(
                                 '失败！',
                                 '可能的输入或网络错误',
+                                duration: const Duration(seconds: 1),
                                 snackPosition: SnackPosition.BOTTOM,
                                 backgroundColor:
                                     ThemeData().colorScheme.secondary,

@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:healing_music/controller/main_controller.dart';
+import 'package:healing_music/controller/depot_controller.dart';
 import 'package:healing_music/style/style.dart';
 
-class EditNameView extends StatelessWidget {
-  EditNameView({super.key});
-  final MainController mainController = Get.find();
-  void back() {
-    Get.back();
-  }
+class EditAgencyNameView extends StatelessWidget {
+  EditAgencyNameView({super.key});
+  final DepotController depotController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +18,8 @@ class EditNameView extends StatelessWidget {
         child: Column(
           children: [
             ListTile(
-              title: Text('修改能量驿站所属机构名称', style: MyStyle.paragraphTitleTextStyle),
+              title:
+                  Text('修改能量驿站所属机构名称', style: MyStyle.paragraphTitleTextStyle),
               subtitle: const Text('请输入新的机构名称'),
               trailing: IconButton(
                   onPressed: () {
@@ -41,12 +39,12 @@ class EditNameView extends StatelessWidget {
                   child: Column(
                     children: [
                       TextFormField(
-                          initialValue: mainController.user.getName(),
+                          initialValue: depotController.user.agencyName.value,
                           decoration: const InputDecoration(
                             labelText: '机构名称',
                           ),
                           onChanged: (value) {
-                            mainController.user.setName(value);
+                            depotController.user.agencyName.value = value;
                           },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -60,26 +58,24 @@ class EditNameView extends StatelessWidget {
                         margin: const EdgeInsets.only(top: 20),
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () async {
-                            if (mainController.user.getName().length >= 2) {
-                              if (await mainController.user.update()) {
-                                mainController.userName.value =
-                                    mainController.user.getName();
-                                back();
-                                Get.snackbar(
-                                  '成功！',
-                                  '修改成功',
-                                  snackPosition: SnackPosition.BOTTOM,
-                                  backgroundColor:
-                                      ThemeData().colorScheme.primary,
-                                  colorText:
-                                      ThemeData().colorScheme.primaryContainer,
-                                );
-                              }
+                          onPressed: () {
+                            Get.back();
+                            if ( depotController.user.updateAgencyName()) {
+                              Get.snackbar(
+                                '成功！',
+                                '修改成功',
+                                duration: const Duration(seconds: 1),
+                                snackPosition: SnackPosition.BOTTOM,
+                                backgroundColor:
+                                    ThemeData().colorScheme.primary,
+                                colorText:
+                                    ThemeData().colorScheme.primaryContainer,
+                              );
                             } else {
                               Get.snackbar(
                                 '失败！',
                                 '机构名称不能少于2个字符',
+                                duration: const Duration(seconds: 1),
                                 snackPosition: SnackPosition.BOTTOM,
                                 backgroundColor:
                                     ThemeData().colorScheme.secondary,

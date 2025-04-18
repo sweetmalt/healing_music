@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:healing_music/controller/main_controller.dart';
+import 'package:healing_music/controller/depot_controller.dart';
 import 'package:healing_music/style/style.dart';
 
 class LoginView extends StatelessWidget {
   LoginView({super.key});
-  final MainController mainController = Get.find();
-  void back() {
-    Get.back();
-  }
+  final DepotController depotController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +20,7 @@ class LoginView extends StatelessWidget {
           children: [
             ListTile(
               title: Text('登录', style: MyStyle.paragraphTitleTextStyle),
-              subtitle: const Text('请输入您的8位登录密码'),
+              subtitle: const Text('请输入您的11位手机号和8位登录密码'),
               trailing: IconButton(
                   onPressed: () {
                     Get.back();
@@ -41,10 +38,36 @@ class LoginView extends StatelessWidget {
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   child: Column(
                     children: [
-                      const Text("机构代码：18位数字"),
-                      Text(mainController.agency.getCode()),
                       TextFormField(
-                          initialValue: mainController.agency.getPassword(),
+                          initialValue:
+                              depotController.user.adminPhonenumber.value,
+                          decoration: const InputDecoration(
+                            labelText: '联系人手机号',
+                          ),
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(11),
+                          ],
+                          onChanged: (value) {
+                            depotController.user.adminPhonenumber.value = value;
+                            if (value.length == 11) {
+                              FocusScope.of(context).unfocus();
+                              SystemChannels.textInput
+                                  .invokeMethod('TextInput.hide');
+                            }
+                          },
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return '请输入11位手机号';
+                            } else if (value.length != 11) {
+                              return '手机号必须是11位数字';
+                            }
+                            return null;
+                          }),
+                      TextFormField(
+                          initialValue:
+                              depotController.user.adminPassword.value,
                           decoration: const InputDecoration(
                             labelText: '登录密码',
                           ),
@@ -54,7 +77,7 @@ class LoginView extends StatelessWidget {
                             LengthLimitingTextInputFormatter(8),
                           ],
                           onChanged: (value) {
-                            mainController.agency.setPassword(value);
+                            depotController.user.adminPassword.value = value;
                             if (value.length == 8) {
                               FocusScope.of(context).unfocus();
                               SystemChannels.textInput
@@ -73,13 +96,13 @@ class LoginView extends StatelessWidget {
                         margin: const EdgeInsets.only(top: 20),
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () async {
-                            if (await mainController.agency.validate()) {
-                              mainController.agency.login();
-                              back();
+                          onPressed: () {
+                            if (depotController.user.login()) {
+                              Get.back();
                               Get.snackbar(
                                 '成功！',
                                 '登录成功',
+                                duration: const Duration(seconds: 1),
                                 snackPosition: SnackPosition.BOTTOM,
                                 backgroundColor:
                                     ThemeData().colorScheme.primary,
@@ -89,7 +112,8 @@ class LoginView extends StatelessWidget {
                             } else {
                               Get.snackbar(
                                 '失败！',
-                                '密码错误',
+                                '手机号或密码错误',
+                                duration: const Duration(seconds: 1),
                                 snackPosition: SnackPosition.BOTTOM,
                                 backgroundColor:
                                     ThemeData().colorScheme.secondary,
