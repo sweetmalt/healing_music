@@ -7,6 +7,7 @@ import 'package:healing_music/style/style.dart';
 class RegisterView extends StatelessWidget {
   RegisterView({super.key});
   final DepotController depotController = Get.find();
+  final RegisterViewController controller = Get.put(RegisterViewController());
 
   @override
   Widget build(BuildContext context) {
@@ -39,12 +40,12 @@ class RegisterView extends StatelessWidget {
                   child: Column(
                     children: [
                       TextFormField(
-                          initialValue: depotController.user.agencyName.value,
+                          initialValue: controller.agencyName.value,
                           decoration: const InputDecoration(
                             labelText: '机构名称',
                           ),
                           onChanged: (value) {
-                            depotController.user.agencyName.value = value;
+                            controller.agencyName.value = value;
                           },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -55,13 +56,12 @@ class RegisterView extends StatelessWidget {
                             return null;
                           }),
                       TextFormField(
-                          initialValue:
-                              depotController.user.adminNickname.value,
+                          initialValue: controller.adminNickname.value,
                           decoration: const InputDecoration(
                             labelText: '联系人昵称',
                           ),
                           onChanged: (value) {
-                            depotController.user.adminNickname.value = value;
+                            controller.adminNickname.value = value;
                           },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -72,8 +72,7 @@ class RegisterView extends StatelessWidget {
                             return null;
                           }),
                       TextFormField(
-                          initialValue:
-                              depotController.user.adminPhonenumber.value,
+                          initialValue: controller.adminPhonenumber.value,
                           decoration: const InputDecoration(
                             labelText: '联系电话（手机号）',
                           ),
@@ -83,7 +82,7 @@ class RegisterView extends StatelessWidget {
                             LengthLimitingTextInputFormatter(11),
                           ],
                           onChanged: (value) {
-                            depotController.user.adminPhonenumber.value = value;
+                            controller.adminPhonenumber.value = value;
                             if (value.length == 11) {
                               FocusScope.of(context).unfocus();
                               SystemChannels.textInput
@@ -99,8 +98,7 @@ class RegisterView extends StatelessWidget {
                             return null;
                           }),
                       TextFormField(
-                          initialValue:
-                              depotController.user.adminPassword.value,
+                          initialValue: controller.adminPassword.value,
                           decoration: const InputDecoration(
                             labelText: '登录密码',
                           ),
@@ -110,7 +108,7 @@ class RegisterView extends StatelessWidget {
                             LengthLimitingTextInputFormatter(8),
                           ],
                           onChanged: (value) {
-                            depotController.user.adminPassword.value = value;
+                            controller.adminPassword.value = value;
                             if (value.length == 8) {
                               FocusScope.of(context).unfocus();
                               SystemChannels.textInput
@@ -126,12 +124,12 @@ class RegisterView extends StatelessWidget {
                             return null;
                           }),
                       TextFormField(
-                          initialValue: depotController.user.adminAddress.value,
+                          initialValue: controller.adminAddress.value,
                           decoration: const InputDecoration(
                             labelText: '所在地址',
                           ),
                           onChanged: (value) {
-                            depotController.user.adminAddress.value = value;
+                            controller.adminAddress.value = value;
                           },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -146,30 +144,14 @@ class RegisterView extends StatelessWidget {
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () {
-                            if (depotController.user.regist()) {
-                              Get.back();
-                              Get.snackbar(
-                                '成功！',
-                                '注册 & 登录',
-                                duration: const Duration(seconds: 1),
-                                snackPosition: SnackPosition.BOTTOM,
-                                backgroundColor:
-                                    ThemeData().colorScheme.primary,
-                                colorText:
-                                    ThemeData().colorScheme.primaryContainer,
-                              );
-                            } else {
-                              Get.snackbar(
-                                '失败！',
-                                '可能的输入或网络错误',
-                                duration: const Duration(seconds: 1),
-                                snackPosition: SnackPosition.BOTTOM,
-                                backgroundColor:
-                                    ThemeData().colorScheme.secondary,
-                                colorText:
-                                    ThemeData().colorScheme.secondaryContainer,
-                              );
-                            }
+                            Get.back();
+                            depotController.user.regist(
+                              controller.agencyName.value,
+                              controller.adminNickname.value,
+                              controller.adminPhonenumber.value,
+                              controller.adminPassword.value,
+                              controller.adminAddress.value,
+                            );
                           },
                           child: const Text('注册'),
                         ),
@@ -182,4 +164,12 @@ class RegisterView extends StatelessWidget {
       ),
     );
   }
+}
+
+class RegisterViewController extends GetxController {
+  final RxString agencyName = "".obs;
+  final RxString adminNickname = "".obs;
+  final RxString adminPhonenumber = "".obs;
+  final RxString adminPassword = "".obs;
+  final RxString adminAddress = "".obs;
 }

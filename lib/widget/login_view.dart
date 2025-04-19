@@ -97,32 +97,16 @@ class LoginView extends StatelessWidget {
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () {
-                            if (depotController.user.login()) {
-                              Get.back();
-                              Get.snackbar(
-                                '成功！',
-                                '登录成功',
-                                duration: const Duration(seconds: 1),
-                                snackPosition: SnackPosition.BOTTOM,
-                                backgroundColor:
-                                    ThemeData().colorScheme.primary,
-                                colorText:
-                                    ThemeData().colorScheme.primaryContainer,
-                              );
-                            } else {
-                              Get.snackbar(
-                                '失败！',
-                                '手机号或密码错误',
-                                duration: const Duration(seconds: 1),
-                                snackPosition: SnackPosition.BOTTOM,
-                                backgroundColor:
-                                    ThemeData().colorScheme.secondary,
-                                colorText:
-                                    ThemeData().colorScheme.secondaryContainer,
-                              );
-                            }
+                            Get.back();
+                            depotController.user.login();
                           },
-                          child: const Text('登录'),
+                          child: Obx(() =>
+                              switch (depotController.user.loginState.value) {
+                                0 => const Text('登录'),
+                                1 => const CircularProgressIndicator(),
+                                2 => const Text('已登录，可重新登录'),
+                                int() => throw UnimplementedError(),
+                              }),
                         ),
                       )
                     ],

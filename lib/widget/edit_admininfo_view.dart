@@ -99,29 +99,7 @@ class EditAdminInfoView extends StatelessWidget {
                         child: ElevatedButton(
                           onPressed: () {
                             Get.back();
-                            if (depotController.user.updateAdminInfo()) {
-                              Get.snackbar(
-                                '成功！',
-                                '修改成功',
-                                duration: const Duration(seconds: 1),
-                                snackPosition: SnackPosition.BOTTOM,
-                                backgroundColor:
-                                    ThemeData().colorScheme.primary,
-                                colorText:
-                                    ThemeData().colorScheme.primaryContainer,
-                              );
-                            } else {
-                              Get.snackbar(
-                                '失败！',
-                                '内容有误',
-                                duration: const Duration(seconds: 1),
-                                snackPosition: SnackPosition.BOTTOM,
-                                backgroundColor:
-                                    ThemeData().colorScheme.secondary,
-                                colorText:
-                                    ThemeData().colorScheme.secondaryContainer,
-                              );
-                            }
+                            depotController.user.updateAdminInfo();
                           },
                           child: const Text('确定'),
                         ),

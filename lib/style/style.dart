@@ -17,14 +17,14 @@ class MyStyle {
     color: ThemeData().colorScheme.primary,
   );
   static TextStyle paragraphBottomTitleTextStyle =
-      TextStyle(fontSize: 12, color: ThemeData().colorScheme.secondary);
+      TextStyle(fontSize: 16, color: ThemeData().colorScheme.secondary);
   static TextStyle itemTitleTextStyle = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.bold,
     color: ThemeData().colorScheme.secondary,
   );
   static TextStyle itemSubtitleTextStyle = TextStyle(
-    fontSize: 12,
+    fontSize: 16,
     color: ThemeData().colorScheme.primary,
   );
 
@@ -35,7 +35,7 @@ class MyStyle {
   );
 
   static const TextStyle albumItemSubtitleTextStyle = TextStyle(
-    fontSize: 12,
+    fontSize: 16,
     color: Colors.white,
   );
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:healing_music/controller/depot_controller.dart';
-import 'package:healing_music/widget/edit_agencyname_view.dart';
-import 'package:healing_music/widget/edit_admininfo_view.dart';
+//import 'package:healing_music/widget/edit_agencyname_view.dart';
+//import 'package:healing_music/widget/edit_admininfo_view.dart';
 import 'package:healing_music/widget/item.dart';
 import 'package:healing_music/widget/login_view.dart';
 import 'package:healing_music/widget/page_title.dart';
@@ -21,7 +21,12 @@ class DepotPage extends StatelessWidget {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         toolbarHeight: 25,
-        title: PageTitle('User Center'),
+        title: Obx(() => switch (controller.user.loginState.value) {
+              0 => PageTitle('User Center - 未登录'),
+              1 => const CircularProgressIndicator(),
+              2 => PageTitle('User Center - 已登录'),
+              int() => throw UnimplementedError(),
+            }),
         centerTitle: true,
       ),
       body: Container(
@@ -48,12 +53,12 @@ class DepotPage extends StatelessWidget {
                 Obx(() => UserParagraphListTile(
                       title: "机构：${controller.user.agencyName.value}",
                       onTap: () {
-                        showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            builder: (context) {
-                              return EditAgencyNameView();
-                            });
+                        // showModalBottomSheet(
+                        //     context: context,
+                        //     isScrollControlled: true,
+                        //     builder: (context) {
+                        //       return EditAgencyNameView();
+                        //     });
                       },
                     )),
                 Obx(() => UserItemListTile(
@@ -66,19 +71,24 @@ class DepotPage extends StatelessWidget {
                       subtitle: " ${controller.user.lastLoginTimestamp.value}",
                       onTap: () {},
                     )),
-                UserParagraphBottomListTile(
-                  title: '.',
-                  onTap: () {},
-                ),
+                Obx(() => UserItemListTile(
+                      title: '账户余额',
+                      subtitle: " ${controller.user.tokens.value}",
+                      onTap: () {},
+                    )),
+                Obx(() => UserParagraphBottomListTile(
+                      title: "VIP等级：${controller.user.vip.value}",
+                      onTap: () {},
+                    )),
                 Obx(() => UserParagraphListTile(
                       title: "联系人：${controller.user.adminNickname.value}",
                       onTap: () {
-                        showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            builder: (context) {
-                              return EditAdminInfoView();
-                            });
+                        // showModalBottomSheet(
+                        //     context: context,
+                        //     isScrollControlled: true,
+                        //     builder: (context) {
+                        //       return EditAdminInfoView();
+                        //     });
                       },
                     )),
                 Obx(() => UserItemListTile(

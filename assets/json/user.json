@@ -1,11 +1,12 @@
 {
     "id": 0,
     "agency_name": "",
-    "tokens": 0.0,
-    "regist_timestamp": 0,
-    "last_login_timestamp": 0,
+    "tokens": 0,
+    "regist_timestamp": "",
+    "last_login_timestamp": "",
     "admin_nickname": "",
     "admin_phonenumber": "",
     "admin_password": "88888888",
-    "admin_address": ""
+    "admin_address": "",
+    "vip": 0
 }

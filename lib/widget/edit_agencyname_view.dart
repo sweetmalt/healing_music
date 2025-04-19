@@ -60,29 +60,8 @@ class EditAgencyNameView extends StatelessWidget {
                         child: ElevatedButton(
                           onPressed: () {
                             Get.back();
-                            if ( depotController.user.updateAgencyName()) {
-                              Get.snackbar(
-                                '成功！',
-                                '修改成功',
-                                duration: const Duration(seconds: 1),
-                                snackPosition: SnackPosition.BOTTOM,
-                                backgroundColor:
-                                    ThemeData().colorScheme.primary,
-                                colorText:
-                                    ThemeData().colorScheme.primaryContainer,
-                              );
-                            } else {
-                              Get.snackbar(
-                                '失败！',
-                                '机构名称不能少于2个字符',
-                                duration: const Duration(seconds: 1),
-                                snackPosition: SnackPosition.BOTTOM,
-                                backgroundColor:
-                                    ThemeData().colorScheme.secondary,
-                                colorText:
-                                    ThemeData().colorScheme.secondaryContainer,
-                              );
-                            }
+                            depotController.user.updateAgencyName();
+                            
                           },
                           child: const Text('确定'),
                         ),
