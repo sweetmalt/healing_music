@@ -298,18 +298,38 @@ class ReportView extends GetView<ReportViewController> {
             TextButton(
               child: const Text('确认'),
               onPressed: () {
-                // 在这里执行确认后的操作
+                ///在这里执行确认后的操作
                 String nickname = healingController.customerNickname.value;
                 int timestamp = DateTime.now().millisecondsSinceEpoch;
-                //生成UUId
+
+                ///生成UUId
                 String uuid = const Uuid().v1();
 
-                Data.write({
+                ///本机存储
+                Map<String, dynamic> report = {
                   "nickname": healingController.customerNickname.value,
                   "timestamp": timestamp.toString(),
+
+                  ///脑波数据
                   "bciData": healingController.bciData,
+                  "bciDataAtt": healingController.bciDataAtt,
+                  "bciDataMed": healingController.bciDataMed,
+                  "bciDataDelta": healingController.bciDataDelta,
+                  "bciDataTheta": healingController.bciDataTheta,
+                  "bciDataLowAlpha": healingController.bciDataLowAlpha,
+                  "bciDataHighAlpha": healingController.bciDataHighAlpha,
+                  "bciDataLowBeta": healingController.bciDataLowBeta,
+                  "bciDataHighBeta": healingController.bciDataHighBeta,
+                  "bciDataLowGamma": healingController.bciDataLowGamma,
+                  "bciDataMiddleGamma": healingController.bciDataMiddleGamma,
+                  "bciDataTemperature": healingController.bciDataTemperature,
+                  "bciDataHeartRate": healingController.bciDataHeartRate,
+                  "bciDataGrind": healingController.bciDataGrind,
+
+                  ///hrv数据
                   "hrvData": healingController.hrvData,
-                }, 'report_${nickname}_$uuid.json');
+                };
+                Data.write(report, 'report_${nickname}_$uuid.json');
                 Navigator.of(context).pop(); // 关闭对话框
               },
             ),
