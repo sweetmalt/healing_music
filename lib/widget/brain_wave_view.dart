@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:healing_music/controller/healing_controller.dart';
+import 'package:healing_music/data/data.dart';
 import 'package:healing_music/style/style.dart';
 import 'package:healing_music/widget/paragraph.dart';
 import 'package:healing_music/widget/wave_chart.dart';
@@ -527,7 +528,7 @@ class BrainWaveView extends StatelessWidget {
   }
 
   final RxBool _showShortDoc = true.obs;
-  final Map<String, Map<String, String>> _dataDoc = HealingController.dataDoc;
+  final Map<String, Map<String, String>> _dataDoc = Data.dataDoc;
 }
 
 class BciSliderBox extends StatelessWidget {
@@ -615,17 +616,41 @@ class BciSlider extends StatelessWidget {
                     trackHeight: 10,
                     activeTrackColor: color,
                     thumbColor: color,
-                    inactiveTrackColor: ThemeData().colorScheme.surface,
+                    inactiveTrackColor:
+                        ThemeData().colorScheme.primaryContainer,
                   ),
                   child: Slider(
                     min: 0.0,
                     max: maxValue,
-                    value: value,
+                    value: value > maxValue ? maxValue : value,
                     onChanged: (double value) {},
                   ))),
-          Text("${((value / maxValue) * 100).toInt()}"),
+          Text(
+              "${((value / maxValue) * 100).toInt()}%${getAttr(value, maxValue)}"),
         ],
       ),
     );
+  }
+
+  String getAttr(double value, double maxValue) {
+    if (value > maxValue * 0.9) {
+      return "极高";
+    }
+    if (value > maxValue * 0.8) {
+      return "高";
+    }
+    if (value > maxValue * 0.6) {
+      return "较高";
+    }
+    if (value > maxValue * 0.4) {
+      return "中";
+    }
+    if (value > maxValue * 0.2) {
+      return "较低";
+    }
+    if (value > maxValue * 0.1) {
+      return "低";
+    }
+    return "极低";
   }
 }

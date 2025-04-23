@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:healing_music/controller/ctrl.dart';
 import 'package:healing_music/data/data.dart';
+import 'package:healing_music/widget/brain_wave_view.dart';
+import 'package:healing_music/widget/wave_chart.dart';
 
 class ReportList extends GetView<ReportListController> {
   ReportList({super.key});
@@ -93,7 +95,7 @@ class ReportList extends GetView<ReportListController> {
 }
 
 class ReportListController extends Ctrl {
-  final String title = '能量报告 文件夹';
+  final String title = '生命体征报告 文件夹';
   final RxList reportFileList = [].obs;
 
   @override
@@ -160,16 +162,177 @@ class ReportPage extends GetView<ReporPageController> {
             ),
 
             ///数据统计
+            StatisticsContainerCircleMini(
+              "愉悦感",
+              controller.bciAp["mv"] / 5,
+              true,
+            ),
             ListTile(
               title: Text(
-                "bciAtt 专注度",
+                "bciAp (${controller.bciAp["count"]}秒数据)",
                 style: TextStyle(
                   fontSize: 16,
                   color: ThemeData().colorScheme.primary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              subtitle: Text("样本量(${controller.bciAtt["count"]}) "),
+              subtitle: Text(Data.dataDoc["bciAp"]!["long"]!),
+            ),
+            BciSlider(
+              title: "愉悦感",
+              color: ThemeData().colorScheme.primary,
+              maxValue: 5,
+              value: controller.bciAp["mv"],
+            ),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(children: [
+                Text("平均值(${controller.bciAp["mv"]}) "),
+                Text("标准差(${controller.bciAp["sdnn"]}) "),
+                Text("均方根(${controller.bciAp["rmssd"]}) "),
+              ]),
+            ),
+            Container(
+              alignment: Alignment.center,
+              transformAlignment: Alignment.center,
+              margin: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
+              height: 80,
+              decoration: BoxDecoration(
+                color: ThemeData().colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Text(
+                "SPA可用于提升愉悦感",
+                style: TextStyle(
+                    color: Colors.purple, fontWeight: FontWeight.bold),
+              ),
+            ),
+
+            ///
+            Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+              StatisticsContainerCircleMini(
+                "松弛感",
+                controller.curRelax["mv"] / 100,
+                true,
+              ),
+              StatisticsContainerCircleMini(
+                "心流指数",
+                controller.curFlow["mv"] / 100,
+                true,
+              ),
+            ]),
+            ListTile(
+              title: Text(
+                "curRelax (${controller.curFlow["count"]}秒数据)",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: ThemeData().colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              subtitle: Text(Data.dataDoc["curRelax"]!["long"]!),
+            ),
+            BciSlider(
+              title: "松弛感",
+              color: ThemeData().colorScheme.primary,
+              maxValue: 100,
+              value: controller.curRelax["mv"],
+            ),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(children: [
+                Text("平均值(${controller.curRelax["mv"]}) "),
+                Text("标准差(${controller.curRelax["sdnn"]}) "),
+                Text("均方根(${controller.curRelax["rmssd"]}) "),
+              ]),
+            ),
+            Container(
+              alignment: Alignment.center,
+              transformAlignment: Alignment.center,
+              margin: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
+              height: 80,
+              decoration: BoxDecoration(
+                color: ThemeData().colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Text(
+                "香疗可用于提升松弛感",
+                style: TextStyle(
+                    color: Colors.purple, fontWeight: FontWeight.bold),
+              ),
+            ),
+
+            ///
+            ListTile(
+              title: Text(
+                "curFlow (${controller.curFlow["count"]}秒数据)",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: ThemeData().colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              subtitle: Text(Data.dataDoc["curFlow"]!["long"]!),
+            ),
+            BciSlider(
+              title: "心流指数",
+              color: ThemeData().colorScheme.primary,
+              maxValue: 100,
+              value: controller.curFlow["mv"],
+            ),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(children: [
+                Text("平均值(${controller.curFlow["mv"]}) "),
+                Text("标准差(${controller.curFlow["sdnn"]}) "),
+                Text("均方根(${controller.curFlow["rmssd"]}) "),
+              ]),
+            ),
+            Container(
+              alignment: Alignment.center,
+              transformAlignment: Alignment.center,
+              margin: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
+              height: 80,
+              decoration: BoxDecoration(
+                color: ThemeData().colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Text(
+                "茶疗+脑波音频可用于提升心流指数",
+                style: TextStyle(
+                    color: Colors.purple, fontWeight: FontWeight.bold),
+              ),
+            ),
+
+            ///
+            Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+              StatisticsContainerCircleMini(
+                "专注度",
+                controller.bciAtt["mv"] / 100,
+                true,
+              ),
+              StatisticsContainerCircleMini(
+                "安全感",
+                controller.bciMed["mv"] / 100,
+                true,
+              ),
+            ]),
+            ListTile(
+              title: Text(
+                "bciAtt (${controller.bciAtt["count"]}秒数据)",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: ThemeData().colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              subtitle: Text(Data.dataDoc["bciAtt"]!["long"]!),
+            ),
+            BciSlider(
+              title: "专注度",
+              color: ThemeData().colorScheme.primary,
+              maxValue: 100,
+              value: controller.bciAtt["mv"],
             ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -179,18 +342,39 @@ class ReportPage extends GetView<ReporPageController> {
                 Text("均方根(${controller.bciAtt["rmssd"]}) "),
               ]),
             ),
+            Container(
+              alignment: Alignment.center,
+              transformAlignment: Alignment.center,
+              margin: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
+              height: 80,
+              decoration: BoxDecoration(
+                color: ThemeData().colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Text(
+                "音疗中的双耳节拍音频可用于训练专注度",
+                style: TextStyle(
+                    color: Colors.purple, fontWeight: FontWeight.bold),
+              ),
+            ),
 
             ///
             ListTile(
               title: Text(
-                "bciMed 安全感",
+                "bciMed (${controller.bciMed["count"]}秒数据)",
                 style: TextStyle(
                   fontSize: 16,
                   color: ThemeData().colorScheme.primary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              subtitle: Text("样本量(${controller.bciMed["count"]}) "),
+              subtitle: Text(Data.dataDoc["bciMed"]!["long"]!),
+            ),
+            BciSlider(
+              title: "安全感",
+              color: ThemeData().colorScheme.primary,
+              maxValue: 100,
+              value: controller.bciMed["mv"],
             ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -200,18 +384,38 @@ class ReportPage extends GetView<ReporPageController> {
                 Text("均方根(${controller.bciMed["rmssd"]}) "),
               ]),
             ),
+            Container(
+              alignment: Alignment.center,
+              transformAlignment: Alignment.center,
+              margin: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
+              height: 80,
+              decoration: BoxDecoration(
+                color: ThemeData().colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Text(
+                "光疗+自然生境音频（如鸟鸣）可用于提升安全感",
+                style: TextStyle(
+                    color: Colors.purple, fontWeight: FontWeight.bold),
+              ),
+            ),
 
             ///
             ListTile(
               title: Text(
-                "bciDelta",
+                "bciDelta (${controller.bciDelta["count"]}秒数据)",
                 style: TextStyle(
                   fontSize: 16,
                   color: ThemeData().colorScheme.primary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              subtitle: Text("样本量(${controller.bciDelta["count"]}) "),
+              subtitle: BciSlider(
+                title: "δ波",
+                color: ThemeData().colorScheme.secondary,
+                maxValue: 100000,
+                value: controller.bciDelta["mv"],
+              ),
             ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -225,14 +429,19 @@ class ReportPage extends GetView<ReporPageController> {
             ///
             ListTile(
               title: Text(
-                "bciTheta",
+                "bciTheta (${controller.bciTheta["count"]}秒数据)",
                 style: TextStyle(
                   fontSize: 16,
                   color: ThemeData().colorScheme.primary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              subtitle: Text("样本量(${controller.bciTheta["count"]}) "),
+              subtitle: BciSlider(
+                title: "θ波",
+                color: ThemeData().colorScheme.secondary,
+                maxValue: 100000,
+                value: controller.bciTheta["mv"],
+              ),
             ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -246,14 +455,19 @@ class ReportPage extends GetView<ReporPageController> {
             ///
             ListTile(
               title: Text(
-                "bciLowAlpha",
+                "bciLowAlpha (${controller.bciLowAlpha["count"]}秒数据)",
                 style: TextStyle(
                   fontSize: 16,
                   color: ThemeData().colorScheme.primary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              subtitle: Text("样本量(${controller.bciLowAlpha["count"]}) "),
+              subtitle: BciSlider(
+                title: "低α",
+                color: ThemeData().colorScheme.secondary,
+                maxValue: 100000,
+                value: controller.bciLowAlpha["mv"],
+              ),
             ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -267,14 +481,19 @@ class ReportPage extends GetView<ReporPageController> {
             ///
             ListTile(
               title: Text(
-                "bciHighAlpha",
+                "bciHighAlpha (${controller.bciHighAlpha["count"]}秒数据)",
                 style: TextStyle(
                   fontSize: 16,
                   color: ThemeData().colorScheme.primary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              subtitle: Text("样本量(${controller.bciHighAlpha["count"]}) "),
+              subtitle: BciSlider(
+                title: "高α",
+                color: ThemeData().colorScheme.secondary,
+                maxValue: 100000,
+                value: controller.bciHighAlpha["mv"],
+              ),
             ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -288,14 +507,19 @@ class ReportPage extends GetView<ReporPageController> {
             ///
             ListTile(
               title: Text(
-                "bciLowBeta",
+                "bciLowBeta (${controller.bciLowBeta["count"]}秒数据)",
                 style: TextStyle(
                   fontSize: 16,
                   color: ThemeData().colorScheme.primary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              subtitle: Text("样本量(${controller.bciLowBeta["count"]}) "),
+              subtitle: BciSlider(
+                title: "低β",
+                color: ThemeData().colorScheme.secondary,
+                maxValue: 100000,
+                value: controller.bciLowBeta["mv"],
+              ),
             ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -309,14 +533,19 @@ class ReportPage extends GetView<ReporPageController> {
             ///
             ListTile(
               title: Text(
-                "bciHighBeta",
+                "bciHighBeta (${controller.bciHighBeta["count"]}秒数据)",
                 style: TextStyle(
                   fontSize: 16,
                   color: ThemeData().colorScheme.primary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              subtitle: Text("样本量(${controller.bciHighBeta["count"]}) "),
+              subtitle: BciSlider(
+                title: "高β",
+                color: ThemeData().colorScheme.secondary,
+                maxValue: 100000,
+                value: controller.bciHighBeta["mv"],
+              ),
             ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -330,14 +559,19 @@ class ReportPage extends GetView<ReporPageController> {
             ///
             ListTile(
               title: Text(
-                "bciLowGamma",
+                "bciLowGamma (${controller.bciLowGamma["count"]}秒数据)",
                 style: TextStyle(
                   fontSize: 16,
                   color: ThemeData().colorScheme.primary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              subtitle: Text("样本量(${controller.bciLowGamma["count"]}) "),
+              subtitle: BciSlider(
+                title: "低γ",
+                color: ThemeData().colorScheme.secondary,
+                maxValue: 100000,
+                value: controller.bciLowGamma["mv"],
+              ),
             ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -351,14 +585,19 @@ class ReportPage extends GetView<ReporPageController> {
             ///
             ListTile(
               title: Text(
-                "bciMiddleGamma",
+                "bciMiddleGamma (${controller.bciMiddleGamma["count"]}秒数据)",
                 style: TextStyle(
                   fontSize: 16,
                   color: ThemeData().colorScheme.primary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              subtitle: Text("样本量(${controller.bciMiddleGamma["count"]}) "),
+              subtitle: BciSlider(
+                title: "中γ",
+                color: ThemeData().colorScheme.secondary,
+                maxValue: 100000,
+                value: controller.bciMiddleGamma["mv"],
+              ),
             ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -379,7 +618,7 @@ class ReportPage extends GetView<ReporPageController> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              subtitle: Text("样本量(${controller.bciTemperature["count"]}) "),
+              subtitle: Text("样本量(${controller.bciTemperature["count"]}秒数据) "),
             ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -393,14 +632,19 @@ class ReportPage extends GetView<ReporPageController> {
             ///
             ListTile(
               title: Text(
-                "bciHeartRate 心率",
+                "bciHeartRate (${controller.bciHeartRate["count"]}秒数据)",
                 style: TextStyle(
                   fontSize: 16,
                   color: ThemeData().colorScheme.primary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              subtitle: Text("样本量(${controller.bciHeartRate["count"]}) "),
+              subtitle: BciSlider(
+                title: "心率",
+                color: Colors.purple,
+                maxValue: 150,
+                value: controller.bciHeartRate["mv"],
+              ),
             ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -414,14 +658,26 @@ class ReportPage extends GetView<ReporPageController> {
             ///
             ListTile(
               title: Text(
-                "hrvRR 心率变异性",
+                "hrvRR (${controller.hrvRR["count"]}条数据)",
                 style: TextStyle(
                   fontSize: 16,
                   color: ThemeData().colorScheme.primary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              subtitle: Text("样本量(${controller.hrvRR["count"]}) "),
+              subtitle: Text(Data.dataDoc["bciHrv"]!["long"]!),
+            ),
+            BciSlider(
+              title: "心率变异性 nn50",
+              color: Colors.purple,
+              maxValue: 1,
+              value: controller.hrvRR["nn50"],
+            ),
+            BciSlider(
+              title: "心率变异性 LF/HF",
+              color: Colors.purple,
+              maxValue: 1,
+              value: (5 - controller.hrvRR["lfhf"]) / 5,
             ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -433,6 +689,23 @@ class ReportPage extends GetView<ReporPageController> {
                 Text("LF/HF(${controller.hrvRR["lfhf"]}) "),
               ]),
             ),
+            Container(
+              alignment: Alignment.center,
+              transformAlignment: Alignment.center,
+              margin: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
+              height: 80,
+              decoration: BoxDecoration(
+                color: ThemeData().colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Text(
+                "LF/HF 取值范围0~5，值越小，身心稳态平衡能力越高",
+                style: TextStyle(
+                    color: Colors.purple, fontWeight: FontWeight.bold),
+              ),
+            ),
+
+            ///
 
 /**
             ///原始数据
@@ -551,7 +824,7 @@ class ReportPage extends GetView<ReporPageController> {
 }
 
 class ReporPageController extends Ctrl {
-  final String title = '能量报告 详情';
+  final String title = '生命体征报告 详情';
   String _fileName = '';
   final Map<String, dynamic> _report = {
     "nickname": "顾客昵称",
@@ -604,6 +877,9 @@ class ReporPageController extends Ctrl {
     "nn50": 0.0, // 心率变异性 hrvRR间期值 邻差数据点百分比PNN50
     "lfhf": 0.0 // 心率变异性 hrvRR间期值 LF/HF 比值
   };
+  Map<String, dynamic> curRelax = {};
+  Map<String, dynamic> bciAp = {};
+  Map<String, dynamic> curFlow = {};
 
   Future<void> getReport(String fileName) async {
     _fileName = fileName;
@@ -727,5 +1003,38 @@ class ReporPageController extends Ctrl {
       List<double> p = Data.calculateLFHF(report['hrvData']);
       hrvRR["lfhf"] = p[3];
     }
+
+    ///
+    curFlow["count"] =
+        bciAtt["count"] > bciMed["count"] ? bciMed["count"] : bciAtt["count"];
+    curFlow["mv"] = 0.5 * bciAtt["mv"] + 0.5 * bciMed["mv"];
+    curFlow["sdnn"] = 0.5 * bciAtt["sdnn"] + 0.5 * bciMed["sdnn"];
+    curFlow["rmssd"] = 0.5 * bciAtt["rmssd"] + 0.5 * bciMed["rmssd"];
+    curFlow["mv"] = (curFlow["mv"] * 100).toInt() / 100;
+    curFlow["sdnn"] = (curFlow["sdnn"] * 100).toInt() / 100;
+    curFlow["rmssd"] = (curFlow["rmssd"] * 100).toInt() / 100;
+
+    ///
+    curRelax["count"] =
+        bciAtt["count"] > bciMed["count"] ? bciMed["count"] : bciAtt["count"];
+    curRelax["mv"] = 0.5 * (100 - bciAtt["mv"]) + 0.5 * bciMed["mv"];
+    curRelax["sdnn"] = 0.5 * bciAtt["sdnn"] + 0.5 * bciMed["sdnn"];
+    curRelax["rmssd"] = 0.5 * bciAtt["rmssd"] + 0.5 * bciMed["rmssd"];
+    curRelax["mv"] = (curRelax["mv"] * 100).toInt() / 100;
+    curRelax["sdnn"] = (curRelax["sdnn"] * 100).toInt() / 100;
+    curRelax["rmssd"] = (curRelax["rmssd"] * 100).toInt() / 100;
+
+    ///
+    bciAp["count"] = bciTheta["count"] > bciHighBeta["count"]
+        ? bciHighBeta["count"]
+        : bciTheta["count"];
+    bciAp["mv"] = bciTheta["mv"] / (bciLowBeta["mv"] + bciHighBeta["mv"]);
+    bciAp["sdnn"] =
+        bciTheta["sdnn"] / (bciLowBeta["sdnn"] + bciHighBeta["sdnn"]);
+    bciAp["rmssd"] =
+        bciTheta["rmssd"] / (bciLowBeta["rmssd"] + bciHighBeta["rmssd"]);
+    bciAp["mv"] = (bciAp["mv"] * 100).toInt() / 100;
+    bciAp["sdnn"] = (bciAp["sdnn"] * 100).toInt() / 100;
+    bciAp["rmssd"] = (bciAp["rmssd"] * 100).toInt() / 100;
   }
 }

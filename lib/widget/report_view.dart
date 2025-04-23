@@ -14,7 +14,7 @@ class ReportView extends GetView<ReportViewController> {
   final HealingController healingController = Get.find();
   final ReportViewController reportViewController = Get.find();
   final RxBool _showShortDoc = true.obs;
-  final Map<String, Map<String, String>> _dataDoc = HealingController.dataDoc;
+  final Map<String, Map<String, String>> _dataDoc = Data.dataDoc;
 
   @override
   @override
