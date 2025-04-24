@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:healing_music/controller/ctrl.dart';
 import 'package:healing_music/controller/healing_controller.dart';
 import 'package:healing_music/data/data.dart';
 import 'package:healing_music/style/style.dart';
@@ -340,7 +339,7 @@ class ReportView extends GetView<ReportViewController> {
   }
 }
 
-class ReportViewController extends Ctrl {
+class ReportViewController extends GetxController {
   final HealingController healingController = Get.find();
   final RxDouble energyPsyScaling = 1.0.obs; //心理能量占比
   final RxDouble energyPhyScaling = 1.0.obs; //生理能量占比

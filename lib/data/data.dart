@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:scidart/numdart.dart';
 import 'package:scidart/scidart.dart';
@@ -307,4 +308,36 @@ class Data extends Object {
     },
     'bciGrind': {"title": '咬牙', "short": "可用于控制音乐。", "long": "可用于控制音乐。"},
   };
+
+  static Future<String> generateAiText(String prompt) async {
+    if (prompt == "") {
+      return "";
+    }
+    final response = await http.post(
+      Uri.parse('https://api.deepseek.com/chat/completions'),
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer sk-a7170a19070b426683827950e06a0dfa',
+      },
+      body: jsonEncode({
+        'model': 'deepseek-chat',
+        'messages': [
+          {
+            'role': 'system',
+            'content':
+                '你是一位专业的情绪分析师，你需要根据用户输入的安全感、专注度、心流指数、松弛感、愉悦感等五项以百分比表示的基于脑波数据计算而得的基础心理状态数据，进一步分析用户的其他情绪状态，然后根据分析生成两段500左右的文字内容，第一段为情绪解读，第二段为疗愈建议。文字的风格要阳光积极正面，禁止出现有碍阅读体验的各种markdown格式符号。'
+          },
+          {'role': 'user', 'content': prompt},
+        ],
+        'stream': false,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(utf8.decode(response.bodyBytes));
+      return data['choices'][0]['message']['content'];
+    } else {
+      throw Exception('Failed to generate AI text');
+    }
+  }
 }

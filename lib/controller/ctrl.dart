@@ -145,7 +145,7 @@ class Ctrl extends GetxController {
 
   void _clearListener() {
     _positionListener?.cancel();
-    _positionListener = null;
+    //_positionListener = null;
   }
 
   @override

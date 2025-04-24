@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:healing_music/controller/ctrl.dart';
 import 'package:healing_music/data/data.dart';
+import 'package:healing_music/widget/ai_view.dart';
 import 'package:healing_music/widget/brain_wave_view.dart';
 import 'package:healing_music/widget/wave_chart.dart';
 
@@ -94,7 +94,7 @@ class ReportList extends GetView<ReportListController> {
   }
 }
 
-class ReportListController extends Ctrl {
+class ReportListController extends GetxController {
   final String title = '生命体征报告 文件夹';
   final RxList reportFileList = [].obs;
 
@@ -116,7 +116,6 @@ class ReportPage extends GetView<ReporPageController> {
   ReportPage({super.key});
   @override
   final ReporPageController controller = Get.put(ReporPageController());
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -159,6 +158,11 @@ class ReportPage extends GetView<ReporPageController> {
                 ),
               ),
               subtitle: Text(_formatTimestamp(controller._report['timestamp'])),
+            ),
+
+            ///AI内容区
+            AiTextView(
+              controller,
             ),
 
             ///数据统计
@@ -677,7 +681,7 @@ class ReportPage extends GetView<ReporPageController> {
               title: "心率变异性 LF/HF",
               color: Colors.purple,
               maxValue: 1,
-              value: (5 - controller.hrvRR["lfhf"]) / 5,
+              value: controller.hrvRR["lfhf"] / 5,
             ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -693,15 +697,25 @@ class ReportPage extends GetView<ReporPageController> {
               alignment: Alignment.center,
               transformAlignment: Alignment.center,
               margin: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
+              padding: const EdgeInsets.all(20),
               height: 80,
               decoration: BoxDecoration(
                 color: ThemeData().colorScheme.primaryContainer,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Text(
-                "LF/HF 取值范围0~5，值越小，身心稳态平衡能力越高",
-                style: TextStyle(
-                    color: Colors.purple, fontWeight: FontWeight.bold),
+              child: const Column(
+                children: [
+                  Text(
+                    "nn50值越大，副交感神经的弹性越好",
+                    style: TextStyle(
+                        color: Colors.purple, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    "LF/HF 取值范围0~5，值越小，身心稳态平衡能力越高",
+                    style: TextStyle(
+                        color: Colors.purple, fontWeight: FontWeight.bold),
+                  ),
+                ],
               ),
             ),
 
@@ -823,9 +837,16 @@ class ReportPage extends GetView<ReporPageController> {
   }
 }
 
-class ReporPageController extends Ctrl {
+class ReporPageController extends GetxController {
   final String title = '生命体征报告 详情';
   String _fileName = '';
+  String get fileName => _fileName;
+  String _aiPrompt = '';
+  String get aiPrompt => _aiPrompt;
+  RxString aiText = ''.obs;
+  RxBool isAiLoading = false.obs;
+
+  Map<String, dynamic> get report => _report;
   final Map<String, dynamic> _report = {
     "nickname": "顾客昵称",
     "timestamp": "时间",
@@ -851,7 +872,6 @@ class ReporPageController extends Ctrl {
     "fileName": "文件名",
   };
 
-  String get fileName => _fileName;
   Map<String, dynamic> bciAtt = {};
   Map<String, dynamic> bciMed = {};
   Map<String, dynamic> bciDelta = {};
@@ -1036,5 +1056,10 @@ class ReporPageController extends Ctrl {
     bciAp["mv"] = (bciAp["mv"] * 100).toInt() / 100;
     bciAp["sdnn"] = (bciAp["sdnn"] * 100).toInt() / 100;
     bciAp["rmssd"] = (bciAp["rmssd"] * 100).toInt() / 100;
+
+    ///AI
+    aiText.value = "";
+    _aiPrompt =
+        "安全感${bciMed["mv"]}%、专注度${bciAtt["mv"]}%、心流指数${curFlow["mv"]}%、松弛度${curRelax["mv"]}%、愉悦感${bciAp["mv"] * 20}%";
   }
 }
