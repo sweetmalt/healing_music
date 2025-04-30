@@ -33,7 +33,7 @@ class FacePage extends StatelessWidget {
                 children: [
                   RotatingButton(
                     onPressed: () {
-                      Get.off(const MainPage());
+                      Get.off( MainPage());
                     },
                     image: const AssetImage('assets/images/logo.png'),
                   ),

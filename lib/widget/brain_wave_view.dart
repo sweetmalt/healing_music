@@ -613,9 +613,9 @@ class BciSlider extends StatelessWidget {
           Expanded(
               child: SliderTheme(
                   data: SliderTheme.of(context).copyWith(
-                    trackHeight: 10,
+                    trackHeight: 3,
                     activeTrackColor: color,
-                    thumbColor: color,
+                    thumbColor: ThemeData().colorScheme.surface,
                     inactiveTrackColor:
                         ThemeData().colorScheme.primaryContainer,
                   ),
@@ -626,7 +626,7 @@ class BciSlider extends StatelessWidget {
                     onChanged: (double value) {},
                   ))),
           Text(
-              "${((value / maxValue) * 100).toInt()}%${getAttr(value, maxValue)}"),
+              "${((value / maxValue) * 100).toInt()}%"),
         ],
       ),
     );

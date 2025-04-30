@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:healing_music/controller/depot_controller.dart';
 import 'package:healing_music/controller/main_controller.dart';
 import 'package:healing_music/page/face_page.dart';
 import 'package:healing_music/page/music_page.dart';
@@ -11,8 +12,8 @@ import 'package:healing_music/widget/app_bar_title.dart';
 import 'package:healing_music/widget/circular_button.dart';
 
 class MainPage extends StatelessWidget {
-  const MainPage({super.key});
-
+  MainPage({super.key});
+  final DepotController depotController = Get.put(DepotController());
   @override
   Widget build(BuildContext context) {
     //开机显示face页面
@@ -27,9 +28,21 @@ class MainPage extends StatelessWidget {
         centerTitle: true,
         shadowColor: ThemeData().colorScheme.primary,
         leading: IconButton(
-          iconSize: 30,
-          color: ThemeData().colorScheme.primary,
-            onPressed: () => {Get.to(() => ReportList())},
+            iconSize: 30,
+            color: ThemeData().colorScheme.primary,
+            onPressed: () => {
+                  if (depotController.user.id.value == 0)
+                    {
+                      Get.snackbar(
+                        "请先登录",
+                        "或注册",
+                        backgroundColor: ThemeData().colorScheme.primary,
+                        colorText: ThemeData().colorScheme.primaryContainer,
+                      )
+                    }
+                  else
+                    {Get.to(() => ReportList())}
+                },
             icon: const Icon(Icons.menu_book_rounded)),
         actions: [
           CircularIconButton(

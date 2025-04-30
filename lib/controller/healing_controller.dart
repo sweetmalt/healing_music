@@ -25,6 +25,7 @@ class HealingController extends Ctrl {
   final RxBool isShowDetails = true.obs;
   static const eventChannel = EventChannel('top.healingAI.brainlink/receiver');
   StreamSubscription? _bciAndHrvBroadcastListener;
+
   /// 用于缓存历史脑波数据、hrv数据（30~60分钟）
   final List<String> _bciData = <String>[""];
   final List<double> _hrvData = <double>[];
@@ -95,6 +96,8 @@ class HealingController extends Ctrl {
   final BbmController bbmController = Get.put(BbmController());
 
   final RxString customerNickname = ''.obs;
+  final RxInt customerAge = 18.obs;
+  final RxInt customerSex = 1.obs;
 
   void setTimePlan(String k, int v) {
     isCtrlByTimePlan.value = true;
@@ -600,8 +603,6 @@ class HealingController extends Ctrl {
     _whileTrue.cancel();
     super.onClose();
   }
-
-  
 
   Future<void> statisticsHrv() async {
     if (_hrvData.length < 10) {

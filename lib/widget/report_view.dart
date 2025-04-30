@@ -213,33 +213,78 @@ class ReportView extends GetView<ReportViewController> {
 
   Future<void> showEditCustomerNicknameDialog(BuildContext context,
       {VoidCallback? callBack}) async {
-    final TextEditingController controller = TextEditingController();
-    controller.text = healingController.customerNickname.value;
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // 用户必须点击按钮才能关闭对话框
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('顾客昵称'),
+          title: const Text('顾客'),
+          contentPadding: const EdgeInsets.all(40),
           content: SingleChildScrollView(
-            child: ListBody(
+            child: Column(
               children: <Widget>[
-                TextField(
-                  maxLength: 32,
-                  autofocus: true,
-                  decoration: const InputDecoration(
-                    hintText: '请输入顾客昵称（2-32个字）',
-                  ),
-                  controller: controller,
-                  onChanged: (value) {
-                    controller.text = value;
-                  },
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(
-                        RegExp(r'[\u4e00-\u9fa5a-zA-Z0-9]')),
+                TextFormField(
+                    initialValue: healingController.customerNickname.value,
+                    decoration: const InputDecoration(
+                      labelText: '顾客昵称',
+                      hintText: '请输入顾客昵称（2-32个字）',
+                    ),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(
+                          RegExp(r'[\u4e00-\u9fa5a-zA-Z0-9]')),
+                    ],
+                    onChanged: (value) {
+                      healingController.customerNickname.value = value;
+                    }),
+                const SizedBox(height: 20),
+                TextFormField(
+                    initialValue:
+                        healingController.customerAge.value.toString(),
+                    decoration: const InputDecoration(
+                      labelText: '顾客年龄',
+                      hintText: '请输入顾客年龄',
+                    ),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(3),
+                    ],
+                    onChanged: (value) {
+                      healingController.customerAge.value = int.parse(value);
+                    }),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Obx(() => Text(
+                        "性别（${healingController.customerSex.value == 0 ? '男' : '女'}）")),
+                    const SizedBox(width: 20),
+                    IconButton(
+                        onPressed: () {
+                          healingController.customerSex.value = 0;
+                        },
+                        icon: Obx(() => Icon(
+                              healingController.customerSex.value == 0
+                                  ? Icons.check_circle_rounded
+                                  : Icons.male_rounded,
+                              color: healingController.customerSex.value == 0
+                                  ? Colors.blue
+                                  : Colors.purple,
+                            ))),
+                    const SizedBox(width: 10),
+                    IconButton(
+                        onPressed: () {
+                          healingController.customerSex.value = 1;
+                        },
+                        icon: Obx(() => Icon(
+                              healingController.customerSex.value == 1
+                                  ? Icons.check_circle_rounded
+                                  : Icons.female_rounded,
+                              color: healingController.customerSex.value == 1
+                                  ? Colors.blue
+                                  : Colors.purple,
+                            ))),
                   ],
                 ),
-                const Text("仅允许中文英文和数字，最少2个字"),
               ],
             ),
           ),
@@ -253,9 +298,12 @@ class ReportView extends GetView<ReportViewController> {
             TextButton(
               child: const Text('确认'),
               onPressed: () {
-                if (controller.text.length >= 2 &&
-                    controller.text.length <= 32) {
-                  healingController.customerNickname.value = controller.text;
+                int age = healingController.customerAge.value;
+                if (age < 1 || age > 100) {
+                  healingController.customerAge.value = 18;
+                }
+                String name = healingController.customerNickname.value;
+                if (name.length >= 2 && name.length <= 32) {
                   Navigator.of(context).pop();
                   callBack?.call();
                 } else {
@@ -307,6 +355,8 @@ class ReportView extends GetView<ReportViewController> {
                 ///本机存储
                 Map<String, dynamic> report = {
                   "nickname": healingController.customerNickname.value,
+                  "age": healingController.customerAge.value,
+                  "sex": healingController.customerSex.value,
                   "timestamp": timestamp.toString(),
 
                   ///脑波数据
