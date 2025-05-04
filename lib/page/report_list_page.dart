@@ -1,9 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:healing_music/data/data.dart';
 import 'package:healing_music/widget/ai_view.dart';
 import 'package:healing_music/widget/brain_wave_view.dart';
 import 'package:healing_music/widget/wave_chart.dart';
+import 'package:screenshot/screenshot.dart';
+//import 'package:pdf/widgets.dart' as pw;
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ReportList extends GetView<ReportListController> {
   ReportList({super.key});
@@ -116,6 +122,8 @@ class ReportPage extends GetView<ReporPageController> {
   ReportPage({super.key});
   @override
   final ReporPageController controller = Get.put(ReporPageController());
+
+  final ScreenshotController screenshotController = ScreenshotController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -124,7 +132,9 @@ class ReportPage extends GetView<ReporPageController> {
           actions: [
             IconButton(
               icon: const Icon(Icons.share),
-              onPressed: () {},
+              onPressed: () async {
+                await _shareReport();
+              },
             ),
             IconButton(
               icon: const Icon(Icons.arrow_back_ios_rounded),
@@ -134,682 +144,692 @@ class ReportPage extends GetView<ReporPageController> {
             ),
           ],
         ),
-        body: SingleChildScrollView(
-            child: Column(
-          children: [
-            ListTile(
-              title: Text(
-                "报告时间",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: ThemeData().colorScheme.primary,
-                  fontWeight: FontWeight.bold,
+        body: Screenshot(
+            controller: screenshotController,
+            child: SingleChildScrollView(
+                child: Column(
+              children: [
+                ListTile(
+                  title: Text(
+                    "报告时间",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ThemeData().colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: Text(controller
+                      .formatTimestamp(controller._report['timestamp'])),
                 ),
-              ),
-              subtitle: Text(
-                  controller.formatTimestamp(controller._report['timestamp'])),
-            ),
-            ListTile(
-              title: Text(
-                "监测时长：${controller.bciAp["count"]}秒",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: ThemeData().colorScheme.primary,
-                  fontWeight: FontWeight.bold,
+                ListTile(
+                  title: Text(
+                    "监测时长：${controller.bciAp["count"]}秒",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ThemeData().colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: const Text("count"),
                 ),
-              ),
-              subtitle: const Text("count"),
-            ),
-            ListTile(
-              title: Text(
-                "顾客昵称：${controller.report['nickname']}",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: ThemeData().colorScheme.primary,
-                  fontWeight: FontWeight.bold,
+                ListTile(
+                  title: Text(
+                    "顾客昵称：${controller.report['nickname']}",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ThemeData().colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: const Text("nickname"),
                 ),
-              ),
-              subtitle: const Text("nickname"),
-            ),
-            ListTile(
-              title: Text(
-                "顾客年龄：${controller._report['age']}岁",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: ThemeData().colorScheme.primary,
-                  fontWeight: FontWeight.bold,
+                ListTile(
+                  title: Text(
+                    "顾客年龄：${controller._report['age']}岁",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ThemeData().colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: const Text("age"),
                 ),
-              ),
-              subtitle: const Text("age"),
-            ),
-            ListTile(
-              title: Text(
-                controller._report['sex'] == 0 ? "顾客性别：男" : "顾客性别：女",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: ThemeData().colorScheme.primary,
-                  fontWeight: FontWeight.bold,
+                ListTile(
+                  title: Text(
+                    controller._report['sex'] == 0 ? "顾客性别：男" : "顾客性别：女",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ThemeData().colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: const Text("sex"),
                 ),
-              ),
-              subtitle: const Text("sex"),
-            ),
-            const ListTile(
-              title: Text(
-                  "感谢您选择先进的AI脑机-能量检测服务！\n以下是您本次的能量检测报告，我们将通过您的脑电和HRV等生理指标评估您当前的“心理能量“和“生理能量“的表现，帮助您更好地了解自己的身心状态。\n专业人员可藉由AI大模型的分析和建议为您制定个性化的服务方案，祝您健康幸福。"),
-            ),
-            ListTile(
-              title: Text(
-                "总能量得分：",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: ThemeData().colorScheme.primary,
-                  fontWeight: FontWeight.bold,
+                const ListTile(
+                  title: Text(
+                      "感谢您选择先进的AI脑机-能量检测服务！\n以下是您本次的能量检测报告，我们将通过您的脑电和HRV等生理指标评估您当前的“心理能量“和“生理能量“的表现，帮助您更好地了解自己的身心状态。\n专业人员可藉由AI大模型的分析和建议为您制定个性化的服务方案，祝您健康幸福。"),
                 ),
-              ),
-              subtitle: const Text("其中，\n心理能量得分：\n生理能量得分："),
-            ),
-            const ListTile(
-              title: Text("能量积分：__相比上次测试，您本次总得分增加__分，奖励积分__，请再接再厉，保持健康好心情！"),
-            ),
+                ListTile(
+                  title: Text(
+                    "总能量得分：",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ThemeData().colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: const Text("其中，\n心理能量得分：\n生理能量得分："),
+                ),
+                const ListTile(
+                  title:
+                      Text("能量积分：__相比上次测试，您本次总得分增加__分，奖励积分__，请再接再厉，保持健康好心情！"),
+                ),
 
-            ///AI内容区
-            AiTextView(
-              controller,
-            ),
-
-            ///数据统计
-            StatisticsContainerCircleMini(
-              "愉悦感",
-              controller.bciAp["mv"] / 5,
-              true,
-            ),
-            ListTile(
-              title: Text(
-                "bciAp 愉悦感",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: ThemeData().colorScheme.primary,
-                  fontWeight: FontWeight.bold,
+                ///AI内容区
+                AiTextView(
+                  controller,
                 ),
-              ),
-              subtitle: Text(Data.dataDoc["bciAp"]!["long"]!),
-            ),
-            BciSlider(
-              title: "愉悦感（${controller.getAttr(controller.bciAp["mv"], 100)}）",
-              color: ThemeData().colorScheme.primary,
-              maxValue: 5,
-              value: controller.bciAp["mv"],
-            ),
-            // SingleChildScrollView(
-            //   scrollDirection: Axis.horizontal,
-            //   child: Row(children: [
-            //     Text("平均值(${controller.bciAp["mv"]}) "),
-            //     Text("标准差(${controller.bciAp["sdnn"]}) "),
-            //     Text("均方根(${controller.bciAp["rmssd"]}) "),
-            //   ]),
-            // ),
-            // Container(
-            //   alignment: Alignment.center,
-            //   transformAlignment: Alignment.center,
-            //   margin: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
-            //   padding: const EdgeInsets.all(10),
-            //   decoration: BoxDecoration(
-            //       color: ThemeData().colorScheme.surface,
-            //       borderRadius: BorderRadius.circular(10),
-            //       border: Border.all(
-            //         color: ThemeData().colorScheme.primaryContainer,
-            //         width: 3,
-            //       )),
-            //   child: const Text(
-            //     "SPA可用于提升愉悦感",
-            //     style: TextStyle(
-            //         color: Colors.purple, fontWeight: FontWeight.bold),
-            //   ),
-            // ),
 
-            ///
-            Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-              StatisticsContainerCircleMini(
-                "松弛感",
-                controller.curRelax["mv"] / 100,
-                true,
-              ),
-              StatisticsContainerCircleMini(
-                "心流指数",
-                controller.curFlow["mv"] / 100,
-                true,
-              ),
-            ]),
-            ListTile(
-              title: Text(
-                "curRelax 松弛感",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: ThemeData().colorScheme.primary,
-                  fontWeight: FontWeight.bold,
+                ///数据统计
+                StatisticsContainerCircleMini(
+                  "愉悦感",
+                  controller.bciAp["mv"] / 5,
+                  true,
                 ),
-              ),
-              subtitle: Text(Data.dataDoc["curRelax"]!["long"]!),
-            ),
-            BciSlider(
-              title:
-                  "松弛感（${controller.getAttr(controller.curRelax["mv"], 100)}）",
-              color: ThemeData().colorScheme.primary,
-              maxValue: 100,
-              value: controller.curRelax["mv"],
-            ),
-            // SingleChildScrollView(
-            //   scrollDirection: Axis.horizontal,
-            //   child: Row(children: [
-            //     Text("平均值(${controller.curRelax["mv"]}) "),
-            //     Text("标准差(${controller.curRelax["sdnn"]}) "),
-            //     Text("均方根(${controller.curRelax["rmssd"]}) "),
-            //   ]),
-            // ),
-            // Container(
-            //   alignment: Alignment.center,
-            //   transformAlignment: Alignment.center,
-            //   margin: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
-            //   padding: const EdgeInsets.all(10),
-            //   decoration: BoxDecoration(
-            //       color: ThemeData().colorScheme.surface,
-            //       borderRadius: BorderRadius.circular(10),
-            //       border: Border.all(
-            //         color: ThemeData().colorScheme.primaryContainer,
-            //         width: 3,
-            //       )),
-            //   child: const Text(
-            //     "香疗可用于提升松弛感",
-            //     style: TextStyle(
-            //         color: Colors.purple, fontWeight: FontWeight.bold),
-            //   ),
-            // ),
-
-            ///
-            ListTile(
-              title: Text(
-                "curFlow 心流指数",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: ThemeData().colorScheme.primary,
-                  fontWeight: FontWeight.bold,
+                ListTile(
+                  title: Text(
+                    "bciAp 愉悦感",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ThemeData().colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: Text(Data.dataDoc["bciAp"]!["long"]!),
                 ),
-              ),
-              subtitle: Text(Data.dataDoc["curFlow"]!["long"]!),
-            ),
-            BciSlider(
-              title:
-                  "心流指数（${controller.getAttr(controller.curFlow["mv"], 100)}）",
-              color: ThemeData().colorScheme.primary,
-              maxValue: 100,
-              value: controller.curFlow["mv"],
-            ),
-            // SingleChildScrollView(
-            //   scrollDirection: Axis.horizontal,
-            //   child: Row(children: [
-            //     Text("平均值(${controller.curFlow["mv"]}) "),
-            //     Text("标准差(${controller.curFlow["sdnn"]}) "),
-            //     Text("均方根(${controller.curFlow["rmssd"]}) "),
-            //   ]),
-            // ),
-            // Container(
-            //   alignment: Alignment.center,
-            //   transformAlignment: Alignment.center,
-            //   margin: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
-            //   padding: const EdgeInsets.all(10),
-            //   height: 80,
-            //   decoration: BoxDecoration(
-            //       color: ThemeData().colorScheme.surface,
-            //       borderRadius: BorderRadius.circular(10),
-            //       border: Border.all(
-            //         color: ThemeData().colorScheme.primaryContainer,
-            //         width: 3,
-            //       )),
-            //   child: const Text(
-            //     "茶疗+脑波音频可用于提升心流指数",
-            //     style: TextStyle(
-            //         color: Colors.purple, fontWeight: FontWeight.bold),
-            //   ),
-            // ),
-
-            ///
-            Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-              StatisticsContainerCircleMini(
-                "专注度",
-                controller.bciAtt["mv"] / 100,
-                true,
-              ),
-              StatisticsContainerCircleMini(
-                "安全感",
-                controller.bciMed["mv"] / 100,
-                true,
-              ),
-            ]),
-            ListTile(
-              title: Text(
-                "bciAtt 专注度",
-                style: TextStyle(
-                  fontSize: 16,
+                BciSlider(
+                  title:
+                      "愉悦感（${controller.getAttr(controller.bciAp["mv"], 100)}）",
                   color: ThemeData().colorScheme.primary,
-                  fontWeight: FontWeight.bold,
+                  maxValue: 5,
+                  value: controller.bciAp["mv"],
                 ),
-              ),
-              subtitle: Text(Data.dataDoc["bciAtt"]!["long"]!),
-            ),
-            BciSlider(
-              title: "专注度（${controller.getAttr(controller.bciAtt["mv"], 100)}）",
-              color: ThemeData().colorScheme.primary,
-              maxValue: 100,
-              value: controller.bciAtt["mv"],
-            ),
-            // SingleChildScrollView(
-            //   scrollDirection: Axis.horizontal,
-            //   child: Row(children: [
-            //     Text("平均值(${controller.bciAtt["mv"]}) "),
-            //     Text("标准差(${controller.bciAtt["sdnn"]}) "),
-            //     Text("均方根(${controller.bciAtt["rmssd"]}) "),
-            //   ]),
-            // ),
-            // Container(
-            //   alignment: Alignment.center,
-            //   transformAlignment: Alignment.center,
-            //   margin: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
-            //   padding: const EdgeInsets.all(10),
-            //   decoration: BoxDecoration(
-            //       color: ThemeData().colorScheme.surface,
-            //       borderRadius: BorderRadius.circular(10),
-            //       border: Border.all(
-            //         color: ThemeData().colorScheme.primaryContainer,
-            //         width: 3,
-            //       )),
-            //   child: const Text(
-            //     "音疗中的双耳节拍音频可用于训练专注度",
-            //     style: TextStyle(
-            //         color: Colors.purple, fontWeight: FontWeight.bold),
-            //   ),
-            // ),
+                // SingleChildScrollView(
+                //   scrollDirection: Axis.horizontal,
+                //   child: Row(children: [
+                //     Text("平均值(${controller.bciAp["mv"]}) "),
+                //     Text("标准差(${controller.bciAp["sdnn"]}) "),
+                //     Text("均方根(${controller.bciAp["rmssd"]}) "),
+                //   ]),
+                // ),
+                // Container(
+                //   alignment: Alignment.center,
+                //   transformAlignment: Alignment.center,
+                //   margin: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
+                //   padding: const EdgeInsets.all(10),
+                //   decoration: BoxDecoration(
+                //       color: ThemeData().colorScheme.surface,
+                //       borderRadius: BorderRadius.circular(10),
+                //       border: Border.all(
+                //         color: ThemeData().colorScheme.primaryContainer,
+                //         width: 3,
+                //       )),
+                //   child: const Text(
+                //     "SPA可用于提升愉悦感",
+                //     style: TextStyle(
+                //         color: Colors.purple, fontWeight: FontWeight.bold),
+                //   ),
+                // ),
 
-            ///
-            ListTile(
-              title: Text(
-                "bciMed 安全感",
-                style: TextStyle(
-                  fontSize: 16,
+                ///
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      StatisticsContainerCircleMini(
+                        "松弛感",
+                        controller.curRelax["mv"] / 100,
+                        true,
+                      ),
+                      StatisticsContainerCircleMini(
+                        "心流指数",
+                        controller.curFlow["mv"] / 100,
+                        true,
+                      ),
+                    ]),
+                ListTile(
+                  title: Text(
+                    "curRelax 松弛感",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ThemeData().colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: Text(Data.dataDoc["curRelax"]!["long"]!),
+                ),
+                BciSlider(
+                  title:
+                      "松弛感（${controller.getAttr(controller.curRelax["mv"], 100)}）",
                   color: ThemeData().colorScheme.primary,
-                  fontWeight: FontWeight.bold,
+                  maxValue: 100,
+                  value: controller.curRelax["mv"],
                 ),
-              ),
-              subtitle: Text(Data.dataDoc["bciMed"]!["long"]!),
-            ),
-            BciSlider(
-              title: "安全感（${controller.getAttr(controller.bciMed["mv"], 100)}）",
-              color: ThemeData().colorScheme.primary,
-              maxValue: 100,
-              value: controller.bciMed["mv"],
-            ),
-            // SingleChildScrollView(
-            //   scrollDirection: Axis.horizontal,
-            //   child: Row(children: [
-            //     Text("平均值(${controller.bciMed["mv"]}) "),
-            //     Text("标准差(${controller.bciMed["sdnn"]}) "),
-            //     Text("均方根(${controller.bciMed["rmssd"]}) "),
-            //   ]),
-            // ),
-            // Container(
-            //   alignment: Alignment.center,
-            //   transformAlignment: Alignment.center,
-            //   margin: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
-            //   padding: const EdgeInsets.all(10),
-            //   decoration: BoxDecoration(
-            //       color: ThemeData().colorScheme.surface,
-            //       borderRadius: BorderRadius.circular(10),
-            //       border: Border.all(
-            //         color: ThemeData().colorScheme.primaryContainer,
-            //         width: 3,
-            //       )),
-            //   child: const Text(
-            //     "光疗+自然生境音频（如鸟鸣）可用于提升安全感",
-            //     style: TextStyle(
-            //         color: Colors.purple, fontWeight: FontWeight.bold),
-            //   ),
-            // ),
-            ListTile(
-              title: Text(
-                "hrvRR心率变异性 (${controller.hrvRR["count"]}条数据)",
-                style: TextStyle(
-                  fontSize: 16,
+                // SingleChildScrollView(
+                //   scrollDirection: Axis.horizontal,
+                //   child: Row(children: [
+                //     Text("平均值(${controller.curRelax["mv"]}) "),
+                //     Text("标准差(${controller.curRelax["sdnn"]}) "),
+                //     Text("均方根(${controller.curRelax["rmssd"]}) "),
+                //   ]),
+                // ),
+                // Container(
+                //   alignment: Alignment.center,
+                //   transformAlignment: Alignment.center,
+                //   margin: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
+                //   padding: const EdgeInsets.all(10),
+                //   decoration: BoxDecoration(
+                //       color: ThemeData().colorScheme.surface,
+                //       borderRadius: BorderRadius.circular(10),
+                //       border: Border.all(
+                //         color: ThemeData().colorScheme.primaryContainer,
+                //         width: 3,
+                //       )),
+                //   child: const Text(
+                //     "香疗可用于提升松弛感",
+                //     style: TextStyle(
+                //         color: Colors.purple, fontWeight: FontWeight.bold),
+                //   ),
+                // ),
+
+                ///
+                ListTile(
+                  title: Text(
+                    "curFlow 心流指数",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ThemeData().colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: Text(Data.dataDoc["curFlow"]!["long"]!),
+                ),
+                BciSlider(
+                  title:
+                      "心流指数（${controller.getAttr(controller.curFlow["mv"], 100)}）",
                   color: ThemeData().colorScheme.primary,
-                  fontWeight: FontWeight.bold,
+                  maxValue: 100,
+                  value: controller.curFlow["mv"],
                 ),
-              ),
-              subtitle: Text(Data.dataDoc["bciHrv"]!["long"]!),
-            ),
-            BciSlider(
-              title:
-                  "心率变异性NN50（${controller.getAttr(controller.hrvRR["nn50"], 1)}）",
-              color: Colors.purple,
-              maxValue: 1,
-              value: controller.hrvRR["nn50"],
-            ),
-            BciSlider(
-              title:
-                  "交感副交感平衡LF/HF（${controller.getAttr(controller.hrvRR["lfhf"] / 5, 1)}）",
-              color: Colors.purple,
-              maxValue: 1,
-              value: controller.hrvRR["lfhf"] / 5,
-            ),
+                // SingleChildScrollView(
+                //   scrollDirection: Axis.horizontal,
+                //   child: Row(children: [
+                //     Text("平均值(${controller.curFlow["mv"]}) "),
+                //     Text("标准差(${controller.curFlow["sdnn"]}) "),
+                //     Text("均方根(${controller.curFlow["rmssd"]}) "),
+                //   ]),
+                // ),
+                // Container(
+                //   alignment: Alignment.center,
+                //   transformAlignment: Alignment.center,
+                //   margin: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
+                //   padding: const EdgeInsets.all(10),
+                //   height: 80,
+                //   decoration: BoxDecoration(
+                //       color: ThemeData().colorScheme.surface,
+                //       borderRadius: BorderRadius.circular(10),
+                //       border: Border.all(
+                //         color: ThemeData().colorScheme.primaryContainer,
+                //         width: 3,
+                //       )),
+                //   child: const Text(
+                //     "茶疗+脑波音频可用于提升心流指数",
+                //     style: TextStyle(
+                //         color: Colors.purple, fontWeight: FontWeight.bold),
+                //   ),
+                // ),
 
-            ///
-            ListTile(
-              title: Text(
-                "AI脑机检测基础指标",
-                style: TextStyle(
-                  fontSize: 16,
+                ///
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      StatisticsContainerCircleMini(
+                        "专注度",
+                        controller.bciAtt["mv"] / 100,
+                        true,
+                      ),
+                      StatisticsContainerCircleMini(
+                        "安全感",
+                        controller.bciMed["mv"] / 100,
+                        true,
+                      ),
+                    ]),
+                ListTile(
+                  title: Text(
+                    "bciAtt 专注度",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ThemeData().colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: Text(Data.dataDoc["bciAtt"]!["long"]!),
+                ),
+                BciSlider(
+                  title:
+                      "专注度（${controller.getAttr(controller.bciAtt["mv"], 100)}）",
                   color: ThemeData().colorScheme.primary,
-                  fontWeight: FontWeight.bold,
+                  maxValue: 100,
+                  value: controller.bciAtt["mv"],
                 ),
-              ),
-              subtitle: const Text("脑波、心率、额温等"),
-            ),
-            ListTile(
-              title: Text(
-                "bciDelta",
-                style: TextStyle(
-                  fontSize: 16,
+                // SingleChildScrollView(
+                //   scrollDirection: Axis.horizontal,
+                //   child: Row(children: [
+                //     Text("平均值(${controller.bciAtt["mv"]}) "),
+                //     Text("标准差(${controller.bciAtt["sdnn"]}) "),
+                //     Text("均方根(${controller.bciAtt["rmssd"]}) "),
+                //   ]),
+                // ),
+                // Container(
+                //   alignment: Alignment.center,
+                //   transformAlignment: Alignment.center,
+                //   margin: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
+                //   padding: const EdgeInsets.all(10),
+                //   decoration: BoxDecoration(
+                //       color: ThemeData().colorScheme.surface,
+                //       borderRadius: BorderRadius.circular(10),
+                //       border: Border.all(
+                //         color: ThemeData().colorScheme.primaryContainer,
+                //         width: 3,
+                //       )),
+                //   child: const Text(
+                //     "音疗中的双耳节拍音频可用于训练专注度",
+                //     style: TextStyle(
+                //         color: Colors.purple, fontWeight: FontWeight.bold),
+                //   ),
+                // ),
+
+                ///
+                ListTile(
+                  title: Text(
+                    "bciMed 安全感",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ThemeData().colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: Text(Data.dataDoc["bciMed"]!["long"]!),
+                ),
+                BciSlider(
+                  title:
+                      "安全感（${controller.getAttr(controller.bciMed["mv"], 100)}）",
                   color: ThemeData().colorScheme.primary,
-                  fontWeight: FontWeight.bold,
+                  maxValue: 100,
+                  value: controller.bciMed["mv"],
                 ),
-              ),
-              subtitle: BciSlider(
-                title: "δ波",
-                color: ThemeData().colorScheme.secondary,
-                maxValue: 100000,
-                value: controller.bciDelta["mv"],
-              ),
-            ),
-            // SingleChildScrollView(
-            //   scrollDirection: Axis.horizontal,
-            //   child: Row(children: [
-            //     Text("平均值(${controller.bciDelta["mv"]}) "),
-            //     Text("标准差(${controller.bciDelta["sdnn"]}) "),
-            //     Text("均方根(${controller.bciDelta["rmssd"]}) "),
-            //   ]),
-            // ),
-
-            ///
-            ListTile(
-              title: Text(
-                "bciTheta",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: ThemeData().colorScheme.primary,
-                  fontWeight: FontWeight.bold,
+                // SingleChildScrollView(
+                //   scrollDirection: Axis.horizontal,
+                //   child: Row(children: [
+                //     Text("平均值(${controller.bciMed["mv"]}) "),
+                //     Text("标准差(${controller.bciMed["sdnn"]}) "),
+                //     Text("均方根(${controller.bciMed["rmssd"]}) "),
+                //   ]),
+                // ),
+                // Container(
+                //   alignment: Alignment.center,
+                //   transformAlignment: Alignment.center,
+                //   margin: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
+                //   padding: const EdgeInsets.all(10),
+                //   decoration: BoxDecoration(
+                //       color: ThemeData().colorScheme.surface,
+                //       borderRadius: BorderRadius.circular(10),
+                //       border: Border.all(
+                //         color: ThemeData().colorScheme.primaryContainer,
+                //         width: 3,
+                //       )),
+                //   child: const Text(
+                //     "光疗+自然生境音频（如鸟鸣）可用于提升安全感",
+                //     style: TextStyle(
+                //         color: Colors.purple, fontWeight: FontWeight.bold),
+                //   ),
+                // ),
+                ListTile(
+                  title: Text(
+                    "hrvRR心率变异性 (${controller.hrvRR["count"]}条数据)",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ThemeData().colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: Text(Data.dataDoc["bciHrv"]!["long"]!),
                 ),
-              ),
-              subtitle: BciSlider(
-                title: "θ波",
-                color: ThemeData().colorScheme.secondary,
-                maxValue: 100000,
-                value: controller.bciTheta["mv"],
-              ),
-            ),
-            // SingleChildScrollView(
-            //   scrollDirection: Axis.horizontal,
-            //   child: Row(children: [
-            //     Text("平均值(${controller.bciTheta["mv"]}) "),
-            //     Text("标准差(${controller.bciTheta["sdnn"]}) "),
-            //     Text("均方根(${controller.bciTheta["rmssd"]}) "),
-            //   ]),
-            // ),
-
-            ///
-            ListTile(
-              title: Text(
-                "bciLowAlpha",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: ThemeData().colorScheme.primary,
-                  fontWeight: FontWeight.bold,
+                BciSlider(
+                  title:
+                      "心率变异性NN50（${controller.getAttr(controller.hrvRR["nn50"], 1)}）",
+                  color: Colors.purple,
+                  maxValue: 1,
+                  value: controller.hrvRR["nn50"],
                 ),
-              ),
-              subtitle: BciSlider(
-                title: "低α",
-                color: ThemeData().colorScheme.secondary,
-                maxValue: 100000,
-                value: controller.bciLowAlpha["mv"],
-              ),
-            ),
-            // SingleChildScrollView(
-            //   scrollDirection: Axis.horizontal,
-            //   child: Row(children: [
-            //     Text("平均值(${controller.bciLowAlpha["mv"]}) "),
-            //     Text("标准差(${controller.bciLowAlpha["sdnn"]}) "),
-            //     Text("均方根(${controller.bciLowAlpha["rmssd"]}) "),
-            //   ]),
-            // ),
-
-            ///
-            ListTile(
-              title: Text(
-                "bciHighAlpha",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: ThemeData().colorScheme.primary,
-                  fontWeight: FontWeight.bold,
+                BciSlider(
+                  title:
+                      "交感副交感平衡LF/HF（${controller.getAttr(controller.hrvRR["lfhf"] / 5, 1)}）",
+                  color: Colors.purple,
+                  maxValue: 1,
+                  value: controller.hrvRR["lfhf"] / 5,
                 ),
-              ),
-              subtitle: BciSlider(
-                title: "高α",
-                color: ThemeData().colorScheme.secondary,
-                maxValue: 100000,
-                value: controller.bciHighAlpha["mv"],
-              ),
-            ),
-            // SingleChildScrollView(
-            //   scrollDirection: Axis.horizontal,
-            //   child: Row(children: [
-            //     Text("平均值(${controller.bciHighAlpha["mv"]}) "),
-            //     Text("标准差(${controller.bciHighAlpha["sdnn"]}) "),
-            //     Text("均方根(${controller.bciHighAlpha["rmssd"]}) "),
-            //   ]),
-            // ),
 
-            ///
-            ListTile(
-              title: Text(
-                "bciLowBeta",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: ThemeData().colorScheme.primary,
-                  fontWeight: FontWeight.bold,
+                ///
+                ListTile(
+                  title: Text(
+                    "AI脑机检测基础指标",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ThemeData().colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: const Text("脑波、心率、额温等"),
                 ),
-              ),
-              subtitle: BciSlider(
-                title: "低β",
-                color: ThemeData().colorScheme.secondary,
-                maxValue: 100000,
-                value: controller.bciLowBeta["mv"],
-              ),
-            ),
-            // SingleChildScrollView(
-            //   scrollDirection: Axis.horizontal,
-            //   child: Row(children: [
-            //     Text("平均值(${controller.bciLowBeta["mv"]}) "),
-            //     Text("标准差(${controller.bciLowBeta["sdnn"]}) "),
-            //     Text("均方根(${controller.bciLowBeta["rmssd"]}) "),
-            //   ]),
-            // ),
-
-            ///
-            ListTile(
-              title: Text(
-                "bciHighBeta",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: ThemeData().colorScheme.primary,
-                  fontWeight: FontWeight.bold,
+                ListTile(
+                  title: Text(
+                    "bciDelta",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ThemeData().colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: BciSlider(
+                    title: "δ波",
+                    color: ThemeData().colorScheme.secondary,
+                    maxValue: 100000,
+                    value: controller.bciDelta["mv"],
+                  ),
                 ),
-              ),
-              subtitle: BciSlider(
-                title: "高β",
-                color: ThemeData().colorScheme.secondary,
-                maxValue: 100000,
-                value: controller.bciHighBeta["mv"],
-              ),
-            ),
-            // SingleChildScrollView(
-            //   scrollDirection: Axis.horizontal,
-            //   child: Row(children: [
-            //     Text("平均值(${controller.bciHighBeta["mv"]}) "),
-            //     Text("标准差(${controller.bciHighBeta["sdnn"]}) "),
-            //     Text("均方根(${controller.bciHighBeta["rmssd"]}) "),
-            //   ]),
-            // ),
+                // SingleChildScrollView(
+                //   scrollDirection: Axis.horizontal,
+                //   child: Row(children: [
+                //     Text("平均值(${controller.bciDelta["mv"]}) "),
+                //     Text("标准差(${controller.bciDelta["sdnn"]}) "),
+                //     Text("均方根(${controller.bciDelta["rmssd"]}) "),
+                //   ]),
+                // ),
 
-            ///
-            ListTile(
-              title: Text(
-                "bciLowGamma",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: ThemeData().colorScheme.primary,
-                  fontWeight: FontWeight.bold,
+                ///
+                ListTile(
+                  title: Text(
+                    "bciTheta",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ThemeData().colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: BciSlider(
+                    title: "θ波",
+                    color: ThemeData().colorScheme.secondary,
+                    maxValue: 100000,
+                    value: controller.bciTheta["mv"],
+                  ),
                 ),
-              ),
-              subtitle: BciSlider(
-                title: "低γ",
-                color: ThemeData().colorScheme.secondary,
-                maxValue: 100000,
-                value: controller.bciLowGamma["mv"],
-              ),
-            ),
-            // SingleChildScrollView(
-            //   scrollDirection: Axis.horizontal,
-            //   child: Row(children: [
-            //     Text("平均值(${controller.bciLowGamma["mv"]}) "),
-            //     Text("标准差(${controller.bciLowGamma["sdnn"]}) "),
-            //     Text("均方根(${controller.bciLowGamma["rmssd"]}) "),
-            //   ]),
-            // ),
+                // SingleChildScrollView(
+                //   scrollDirection: Axis.horizontal,
+                //   child: Row(children: [
+                //     Text("平均值(${controller.bciTheta["mv"]}) "),
+                //     Text("标准差(${controller.bciTheta["sdnn"]}) "),
+                //     Text("均方根(${controller.bciTheta["rmssd"]}) "),
+                //   ]),
+                // ),
 
-            ///
-            ListTile(
-              title: Text(
-                "bciMiddleGamma",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: ThemeData().colorScheme.primary,
-                  fontWeight: FontWeight.bold,
+                ///
+                ListTile(
+                  title: Text(
+                    "bciLowAlpha",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ThemeData().colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: BciSlider(
+                    title: "低α",
+                    color: ThemeData().colorScheme.secondary,
+                    maxValue: 100000,
+                    value: controller.bciLowAlpha["mv"],
+                  ),
                 ),
-              ),
-              subtitle: BciSlider(
-                title: "中γ",
-                color: ThemeData().colorScheme.secondary,
-                maxValue: 100000,
-                value: controller.bciMiddleGamma["mv"],
-              ),
-            ),
-            // SingleChildScrollView(
-            //   scrollDirection: Axis.horizontal,
-            //   child: Row(children: [
-            //     Text("平均值(${controller.bciMiddleGamma["mv"]}) "),
-            //     Text("标准差(${controller.bciMiddleGamma["sdnn"]}) "),
-            //     Text("均方根(${controller.bciMiddleGamma["rmssd"]}) "),
-            //   ]),
-            // ),
+                // SingleChildScrollView(
+                //   scrollDirection: Axis.horizontal,
+                //   child: Row(children: [
+                //     Text("平均值(${controller.bciLowAlpha["mv"]}) "),
+                //     Text("标准差(${controller.bciLowAlpha["sdnn"]}) "),
+                //     Text("均方根(${controller.bciLowAlpha["rmssd"]}) "),
+                //   ]),
+                // ),
 
-            ///
-            ListTile(
-              title: Text(
-                "bciTemperature",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: ThemeData().colorScheme.primary,
-                  fontWeight: FontWeight.bold,
+                ///
+                ListTile(
+                  title: Text(
+                    "bciHighAlpha",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ThemeData().colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: BciSlider(
+                    title: "高α",
+                    color: ThemeData().colorScheme.secondary,
+                    maxValue: 100000,
+                    value: controller.bciHighAlpha["mv"],
+                  ),
                 ),
-              ),
-              subtitle: Text("额温(${controller.bciTemperature["mv"]}摄氏度)"),
-            ),
-            // SingleChildScrollView(
-            //   scrollDirection: Axis.horizontal,
-            //   child: Row(children: [
-            //     Text("平均值(${controller.bciTemperature["mv"]}) "),
-            //     Text("标准差(${controller.bciTemperature["sdnn"]}) "),
-            //     Text("均方根(${controller.bciTemperature["rmssd"]}) "),
-            //   ]),
-            // ),
+                // SingleChildScrollView(
+                //   scrollDirection: Axis.horizontal,
+                //   child: Row(children: [
+                //     Text("平均值(${controller.bciHighAlpha["mv"]}) "),
+                //     Text("标准差(${controller.bciHighAlpha["sdnn"]}) "),
+                //     Text("均方根(${controller.bciHighAlpha["rmssd"]}) "),
+                //   ]),
+                // ),
 
-            ///
-            ListTile(
-              title: Text(
-                "bciHeartRate",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: ThemeData().colorScheme.primary,
-                  fontWeight: FontWeight.bold,
+                ///
+                ListTile(
+                  title: Text(
+                    "bciLowBeta",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ThemeData().colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: BciSlider(
+                    title: "低β",
+                    color: ThemeData().colorScheme.secondary,
+                    maxValue: 100000,
+                    value: controller.bciLowBeta["mv"],
+                  ),
                 ),
-              ),
-              subtitle: BciSlider(
-                title:
-                    "心率（${controller.getAttr(controller.bciHeartRate["mv"], 140)}）",
-                color: Colors.purple,
-                maxValue: 140,
-                value: controller.bciHeartRate["mv"],
-              ),
-            ),
-            // SingleChildScrollView(
-            //   scrollDirection: Axis.horizontal,
-            //   child: Row(children: [
-            //     Text("平均值(${controller.bciHeartRate["mv"]}) "),
-            //     Text("标准差(${controller.bciHeartRate["sdnn"]}) "),
-            //     Text("均方根(${controller.bciHeartRate["rmssd"]}) "),
-            //   ]),
-            // ),
+                // SingleChildScrollView(
+                //   scrollDirection: Axis.horizontal,
+                //   child: Row(children: [
+                //     Text("平均值(${controller.bciLowBeta["mv"]}) "),
+                //     Text("标准差(${controller.bciLowBeta["sdnn"]}) "),
+                //     Text("均方根(${controller.bciLowBeta["rmssd"]}) "),
+                //   ]),
+                // ),
 
-            ///
+                ///
+                ListTile(
+                  title: Text(
+                    "bciHighBeta",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ThemeData().colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: BciSlider(
+                    title: "高β",
+                    color: ThemeData().colorScheme.secondary,
+                    maxValue: 100000,
+                    value: controller.bciHighBeta["mv"],
+                  ),
+                ),
+                // SingleChildScrollView(
+                //   scrollDirection: Axis.horizontal,
+                //   child: Row(children: [
+                //     Text("平均值(${controller.bciHighBeta["mv"]}) "),
+                //     Text("标准差(${controller.bciHighBeta["sdnn"]}) "),
+                //     Text("均方根(${controller.bciHighBeta["rmssd"]}) "),
+                //   ]),
+                // ),
 
-            // SingleChildScrollView(
-            //   scrollDirection: Axis.horizontal,
-            //   child: Row(children: [
-            //     Text("平均值(${controller.hrvRR["mv"]}) "),
-            //     Text("标准差(${controller.hrvRR["sdnn"]}) "),
-            //     Text("均方根(${controller.hrvRR["rmssd"]}) "),
-            //     Text("邻差50(${controller.hrvRR["nn50"]}) "),
-            //     Text("LF/HF(${controller.hrvRR["lfhf"]}) "),
-            //   ]),
-            // ),
-            // Container(
-            //   alignment: Alignment.center,
-            //   transformAlignment: Alignment.center,
-            //   margin: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
-            //   padding: const EdgeInsets.all(10),
-            //   decoration: BoxDecoration(
-            //       color: ThemeData().colorScheme.surface,
-            //       borderRadius: BorderRadius.circular(10),
-            //       border: Border.all(
-            //         color: ThemeData().colorScheme.primaryContainer,
-            //         width: 3,
-            //       )),
-            //   child: const Column(
-            //     children: [
-            //       Text(
-            //         "nn50值越大，副交感神经的弹性越好",
-            //         style: TextStyle(
-            //             color: Colors.purple, fontWeight: FontWeight.bold),
-            //       ),
-            //     ],
-            //   ),
-            // ),
+                ///
+                ListTile(
+                  title: Text(
+                    "bciLowGamma",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ThemeData().colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: BciSlider(
+                    title: "低γ",
+                    color: ThemeData().colorScheme.secondary,
+                    maxValue: 100000,
+                    value: controller.bciLowGamma["mv"],
+                  ),
+                ),
+                // SingleChildScrollView(
+                //   scrollDirection: Axis.horizontal,
+                //   child: Row(children: [
+                //     Text("平均值(${controller.bciLowGamma["mv"]}) "),
+                //     Text("标准差(${controller.bciLowGamma["sdnn"]}) "),
+                //     Text("均方根(${controller.bciLowGamma["rmssd"]}) "),
+                //   ]),
+                // ),
 
-            ///脑机作画
-            AiImageView(
-              controller,
-            ),
+                ///
+                ListTile(
+                  title: Text(
+                    "bciMiddleGamma",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ThemeData().colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: BciSlider(
+                    title: "中γ",
+                    color: ThemeData().colorScheme.secondary,
+                    maxValue: 100000,
+                    value: controller.bciMiddleGamma["mv"],
+                  ),
+                ),
+                // SingleChildScrollView(
+                //   scrollDirection: Axis.horizontal,
+                //   child: Row(children: [
+                //     Text("平均值(${controller.bciMiddleGamma["mv"]}) "),
+                //     Text("标准差(${controller.bciMiddleGamma["sdnn"]}) "),
+                //     Text("均方根(${controller.bciMiddleGamma["rmssd"]}) "),
+                //   ]),
+                // ),
 
-            ///
-            SuggestView(
-              controller,
-            ),
+                ///
+                ListTile(
+                  title: Text(
+                    "bciTemperature",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ThemeData().colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: Text("额温(${controller.bciTemperature["mv"]}摄氏度)"),
+                ),
+                // SingleChildScrollView(
+                //   scrollDirection: Axis.horizontal,
+                //   child: Row(children: [
+                //     Text("平均值(${controller.bciTemperature["mv"]}) "),
+                //     Text("标准差(${controller.bciTemperature["sdnn"]}) "),
+                //     Text("均方根(${controller.bciTemperature["rmssd"]}) "),
+                //   ]),
+                // ),
+
+                ///
+                ListTile(
+                  title: Text(
+                    "bciHeartRate",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ThemeData().colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: BciSlider(
+                    title:
+                        "心率（${controller.getAttr(controller.bciHeartRate["mv"], 140)}）",
+                    color: Colors.purple,
+                    maxValue: 140,
+                    value: controller.bciHeartRate["mv"],
+                  ),
+                ),
+                // SingleChildScrollView(
+                //   scrollDirection: Axis.horizontal,
+                //   child: Row(children: [
+                //     Text("平均值(${controller.bciHeartRate["mv"]}) "),
+                //     Text("标准差(${controller.bciHeartRate["sdnn"]}) "),
+                //     Text("均方根(${controller.bciHeartRate["rmssd"]}) "),
+                //   ]),
+                // ),
+
+                ///
+
+                // SingleChildScrollView(
+                //   scrollDirection: Axis.horizontal,
+                //   child: Row(children: [
+                //     Text("平均值(${controller.hrvRR["mv"]}) "),
+                //     Text("标准差(${controller.hrvRR["sdnn"]}) "),
+                //     Text("均方根(${controller.hrvRR["rmssd"]}) "),
+                //     Text("邻差50(${controller.hrvRR["nn50"]}) "),
+                //     Text("LF/HF(${controller.hrvRR["lfhf"]}) "),
+                //   ]),
+                // ),
+                // Container(
+                //   alignment: Alignment.center,
+                //   transformAlignment: Alignment.center,
+                //   margin: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
+                //   padding: const EdgeInsets.all(10),
+                //   decoration: BoxDecoration(
+                //       color: ThemeData().colorScheme.surface,
+                //       borderRadius: BorderRadius.circular(10),
+                //       border: Border.all(
+                //         color: ThemeData().colorScheme.primaryContainer,
+                //         width: 3,
+                //       )),
+                //   child: const Column(
+                //     children: [
+                //       Text(
+                //         "nn50值越大，副交感神经的弹性越好",
+                //         style: TextStyle(
+                //             color: Colors.purple, fontWeight: FontWeight.bold),
+                //       ),
+                //     ],
+                //   ),
+                // ),
+
+                ///脑机作画
+                AiImageView(
+                  controller,
+                ),
+
+                ///
+                SuggestView(
+                  controller,
+                ),
 
 /**
             ///原始数据
@@ -900,19 +920,46 @@ class ReportPage extends GetView<ReporPageController> {
               ),
             ),
  */
-            ListTile(
-              title: Text(
-                "数据文件",
-                style: TextStyle(
-                  fontSize: 20,
-                  color: ThemeData().colorScheme.primary,
-                  fontWeight: FontWeight.bold,
+                ListTile(
+                  title: Text(
+                    "数据文件",
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: ThemeData().colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: Text(controller._report['fileName']),
                 ),
-              ),
-              subtitle: Text(controller._report['fileName']),
-            ),
-          ],
-        )));
+              ],
+            ))));
+  }
+
+  Future<void> _shareReport() async {
+    final image = await screenshotController.capture();
+    if (image != null) {
+      // final pdf = pw.Document();
+      // pdf.addPage(pw.Page(build: (pw.Context context) {
+      //   return pw.Center(
+      //     child: pw.Image(pw.MemoryImage(image)),
+      //   );
+      // }));
+
+      final directory = await getApplicationDocumentsDirectory();
+      final imagePath = '${directory.path}/share.png';
+      //final pdfPath = '${directory.path}/share.pdf';
+
+      final imageFile = File(imagePath);
+      await imageFile.writeAsBytes(image);
+
+      //final pdfFile = File(pdfPath);
+      //await pdfFile.writeAsBytes(await pdf.save());
+
+      await SharePlus.instance.share(ShareParams(
+        files: [XFile(imagePath)],
+        text: '分享给好友',
+      ));
+    }
   }
 }
 
