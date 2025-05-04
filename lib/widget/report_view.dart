@@ -358,6 +358,7 @@ class ReportView extends GetView<ReportViewController> {
                   "age": healingController.customerAge.value,
                   "sex": healingController.customerSex.value,
                   "timestamp": timestamp.toString(),
+                  "uuid": uuid,
 
                   ///脑波数据
                   "bciData": healingController.bciData,

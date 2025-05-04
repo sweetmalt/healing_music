@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:healing_music/controller/depot_controller.dart';
@@ -23,7 +25,7 @@ class AiTextView extends GetView {
             width: 3,
           )),
       child: Column(children: [
-        TextButton(
+        ElevatedButton(
             style: ButtonStyle(
               backgroundColor: WidgetStateProperty.all(
                 ThemeData().colorScheme.primaryContainer,
@@ -35,8 +37,9 @@ class AiTextView extends GetView {
               }
               controller.isAiLoading.value = true;
               controller.aiText.value =
-                  await Data.generateAiText(controller.aiPrompt);
-
+                  await Data.generateAiText2(controller.aiPrompt);
+              await Data.write({"aiText": controller.aiText.value},
+                  controller.aiTextFileName.value);
               controller.isAiLoading.value = false;
             },
             child: Obx(() => controller.isAiLoading.value
@@ -46,9 +49,11 @@ class AiTextView extends GetView {
           height: 20,
         ),
         Obx(() => Text(
-              controller.isAiLoading.value
-                  ? "AI调用需要5~10秒，请耐心等待……"
-                  : controller.aiText.value,
+              controller.isAiLoading.value ? "AI调用需要5~10秒，请耐心等待……" : "",
+              style: const TextStyle(fontSize: 16),
+            )),
+        Obx(() => Text(
+              controller.aiText.value,
               style: const TextStyle(fontSize: 16),
             )),
       ]),
@@ -89,7 +94,10 @@ class AiImageView extends GetView {
               controller.aiImageUrl.value =
                   await Data.generateAiImage(controller.aiPrompt);
 
-              //controller.isAiImageLoading.value = false;
+              await Data.downloadAndSaveImage(controller.aiImageUrl.value,
+                  controller.aiImageFilePath.value);
+
+              controller.isAiImageExists.value = true;
             },
             child: Obx(() => controller.isAiImageLoading.value
                 ? const CircularProgressIndicator()
@@ -97,12 +105,12 @@ class AiImageView extends GetView {
         const SizedBox(
           height: 20,
         ),
-        Obx(() => controller.aiImageUrl.value == ""
+        Obx(() => !controller.isAiImageExists.value
             ? const SizedBox()
             : ClipRRect(
                 borderRadius: const BorderRadius.all(Radius.circular(10)),
-                child: Image.network(
-                  controller.aiImageUrl.value,
+                child: Image.file(
+                  File(controller.aiImageFilePath.value),
                   width: Get.width,
                   frameBuilder:
                       (context, child, frame, wasSynchronouslyLoaded) {
@@ -115,7 +123,35 @@ class AiImageView extends GetView {
                     return child;
                   },
                 ),
+                // Image.network(
+                //   controller.aiImageUrl.value,
+                //   width: Get.width,
+                //   frameBuilder:
+                //       (context, child, frame, wasSynchronouslyLoaded) {
+                //     if (frame != null) {
+                //       // 图片加载完成时触发
+                //       WidgetsBinding.instance.addPostFrameCallback((_) {
+                //         controller.isAiImageLoading.value = false;
+                //       });
+                //     }
+                //     return child;
+                //   },
+                // ),
               )),
+        Obx(() => controller.isAiImageExists.value &&
+                !controller.isAiImageLoading.value
+            ? ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.all(
+                    ThemeData().colorScheme.primaryContainer,
+                  ),
+                ),
+                onPressed: () async {
+                  await Data.saveImageToGallery(
+                      controller.aiImageFilePath.value);
+                },
+                child: const Text("保存到相册"))
+            : const SizedBox()),
         const SizedBox(
           height: 20,
         ),
@@ -146,7 +182,7 @@ class SuggestView extends GetView {
               width: 3,
             )),
         child: Column(children: [
-          TextButton(
+          ElevatedButton(
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.all(
                   ThemeData().colorScheme.primaryContainer,
@@ -280,11 +316,13 @@ class SuggestView extends GetView {
                     subtitle: Text(
                         '亲爱的朋友，真正的疗愈始于对自我的慈悲觉察。请相信，每一刻的关照都会在时光中沉淀为生命的光彩。我们愿做您旅程中的温暖烛火，静候您绽放身心原生的力量。'),
                   ),
-                   ListTile(
-                    title: Text('您的专属疗愈师：${deportController.user.adminNickname.value}'),
+                  ListTile(
+                    title: Text(
+                        '您的专属疗愈师：${deportController.user.adminNickname.value}'),
                   ),
-                   ListTile(
-                    title: Text('机构名称：${deportController.user.agencyName.value}'),
+                  ListTile(
+                    title:
+                        Text('机构名称：${deportController.user.agencyName.value}'),
                   ),
                 ])
               : const Text("点击按钮查看")),

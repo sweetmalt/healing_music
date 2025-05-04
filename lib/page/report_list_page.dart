@@ -926,15 +926,18 @@ class ReporPageController extends GetxController {
   RxBool isAiLoading = false.obs;
   RxString aiImageUrl = ''.obs;
   RxBool isAiImageLoading = false.obs;
-
+  RxString aiImageFilePath = ''.obs;
+  RxBool isAiImageExists = false.obs;
+  RxString aiTextFileName = ''.obs;
+  RxBool isAiTextExists = false.obs;
   RxBool isShowSuggest = false.obs;
 
   Map<String, dynamic> get report => _report;
   final Map<String, dynamic> _report = {
-    "nickname": "顾客昵称",
+    "nickname": "", //顾客昵称
     "age": 18, // "顾客年龄",
     "sex": 1, //"顾客性别",
-    "timestamp": "时间",
+    "timestamp": "", //时间戳
 
     ///bci数据
     "bciData": [],
@@ -954,7 +957,7 @@ class ReporPageController extends GetxController {
 
     ///hrv数据
     "hrvData": [],
-    "fileName": "文件名",
+    "fileName": "", //文件名
   };
 
   Map<String, dynamic> bciAtt = {};
@@ -989,12 +992,32 @@ class ReporPageController extends GetxController {
   Future<void> getReport(String fileName) async {
     _fileName = fileName;
     _report['fileName'] = fileName;
+    List<String> lf = fileName.split("_");
+    if (lf.length == 3) {
+      aiImageUrl.value = "";
+      String png = "image_${lf[1]}_${lf[2].split(".")[0]}.png";
+      aiImageFilePath.value = await Data.path(png);
+      isAiImageExists.value = false;
+      if (await Data.exists(png)) {
+        isAiImageExists.value = true;
+      }
+      String txt = "text_${lf[1]}_${lf[2].split(".")[0]}.json";
+      aiTextFileName.value = txt;
+      isAiTextExists.value = false;
+      aiText.value = "";
+      if (await Data.exists(txt)) {
+        isAiTextExists.value = true;
+        Map<String, dynamic> jsonObj = await Data.read(txt);
+        aiText.value = jsonObj['aiText'];
+      }
+    }
 
     Map<String, dynamic> report = await Data.read(fileName);
     _report['nickname'] = report['nickname'];
     _report['age'] = report['age'];
     _report['sex'] = report['sex'];
     _report['timestamp'] = report['timestamp'];
+    _report['uuid'] = report['uuid'];
 
     ///bci数据（文本）
     _report['bciData'] = report['bciData'];
@@ -1145,8 +1168,6 @@ class ReporPageController extends GetxController {
     bciAp["rmssd"] = (bciAp["rmssd"] * 100).toInt() / 100;
 
     ///AI
-    aiText.value = "";
-    aiImageUrl.value = "";
     _aiPrompt =
         "安全感${bciMed["mv"]}%、专注度${bciAtt["mv"]}%、心流指数${curFlow["mv"]}%、松弛度${curRelax["mv"]}%、愉悦感${bciAp["mv"] * 20}%、心率变异性NN50值${hrvRR["nn50"] * 100}%、心率变异性LF/HF比值${hrvRR["lfhf"] * 20}%";
   }

@@ -1,8 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:scidart/numdart.dart';
 import 'package:scidart/scidart.dart';
@@ -12,6 +16,23 @@ class Data extends Object {
   @override
   String toString() {
     return 'Data';
+  }
+
+  static Future<String> path(String fileName) async {
+    if (fileName.isEmpty) {
+      return "";
+    }
+    final directory = await getApplicationDocumentsDirectory();
+    return '${directory.path}/$fileName';
+  }
+
+  static Future<bool> exists(String fileName) async {
+    if (fileName.isEmpty) {
+      return false;
+    }
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File('${directory.path}/$fileName');
+    return await file.exists();
   }
 
   static Future<Map<String, dynamic>> read(String jsonFileName) async {
@@ -347,6 +368,57 @@ class Data extends Object {
     }
   }
 
+  static Future<String> generateAiText2(String prompt) async {
+    if (prompt == "") {
+      return "";
+    }
+    final client = http.Client();
+    try {
+      final request =
+          http.Request('POST', Uri.parse('https://api.coze.cn/v3/chat?'));
+      request.headers.addAll({
+        'Content-Type': 'application/json',
+        'Authorization':
+            'Bearer pat_PoodcJJ0NxjV2LmfuQ6LCBk48hFQUDAvdxfZPGTgyvlf6ei22rjPkIyyoz13a3mP',
+      });
+      request.body = jsonEncode({
+        "bot_id": "7434848152596774939",
+        "user_id": "1234567890",
+        "stream": true,
+        "additional_messages": [
+          {
+            "role": "user",
+            "content": prompt,
+            "content_type": "text",
+            "type": "question"
+          }
+        ]
+      });
+
+      final response = await client.send(request);
+      await for (var chunk in response.stream.transform(utf8.decoder)) {
+        List<String> lines = chunk.split('\n');
+        for (var line in lines) {
+          if (line.startsWith('data:')) {
+            String jsonData = line.substring(5);
+            Map<String, dynamic> data = jsonDecode(jsonData);
+            if (data['type'] != null &&
+                data['type'] == 'answer' &&
+                data['content'] != null &&
+                data['content'].length > 100) {
+              String aiText = data['content'];
+              aiText = aiText.replaceAll('#', '');
+              return aiText;
+            }
+          }
+        }
+      }
+      return "";
+    } finally {
+      client.close();
+    }
+  }
+
   static Future<String> generateAiImage(String prompt) async {
     if (prompt == "") {
       return "";
@@ -393,6 +465,62 @@ class Data extends Object {
       return "";
     } finally {
       client.close();
+    }
+  }
+
+  static Future<void> downloadAndSaveImage(
+      String imageUrl, String savePath) async {
+    if (imageUrl.isEmpty || savePath.isEmpty) {
+      return;
+    }
+    try {
+      // 发送HTTP GET请求获取图片数据
+      final response = await http.get(Uri.parse(imageUrl));
+
+      if (response.statusCode == 200) {
+        // 将图片数据写入文件
+        final file = File(savePath);
+        await file.writeAsBytes(response.bodyBytes);
+        if (kDebugMode) {
+          print('图片保存成功: $savePath');
+        }
+      } else {
+        if (kDebugMode) {
+          print('图片下载失败，状态码: ${response.statusCode}');
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('图片下载或保存过程中发生错误: $e');
+      }
+    }
+  }
+
+  static Future<void> saveImageToGallery(String imagePath) async {
+    try {
+      final result = await ImageGallerySaverPlus.saveFile(imagePath);
+      if (result['isSuccess']) {
+        Get.snackbar(
+          "成功",
+          "图片保存成功",
+          backgroundColor: ThemeData().colorScheme.primary,
+          colorText: ThemeData().colorScheme.primaryContainer,
+        );
+      } else {
+        Get.snackbar(
+          "失败",
+          "图片保存失败",
+          backgroundColor: ThemeData().colorScheme.primary,
+          colorText: ThemeData().colorScheme.primaryContainer,
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        "错误",
+        "保存图片时发生错误",
+        backgroundColor: ThemeData().colorScheme.primary,
+        colorText: ThemeData().colorScheme.primaryContainer,
+      );
     }
   }
 }
