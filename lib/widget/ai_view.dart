@@ -5,12 +5,14 @@ import 'package:get/get.dart';
 import 'package:healing_music/controller/depot_controller.dart';
 import 'package:healing_music/data/data.dart';
 import 'package:healing_music/page/report_list_page.dart';
+import 'package:healing_music/widget/brain_wave_view.dart';
 
 class AiTextView extends GetView {
   @override
   final ReporPageController controller;
-  const AiTextView(this.controller, {super.key});
+  AiTextView(this.controller, {super.key});
 
+  final DepotController depotController = Get.put(DepotController());
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -36,8 +38,8 @@ class AiTextView extends GetView {
                 return;
               }
               controller.isAiLoading.value = true;
-              controller.aiText.value =
-                  await Data.generateAiText2(controller.aiPrompt);
+              controller.aiText.value = await Data.generateAiText2(
+                  controller.aiPrompt, depotController.user.bearer.value);
               await Data.write({"aiText": controller.aiText.value},
                   controller.aiTextFileName.value);
               controller.isAiLoading.value = false;
@@ -64,8 +66,8 @@ class AiTextView extends GetView {
 class AiImageView extends GetView {
   @override
   final ReporPageController controller;
-  const AiImageView(this.controller, {super.key});
-
+  AiImageView(this.controller, {super.key});
+  final DepotController depotController = Get.put(DepotController());
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -91,9 +93,14 @@ class AiImageView extends GetView {
                 return;
               }
               controller.isAiImageLoading.value = true;
-              controller.aiImageUrl.value =
-                  await Data.generateAiImage(controller.aiPrompt);
-
+              controller.aiImageUrl.value = await Data.generateAiImage(
+                  controller.aiPrompt, depotController.user.bearer.value);
+              controller.isAiImageExists.value = false;
+              final timestamp = DateTime.now().millisecondsSinceEpoch;
+              final newPath = "${controller.aiImageFilePath_}?v=$timestamp";
+              controller.aiImageFilePath.value = newPath;
+              await Data.downloadAndSaveImage(
+                  controller.aiImageUrl.value, controller.aiImageFilePath_);
               await Data.downloadAndSaveImage(controller.aiImageUrl.value,
                   controller.aiImageFilePath.value);
 
@@ -111,6 +118,7 @@ class AiImageView extends GetView {
                 borderRadius: const BorderRadius.all(Radius.circular(10)),
                 child: Image.file(
                   File(controller.aiImageFilePath.value),
+                  //key: ValueKey("${DateTime.now().millisecondsSinceEpoch}"),
                   width: Get.width,
                   frameBuilder:
                       (context, child, frame, wasSynchronouslyLoaded) {
@@ -147,8 +155,7 @@ class AiImageView extends GetView {
                   ),
                 ),
                 onPressed: () async {
-                  await Data.saveImageToGallery(
-                      controller.aiImageFilePath.value);
+                  await Data.saveImageToGallery(controller.aiImageFilePath_);
                 },
                 child: const Text("保存到相册"))
             : const SizedBox()),
@@ -221,11 +228,12 @@ class SuggestView extends GetView {
                     subtitle: Text(
                         "感谢您选择与我们共同踏上这段身心疗愈的旅程。通过精准的脑机接口设备与AI数据分析，我们聆听了您身体与心灵的“声音”，并为您量身定制了专属疗愈方案。此刻，您已迈出自我关怀的重要一步——愿这份方案如春日细雨，滋养您的能量场域，唤醒内在的平衡与活力，拥抱身心的温柔觉醒。"),
                   ),
-                  const ListTile(
-                    title: Text('【身心能量图谱与疗愈建议】'),
+                  ListTile(
+                    title: const Text('【身心能量图谱与疗愈建议】'),
                     subtitle: Text(
-                        "基于您的生理能量值（XX分）与心理能量值（XX分）的综合分析，我们分析您的能量疗愈地图如下：（数值越低，代表越需要被疗愈的“缺失”方向）"),
+                        "基于您的生理能量值（${controller.hrvEnergy.value}分）与心理能量值（${controller.bciEnergy.value}分）的综合分析，我们分析您的能量疗愈地图如下：（数值越低，代表越需要被疗愈的“缺失”方向）"),
                   ),
+                  BciSliderBox(),
                   const ListTile(
                     title: Text('【疗愈方向详解】'),
                   ),

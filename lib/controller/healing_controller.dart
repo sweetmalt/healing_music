@@ -13,6 +13,7 @@ class HealingController extends Ctrl {
   final RxString audioSubTitle = ''.obs;
   final RxBool isCtrlByDevice = true.obs;
   final RxBool isDeviceLinking = false.obs;
+  final RxBool isRecordData = false.obs;
   final List<int> bciCurrentTwoTimeMillis = [0, 0]; //用于判断连接状态
   late Timer _whileTrue;
   final RxString healingTimePlanKey = ''.obs;
@@ -98,6 +99,33 @@ class HealingController extends Ctrl {
   final RxString customerNickname = ''.obs;
   final RxInt customerAge = 18.obs;
   final RxInt customerSex = 1.obs;
+  final RxString customerSleepP2Q1 = ''.obs;
+  List<String> customerSleepP2Q1_ = ["10分钟", "10~30分钟", "30~60分钟", "1小时以上"];
+  final RxString customerSleepP2Q2 = ''.obs;
+  Map<String, bool> customerSleepP2Q2_ = {
+    "夜间易醒且难以再次入睡": false,
+    "早醒（比预期早1小时以上）": false,
+    "白天疲劳感明显": false,
+    "睡眠浅、易受环境影响": false
+  };
+  final RxString customerSleepP2Q3 = ''.obs;
+  List<String> customerSleepP2Q3_ = ["非常满意", "较满意", "一般", "不满意", "非常不满意"];
+  final RxString customerSleepP3Q1 = ''.obs;
+  Map<String, bool> customerSleepP3Q1_ = {
+    "工作/学业": false,
+    "家庭关系": false,
+    "经济问题": false,
+    "健康问题": false,
+    "社交或情感关系": false
+  };
+  final RxString customerSleepP3Q2 = ''.obs;
+  Map<String, bool> customerSleepP3Q2_ = {
+    "烦躁易怒": false,
+    "注意力难以集中": false,
+    "对日常活动兴趣下降": false,
+    "身体紧绷或肌肉酸痛": false
+  };
+  final RxInt customerCheckSeconds = 180.obs;
 
   void setTimePlan(String k, int v) {
     isCtrlByTimePlan.value = true;
@@ -130,13 +158,16 @@ class HealingController extends Ctrl {
   }
 
   void _initWhileTrue() {
-    const seconds = Duration(seconds: 3);
+    const seconds = Duration(seconds: 1);
     _whileTrue = Timer.periodic(seconds, (Timer timer) {
       if (bciCurrentTwoTimeMillis[1] != bciCurrentTwoTimeMillis[0]) {
         isDeviceLinking.value = true;
         bciCurrentTwoTimeMillis[0] = bciCurrentTwoTimeMillis[1];
       } else {
         isDeviceLinking.value = false;
+      }
+      if (isRecordData.value && customerCheckSeconds.value > 0) {
+        customerCheckSeconds.value = customerCheckSeconds.value - 1;
       }
     });
   }
@@ -403,6 +434,9 @@ class HealingController extends Ctrl {
     _initWhileTrue();
     _bciAndHrvBroadcastListener =
         eventChannel.receiveBroadcastStream().listen((data) async {
+      if (isRecordData.value == false) {
+        return;
+      }
       List<String> temp = data.toString().split('_');
       if (temp.length == 2) {
         if (temp[0] == "bci") {

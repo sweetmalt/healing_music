@@ -368,8 +368,8 @@ class Data extends Object {
     }
   }
 
-  static Future<String> generateAiText2(String prompt) async {
-    if (prompt == "") {
+  static Future<String> generateAiText2(String prompt, String bearer) async {
+    if (prompt == "" || bearer == "") {
       return "";
     }
     final client = http.Client();
@@ -378,8 +378,7 @@ class Data extends Object {
           http.Request('POST', Uri.parse('https://api.coze.cn/v3/chat?'));
       request.headers.addAll({
         'Content-Type': 'application/json',
-        'Authorization':
-            'Bearer pat_PoodcJJ0NxjV2LmfuQ6LCBk48hFQUDAvdxfZPGTgyvlf6ei22rjPkIyyoz13a3mP',
+        'Authorization': 'Bearer $bearer',
       });
       request.body = jsonEncode({
         "bot_id": "7434848152596774939",
@@ -408,6 +407,7 @@ class Data extends Object {
                 data['content'].length > 100) {
               String aiText = data['content'];
               aiText = aiText.replaceAll('#', '');
+              aiText = aiText.replaceAll('*', '');
               return aiText;
             }
           }
@@ -419,8 +419,8 @@ class Data extends Object {
     }
   }
 
-  static Future<String> generateAiImage(String prompt) async {
-    if (prompt == "") {
+  static Future<String> generateAiImage(String prompt, String bearer) async {
+    if (prompt == "" || bearer == "") {
       return "";
     }
     final client = http.Client();
@@ -429,8 +429,7 @@ class Data extends Object {
           http.Request('POST', Uri.parse('https://api.coze.cn/v3/chat?'));
       request.headers.addAll({
         'Content-Type': 'application/json',
-        'Authorization':
-            'Bearer pat_PoodcJJ0NxjV2LmfuQ6LCBk48hFQUDAvdxfZPGTgyvlf6ei22rjPkIyyoz13a3mP',
+        'Authorization': 'Bearer $bearer',
       });
       request.body = jsonEncode({
         "bot_id": "7496709743646720035",

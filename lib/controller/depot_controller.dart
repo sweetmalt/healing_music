@@ -22,8 +22,8 @@ class User {
   final RxString adminPhonenumber = "".obs;
   final RxString adminPassword = "".obs;
   final RxString adminAddress = "".obs;
-  final RxInt vip = 0.obs;//0普通用户(无法生成报告)，1vip用户(生成报告需扣分)，2vip(生成报告不扣分)
-
+  final RxInt vip = 0.obs; //0普通用户(无法生成报告)，1vip用户(生成报告需扣分)，2vip(生成报告不扣分)
+  final RxString bearer = "".obs;
   final RxInt loginState = 0.obs; //0未登录，1登录中，2登录成功
 
   User();
@@ -40,6 +40,7 @@ class User {
     adminPassword.value = user["admin_password"];
     adminAddress.value = user["admin_address"];
     vip.value = user["vip"];
+    bearer.value = user["bearer"];
     if (id.value != 0) {
       loginState.value = 2;
     }
@@ -57,6 +58,7 @@ class User {
       "admin_password": adminPassword.value,
       "admin_address": adminAddress.value,
       "vip": vip.value,
+      "bearer": bearer.value,
     };
     await Data.write(user, "user.json");
   }
@@ -86,6 +88,7 @@ class User {
       //adminPassword.value = user["admin_password"];
       adminAddress.value = user["admin_address"];
       vip.value = user["vip"];
+      bearer.value = user['bearer'];
       await cache();
       loginState.value = 2;
     } else {
@@ -129,6 +132,7 @@ class User {
       adminPassword.value = adminPassword_;
       adminAddress.value = adminAddress_;
       vip.value = user["vip"];
+      bearer.value = user['bearer'];
       await cache();
       loginState.value = 2;
     } else {

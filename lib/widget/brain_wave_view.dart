@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:healing_music/controller/healing_controller.dart';
 import 'package:healing_music/data/data.dart';
+import 'package:healing_music/page/report_list_page.dart';
 import 'package:healing_music/style/style.dart';
 import 'package:healing_music/widget/paragraph.dart';
 import 'package:healing_music/widget/wave_chart.dart';
 import 'package:get/get.dart';
+import 'package:uuid/uuid.dart';
 
 class BrainWaveView extends StatelessWidget {
   BrainWaveView({
@@ -22,6 +25,303 @@ class BrainWaveView extends StatelessWidget {
               topLeft: Radius.circular(20), topRight: Radius.circular(20))),
       child: ListView(
         children: [
+          ListTile(
+            leading: Icon(
+              Icons.sensors_rounded,
+              color: ThemeData().colorScheme.primary,
+            ),
+            title: Text(
+              "AI脑机能量检测",
+              style: TextStyle(
+                color: ThemeData().colorScheme.primary,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          ListTile(
+            title: Text(
+              '''
+感谢您选择我们的AI脑机能量检测服务。该项检测将帮助为您：
+-提供精准的身心能量报告并通过专业顾问和AI模型进行解读
+-提供精准的身心平衡干预方案，整合科技与自然手段实现疗愈
+我们的检测服务将创新的结合国际标准量表与先进的脑机接口设备，由专业顾问引导，整个过程大约耗时5分钟。
+请您舒适就坐，自然放松，开启一场内在旅行。
+''',
+              style: TextStyle(
+                color: ThemeData().colorScheme.secondary,
+                fontSize: 16,
+              ),
+            ),
+          ),
+          ListTile(
+            title: Text(
+              "睡眠与身心平衡咨询表",
+              style: TextStyle(
+                color: ThemeData().colorScheme.primary,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            subtitle: Column(children: [
+              ListTile(
+                title: const Text(
+                  "Part1：基础信息",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                trailing: ElevatedButton(
+                    onPressed: () {
+                      showEditCustomerNicknameDialog(context);
+                    },
+                    child: const Icon(Icons.edit_rounded)),
+              ),
+              Obx(() => ListTile(
+                    title: Text(
+                        "顾客昵称：${healingController.customerNickname.value}"),
+                  )),
+              Obx(() => ListTile(
+                    title: Text("顾客年龄：${healingController.customerAge.value}岁"),
+                  )),
+              Obx(() => ListTile(
+                    title: Text(
+                        "顾客性别：${healingController.customerSex.value == 0 ? '男' : '女'}"),
+                  )),
+              const ListTile(
+                title: Text(
+                  "Part2：睡眠质量评估",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const Text("Q1您的平均入睡时间需要多久？",
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              Obx(() => Text(
+                    "【${healingController.customerSleepP2Q1.value}】",
+                  )),
+              const SizedBox(
+                height: 10,
+              ),
+              for (int i = 0;
+                  i < healingController.customerSleepP2Q1_.length;
+                  i++)
+                ElevatedButton(
+                  onPressed: () {
+                    healingController.customerSleepP2Q1.value =
+                        healingController.customerSleepP2Q1_[i];
+                  },
+                  child: Text(
+                    healingController.customerSleepP2Q1_[i],
+                  ),
+                ),
+              const SizedBox(
+                height: 20,
+              ),
+              const Text("Q2您是否经常有以下情况？（多选）",
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              Obx(() => Text(
+                    "【${healingController.customerSleepP2Q2.value}】",
+                  )),
+              const SizedBox(
+                height: 10,
+              ),
+              for (int i = 0;
+                  i < healingController.customerSleepP2Q2_.keys.length;
+                  i++)
+                ElevatedButton(
+                    onPressed: () {
+                      String key = healingController.customerSleepP2Q2_.keys
+                          .elementAt(i);
+                      bool v = healingController.customerSleepP2Q2_[key]!;
+                      healingController.customerSleepP2Q2_[key] = !v;
+                      List<String> newList = [];
+                      for (String k
+                          in healingController.customerSleepP2Q2_.keys) {
+                        if (healingController.customerSleepP2Q2_[k]!) {
+                          newList.add(k);
+                        }
+                      }
+                      healingController.customerSleepP2Q2.value =
+                          newList.join(',');
+                    },
+                    child: Text(
+                      healingController.customerSleepP2Q2_.keys.elementAt(i),
+                    )),
+              const SizedBox(
+                height: 20,
+              ),
+              const Text("Q3您对当前睡眠质量的满意度如何？",
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              Obx(() => Text(
+                    "【${healingController.customerSleepP2Q3.value}】",
+                  )),
+              const SizedBox(
+                height: 10,
+              ),
+              for (int i = 0;
+                  i < healingController.customerSleepP2Q3_.length;
+                  i++)
+                ElevatedButton(
+                  onPressed: () {
+                    healingController.customerSleepP2Q3.value =
+                        healingController.customerSleepP2Q3_[i];
+                  },
+                  child: Text(
+                    healingController.customerSleepP2Q3_[i],
+                  ),
+                ),
+              const SizedBox(
+                height: 20,
+              ),
+              const ListTile(
+                title: Text(
+                  "Part3：日常压力与情绪状态",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const Text("Q1近期您感受到的压力主要来自哪些方面？（多选）",
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              Obx(() => Text(
+                    "【${healingController.customerSleepP3Q1.value}】",
+                  )),
+              const SizedBox(
+                height: 10,
+              ),
+              for (int i = 0;
+                  i < healingController.customerSleepP3Q1_.keys.length;
+                  i++)
+                ElevatedButton(
+                    onPressed: () {
+                      String key = healingController.customerSleepP3Q1_.keys
+                          .elementAt(i);
+                      bool v = healingController.customerSleepP3Q1_[key]!;
+                      healingController.customerSleepP3Q1_[key] = !v;
+                      List<String> newList = [];
+                      for (String k
+                          in healingController.customerSleepP3Q1_.keys) {
+                        if (healingController.customerSleepP3Q1_[k]!) {
+                          newList.add(k);
+                        }
+                      }
+                      healingController.customerSleepP3Q1.value =
+                          newList.join(',');
+                    },
+                    child: Text(
+                      healingController.customerSleepP3Q1_.keys.elementAt(i),
+                    )),
+              const SizedBox(
+                height: 20,
+              ),
+              const Text(
+                "Q2您是否经常出现以下情绪？（多选）",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Obx(() => Text(
+                    "【${healingController.customerSleepP3Q2.value}】",
+                  )),
+              const SizedBox(
+                height: 10,
+              ),
+              for (int i = 0;
+                  i < healingController.customerSleepP3Q2_.keys.length;
+                  i++)
+                ElevatedButton(
+                    onPressed: () {
+                      String key = healingController.customerSleepP3Q2_.keys
+                          .elementAt(i);
+                      bool v = healingController.customerSleepP3Q2_[key]!;
+                      healingController.customerSleepP3Q2_[key] = !v;
+                      List<String> newList = [];
+                      for (String k
+                          in healingController.customerSleepP3Q2_.keys) {
+                        if (healingController.customerSleepP3Q2_[k]!) {
+                          newList.add(k);
+                        }
+                      }
+                      healingController.customerSleepP3Q2.value =
+                          newList.join(',');
+                    },
+                    child: Text(
+                      healingController.customerSleepP3Q2_.keys.elementAt(i),
+                    )),
+              const SizedBox(
+                height: 20,
+              ),
+            ]),
+          ),
+          ElevatedButton(
+            style: ButtonStyle(
+              backgroundColor:
+                  WidgetStateProperty.all(ThemeData().colorScheme.primary),
+            ),
+            onPressed: () {
+              healingController.isRecordData.value =
+                  !healingController.isRecordData.value;
+              if (healingController.isRecordData.value) {
+                healingController.clearData();
+                healingController.customerCheckSeconds.value = 180;
+              }
+            },
+            child: Obx(() => Text(
+                  healingController.isRecordData.value
+                      ? healingController.customerCheckSeconds.value > 0
+                          ? "检测进行中…稍等${healingController.customerCheckSeconds.value}秒"
+                          : "检测完毕"
+                      : "启动检测",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                )),
+          ),
+
+          ElevatedButton(
+            style: ButtonStyle(
+              backgroundColor: WidgetStateProperty.all(Colors.blue),
+            ),
+            onPressed: () {
+              healingController.customerNickname.value.isEmpty
+                  ? showEditCustomerNicknameDialog(context, callBack: () {
+                      showSaveConfirmationDialog(context);
+                    })
+                  : showSaveConfirmationDialog(context);
+            },
+            child: const Text(
+              "生成报告",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            style: ButtonStyle(
+              backgroundColor: WidgetStateProperty.all(Colors.green),
+            ),
+            onPressed: () {
+              Get.to(() => ReportList());
+            },
+            child: const Text(
+              "查看报告",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: 100,
+          ),
           ListTile(
             title: Text('是否让设备参与音乐控制？', style: MyStyle.paragraphTitleTextStyle),
             subtitle: const Text(
@@ -55,7 +355,7 @@ class BrainWaveView extends StatelessWidget {
               await healingController.clearData();
             },
           ),
-          BciSliderBox(),
+          // BciSliderBox(),
           const SizedBox(
             height: 40,
           ),
@@ -517,6 +817,189 @@ class BrainWaveView extends StatelessWidget {
     );
   }
 
+  Future<void> showEditCustomerNicknameDialog(BuildContext context,
+      {VoidCallback? callBack}) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // 用户必须点击按钮才能关闭对话框
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('顾客'),
+          contentPadding: const EdgeInsets.all(40),
+          content: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                TextFormField(
+                    initialValue: healingController.customerNickname.value,
+                    decoration: const InputDecoration(
+                      labelText: '顾客昵称',
+                      hintText: '请输入顾客昵称（2-32个字）',
+                    ),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(
+                          RegExp(r'[\u4e00-\u9fa5a-zA-Z0-9]')),
+                    ],
+                    onChanged: (value) {
+                      healingController.customerNickname.value = value;
+                    }),
+                const SizedBox(height: 20),
+                TextFormField(
+                    initialValue:
+                        healingController.customerAge.value.toString(),
+                    decoration: const InputDecoration(
+                      labelText: '顾客年龄',
+                      hintText: '请输入顾客年龄',
+                    ),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(3),
+                    ],
+                    onChanged: (value) {
+                      healingController.customerAge.value = int.parse(value);
+                    }),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Obx(() => Text(
+                        "性别（${healingController.customerSex.value == 0 ? '男' : '女'}）")),
+                    const SizedBox(width: 20),
+                    IconButton(
+                        onPressed: () {
+                          healingController.customerSex.value = 0;
+                        },
+                        icon: Obx(() => Icon(
+                              healingController.customerSex.value == 0
+                                  ? Icons.check_circle_rounded
+                                  : Icons.male_rounded,
+                              color: healingController.customerSex.value == 0
+                                  ? Colors.blue
+                                  : Colors.purple,
+                            ))),
+                    const SizedBox(width: 10),
+                    IconButton(
+                        onPressed: () {
+                          healingController.customerSex.value = 1;
+                        },
+                        icon: Obx(() => Icon(
+                              healingController.customerSex.value == 1
+                                  ? Icons.check_circle_rounded
+                                  : Icons.female_rounded,
+                              color: healingController.customerSex.value == 1
+                                  ? Colors.blue
+                                  : Colors.purple,
+                            ))),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            // TextButton(
+            //   child: const Text('取消'),
+            //   onPressed: () {
+            //     Navigator.of(context).pop(); // 关闭对话框
+            //   },
+            // ),
+            TextButton(
+              child: const Text('确认'),
+              onPressed: () {
+                int age = healingController.customerAge.value;
+                if (age < 1 || age > 100) {
+                  healingController.customerAge.value = 18;
+                }
+                String name = healingController.customerNickname.value;
+                if (name.length >= 2 && name.length <= 32) {
+                  Navigator.of(context).pop();
+                  callBack?.call();
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('昵称长度必须在4到32个字符之间')),
+                  );
+                  Navigator.of(context).pop();
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> showSaveConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // 用户必须点击按钮才能关闭对话框
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('为顾客保存一份能量报告'),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('您确定要执行此操作吗？'),
+                Text('此操作不可撤销。'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('取消'),
+              onPressed: () {
+                Navigator.of(context).pop(); // 关闭对话框
+              },
+            ),
+            TextButton(
+              child: const Text('确认'),
+              onPressed: () {
+                ///在这里执行确认后的操作
+                String nickname = healingController.customerNickname.value;
+                int timestamp = DateTime.now().millisecondsSinceEpoch;
+
+                ///生成UUId
+                String uuid = const Uuid().v1();
+
+                ///本机存储
+                Map<String, dynamic> report = {
+                  "nickname": healingController.customerNickname.value,
+                  "age": healingController.customerAge.value,
+                  "sex": healingController.customerSex.value,
+                  "timestamp": timestamp.toString(),
+                  "uuid": uuid,
+                  "sleep_p2q1": healingController.customerSleepP2Q1.value,
+                  "sleep_p2q2": healingController.customerSleepP2Q2.value,
+                  "sleep_p2q3": healingController.customerSleepP2Q3.value,
+                  "sleep_p3q1": healingController.customerSleepP3Q1.value,
+                  "sleep_p3q2": healingController.customerSleepP3Q2.value,
+
+                  ///脑波数据
+                  "bciData": healingController.bciData,
+                  "bciDataAtt": healingController.bciDataAtt,
+                  "bciDataMed": healingController.bciDataMed,
+                  "bciDataDelta": healingController.bciDataDelta,
+                  "bciDataTheta": healingController.bciDataTheta,
+                  "bciDataLowAlpha": healingController.bciDataLowAlpha,
+                  "bciDataHighAlpha": healingController.bciDataHighAlpha,
+                  "bciDataLowBeta": healingController.bciDataLowBeta,
+                  "bciDataHighBeta": healingController.bciDataHighBeta,
+                  "bciDataLowGamma": healingController.bciDataLowGamma,
+                  "bciDataMiddleGamma": healingController.bciDataMiddleGamma,
+                  "bciDataTemperature": healingController.bciDataTemperature,
+                  "bciDataHeartRate": healingController.bciDataHeartRate,
+                  "bciDataGrind": healingController.bciDataGrind,
+
+                  ///hrv数据
+                  "hrvData": healingController.hrvData,
+                };
+                Data.write(report, 'report_${nickname}_$uuid.json');
+                Navigator.of(context).pop(); // 关闭对话框
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   IconButton _showShortDocIconButton() {
     return IconButton(
         onPressed: () {
@@ -541,48 +1024,48 @@ class BciSliderBox extends StatelessWidget {
       margin: const EdgeInsets.only(top: 20, bottom: 20),
       child: Column(
         children: [
-          Obx(() => BciSlider(
-                title: "全息", //γ 波
-                color: Colors.purple,
-                maxValue: 1,
-                value: healingController.bciGammaHistory60Mean.value,
-              )),
-          Obx(() => BciSlider(
-                title: "睡眠", //δ 波
-                color: Colors.deepPurpleAccent,
-                maxValue: 1,
-                value: healingController.bciDeltaHistory60Mean.value,
-              )),
-          Obx(() => BciSlider(
-                title: "代谢", //θ 波
-                color: Colors.blue,
-                maxValue: 1,
-                value: healingController.bciThetaHistory60Mean.value,
-              )),
-          Obx(() => BciSlider(
-                title: "免疫", //高 α
-                color: Colors.green,
-                maxValue: 1,
-                value: healingController.bciHighAlphaHistory60Mean.value,
-              )),
-          Obx(() => BciSlider(
-                title: "消化", //低 α
-                color: Colors.yellow,
-                maxValue: 1,
-                value: healingController.bciLowAlphaHistory60Mean.value,
-              )),
-          Obx(() => BciSlider(
-                title: "幸福", //高 β
-                color: Colors.orange,
-                maxValue: 1,
-                value: healingController.bciHighBetaHistory60Mean.value,
-              )),
-          Obx(() => BciSlider(
-                title: "动力", //低 β
-                color: Colors.red,
-                maxValue: 1,
-                value: healingController.bciLowBetaHistory60Mean.value,
-              )),
+          BciSlider(
+            title: "全息", //γ 波
+            color: Colors.purple,
+            maxValue: 1,
+            value: healingController.bciGammaHistory60Mean.value,
+          ),
+          BciSlider(
+            title: "睡眠", //δ 波
+            color: Colors.deepPurpleAccent,
+            maxValue: 1,
+            value: healingController.bciDeltaHistory60Mean.value,
+          ),
+          BciSlider(
+            title: "代谢", //θ 波
+            color: Colors.blue,
+            maxValue: 1,
+            value: healingController.bciThetaHistory60Mean.value,
+          ),
+          BciSlider(
+            title: "免疫", //高 α
+            color: Colors.green,
+            maxValue: 1,
+            value: healingController.bciHighAlphaHistory60Mean.value,
+          ),
+          BciSlider(
+            title: "消化", //低 α
+            color: Colors.yellow,
+            maxValue: 1,
+            value: healingController.bciLowAlphaHistory60Mean.value,
+          ),
+          BciSlider(
+            title: "幸福", //高 β
+            color: Colors.orange,
+            maxValue: 1,
+            value: healingController.bciHighBetaHistory60Mean.value,
+          ),
+          BciSlider(
+            title: "动力", //低 β
+            color: Colors.red,
+            maxValue: 1,
+            value: healingController.bciLowBetaHistory60Mean.value,
+          ),
         ],
       ),
     );
@@ -625,8 +1108,7 @@ class BciSlider extends StatelessWidget {
                     value: value > maxValue ? maxValue : value,
                     onChanged: (double value) {},
                   ))),
-          Text(
-              "${((value / maxValue) * 100).toInt()}%"),
+          Text("${((value / maxValue) * 100).toInt()}%"),
         ],
       ),
     );

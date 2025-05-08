@@ -8,5 +8,6 @@
     "admin_phonenumber": "",
     "admin_password": "88888888",
     "admin_address": "",
-    "vip": 0
+    "vip": 0,
+    "bearer": ""
 }

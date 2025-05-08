@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:healing_music/controller/depot_controller.dart';
+import 'package:healing_music/controller/healing_controller.dart';
 import 'package:healing_music/controller/main_controller.dart';
 import 'package:healing_music/page/face_page.dart';
 import 'package:healing_music/page/music_page.dart';
@@ -14,6 +15,7 @@ import 'package:healing_music/widget/circular_button.dart';
 class MainPage extends StatelessWidget {
   MainPage({super.key});
   final DepotController depotController = Get.put(DepotController());
+  final HealingController healingController = Get.put(HealingController());
   @override
   Widget build(BuildContext context) {
     //开机显示face页面
@@ -24,7 +26,7 @@ class MainPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 60,
-        title: AppBarTitle('AI音疗 HealingMusic'),
+        title: AppBarTitle('HealingAI'),
         centerTitle: true,
         shadowColor: ThemeData().colorScheme.primary,
         leading: IconButton(
@@ -45,6 +47,11 @@ class MainPage extends StatelessWidget {
                 },
             icon: const Icon(Icons.menu_book_rounded)),
         actions: [
+          Obx(() => IconButton(
+              onPressed: () {},
+              icon: Icon(healingController.isDeviceLinking.value
+                  ? Icons.sensors_rounded
+                  : Icons.sensors_off_rounded))),
           CircularIconButton(
             onPressed: () => {showConfirmationDialog(context)},
             icon: Icons.logout, //Icons.play_arrow,
@@ -57,8 +64,8 @@ class MainPage extends StatelessWidget {
           return IndexedStack(
             index: controller.currentIndex.value,
             children: [
-              const MusicPage(),
               HealingPage(),
+              const MusicPage(),
               DepotPage(),
             ],
           );
@@ -109,20 +116,24 @@ class BottomNavigationBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() => BottomNavigationBar(
+          selectedItemColor: Colors.blue,
+          unselectedItemColor: ThemeData().colorScheme.primary,
+          showSelectedLabels: true,
+          showUnselectedLabels: true,
           currentIndex: controller.currentIndex.value,
           onTap: controller.changePage,
           items: const [
             BottomNavigationBarItem(
-              icon: Icon(Icons.music_note),
-              label: '疗愈音乐',
+              icon: Icon(Icons.sensors_rounded),
+              label: '脑电',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.hearing),
-              label: '音疗服务',
+              icon: Icon(Icons.sunny_snowing),
+              label: '疗愈',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.people),
-              label: '能量驿站',
+              label: '我的',
             ),
           ],
         ));

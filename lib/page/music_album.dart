@@ -126,7 +126,7 @@ class AlbumPage extends StatelessWidget {
                             foregroundColor: ThemeData().colorScheme.primary,
                           ),
                           onPressed: () {
-                            mainController.changePage(1);
+                            mainController.changePage(0);
                             Get.back(closeOverlays: true);
                           },
                           child: Row(

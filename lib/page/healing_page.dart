@@ -4,6 +4,7 @@ import 'package:healing_music/controller/players_controller.dart';
 import 'package:healing_music/controller/healing_controller.dart';
 import 'package:healing_music/controller/main_controller.dart';
 import 'package:healing_music/data/audios.dart';
+import 'package:healing_music/page/report_list_page.dart';
 import 'package:healing_music/widget/brain_wave_view.dart';
 import 'package:healing_music/widget/circular_button.dart';
 import 'package:healing_music/widget/item.dart';
@@ -147,7 +148,7 @@ class HealingPage extends GetView<HealingController> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 25,
-        title: PageTitle('Healing Service'),
+        title: PageTitle('BCI'),
         centerTitle: true,
       ),
       body: Center(
@@ -156,6 +157,52 @@ class HealingPage extends GetView<HealingController> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              const SizedBox(height: 100),
+              ElevatedButton(
+                style: ButtonStyle(
+                  padding: WidgetStateProperty.all(
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  ),
+                ),
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    showDragHandle: true,
+                    useRootNavigator: true,
+                    isScrollControlled: true,
+                    useSafeArea: true,
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height * 0.9,
+                    ),
+                    builder: (context) {
+                      return BrainWaveView();
+                    },
+                  );
+                },
+                child: Text(
+                  "脑电检测",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: ThemeData().colorScheme.primary,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 100),
+              ElevatedButton(
+                onPressed: () {
+                  Get.to(() => ReportList());
+                },
+                child: Text(
+                  "脑电创作",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: ThemeData().colorScheme.primary,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 100),
               Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 Obx(
                   () => CircularIconButton(
@@ -167,7 +214,7 @@ class HealingPage extends GetView<HealingController> {
                         isScrollControlled: true,
                         useSafeArea: true,
                         constraints: BoxConstraints(
-                          maxHeight: MediaQuery.of(context).size.height * 0.8,
+                          maxHeight: MediaQuery.of(context).size.height * 0.9,
                         ),
                         builder: (context) {
                           return BrainWaveView();
@@ -185,44 +232,44 @@ class HealingPage extends GetView<HealingController> {
                         : ThemeData().colorScheme.primary,
                   ),
                 ),
-                const SizedBox(width: 40),
-                CircularIconButton(
-                  onPressed: () {
-                    if (healingController.receivedBciDataCount < 10) {
-                      Get.snackbar(
-                        "请稍后……",
-                        "数据量太少，请确保设备连接正常后，过一分钟再试",
-                        backgroundColor: ThemeData().colorScheme.primary,
-                        colorText: ThemeData().colorScheme.primaryContainer,
-                      );
-                      return;
-                    }
-                    Get.snackbar(
-                      "报告生成中……",
-                      "请稍后",
-                      backgroundColor: ThemeData().colorScheme.primary,
-                      colorText: ThemeData().colorScheme.primaryContainer,
-                    );
-                    reportViewController.energyScaling();
+                // const SizedBox(width: 40),
+                // CircularIconButton(
+                //   onPressed: () {
+                //     if (healingController.receivedBciDataCount < 10) {
+                //       Get.snackbar(
+                //         "请稍后……",
+                //         "数据量太少，请确保设备连接正常后，过一分钟再试",
+                //         backgroundColor: ThemeData().colorScheme.primary,
+                //         colorText: ThemeData().colorScheme.primaryContainer,
+                //       );
+                //       return;
+                //     }
+                //     Get.snackbar(
+                //       "报告生成中……",
+                //       "请稍后",
+                //       backgroundColor: ThemeData().colorScheme.primary,
+                //       colorText: ThemeData().colorScheme.primaryContainer,
+                //     );
+                //     reportViewController.energyScaling();
 
-                    showModalBottomSheet(
-                      context: context,
-                      showDragHandle: true,
-                      useRootNavigator: true,
-                      isScrollControlled: true,
-                      useSafeArea: true,
-                      constraints: BoxConstraints(
-                        maxHeight: MediaQuery.of(context).size.height * 0.8,
-                      ),
-                      builder: (context) {
-                        return ReportView();
-                      },
-                    );
-                  },
-                  icon: Icons.menu_book_rounded,
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                ),
+                //     showModalBottomSheet(
+                //       context: context,
+                //       showDragHandle: true,
+                //       useRootNavigator: true,
+                //       isScrollControlled: true,
+                //       useSafeArea: true,
+                //       constraints: BoxConstraints(
+                //         maxHeight: MediaQuery.of(context).size.height * 0.9,
+                //       ),
+                //       builder: (context) {
+                //         return ReportView();
+                //       },
+                //     );
+                //   },
+                //   icon: Icons.menu_book_rounded,
+                //   backgroundColor: Colors.blue,
+                //   foregroundColor: Colors.white,
+                // ),
               ]),
               const SizedBox(
                 height: 10,
