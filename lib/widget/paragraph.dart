@@ -39,11 +39,11 @@ class ParagraphListTile extends StatelessWidget {
         color: ThemeData().colorScheme.primaryContainer,
         border: Border(
           top: BorderSide(
-              color: ThemeData().colorScheme.primary, width: 5), // 顶部边框
+              color: ThemeData().colorScheme.primary, width: 1), // 顶部边框
           left: BorderSide(
-              color: ThemeData().colorScheme.primary, width: 3), // 左侧边框
+              color: ThemeData().colorScheme.primary, width: 1), // 左侧边框
           right: BorderSide(
-              color: ThemeData().colorScheme.primary, width: 3), // 右侧边框
+              color: ThemeData().colorScheme.primary, width: 1), // 右侧边框
         ),
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(10), // 左上角圆角

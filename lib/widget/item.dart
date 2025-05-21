@@ -36,13 +36,12 @@ class ItemListTile extends StatelessWidget {
   final VoidCallback onTap;
   final IconData icon;
 
-  const ItemListTile({
-    super.key,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-    required this.icon
-  });
+  const ItemListTile(
+      {super.key,
+      required this.title,
+      required this.subtitle,
+      required this.onTap,
+      required this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -50,9 +49,14 @@ class ItemListTile extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border(
           left: BorderSide(
-              color: ThemeData().colorScheme.primary, width: 3), // 左侧边框
+              color: ThemeData().colorScheme.primary, width: 1), // 左侧边框
           right: BorderSide(
-              color: ThemeData().colorScheme.primary, width: 3), // 右侧边框
+              color: ThemeData().colorScheme.primary, width: 1), // 右侧边框
+          bottom: BorderSide(color: ThemeData().colorScheme.primary, width: 1),
+        ),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(10),
+          bottomRight: Radius.circular(10),
         ),
       ),
       child: ListTile(
@@ -63,13 +67,14 @@ class ItemListTile extends StatelessWidget {
           onPressed: () {
             onTap();
           },
-          icon: icon,//Icons.play_arrow,
+          icon: icon, //Icons.play_arrow,
         ),
         onTap: onTap,
       ),
     );
   }
 }
+
 class HealingItemListTile extends StatelessWidget {
   final Widget child;
 
@@ -81,15 +86,11 @@ class HealingItemListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(left: 20,top: 10, bottom: 10),
+      padding: const EdgeInsets.only(left: 20, top: 10, bottom: 10),
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
-        border: Border(
-          left: BorderSide(
-              color: ThemeData().colorScheme.primary, width: 3), // 左侧边框
-          right: BorderSide(
-              color: ThemeData().colorScheme.primary, width: 3), // 右侧边框
-        ),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(width:1, color: Colors.grey),
       ),
       child: child,
     );

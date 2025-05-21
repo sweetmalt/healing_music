@@ -24,16 +24,18 @@ class ParagraphBottomListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: ThemeData().colorScheme.secondaryContainer,
-        border: Border(
-          left: BorderSide(color: ThemeData().colorScheme.primary, width: 3), // 左侧边框
-          right: BorderSide(color: ThemeData().colorScheme.primary, width: 3), // 右侧边框
-          bottom: BorderSide(color: ThemeData().colorScheme.primary, width: 5), // 底部边框
-        ),
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(10), // 左上角圆角
-          bottomRight: Radius.circular(10), // 右上角圆角
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        // border: Border(
+        //   left: BorderSide(color: ThemeData().colorScheme.primary, width: 1), // 左侧边框
+        //   right: BorderSide(color: ThemeData().colorScheme.primary, width: 1), // 右侧边框
+        //   bottom: BorderSide(color: ThemeData().colorScheme.primary, width: 1), // 底部边框
+        // ),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(10), 
+          topRight: Radius.circular(10), 
+          bottomLeft: Radius.circular(10), 
+          bottomRight: Radius.circular(10), 
         ),
       ),
       child: ListTile(

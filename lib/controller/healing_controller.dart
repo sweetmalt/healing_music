@@ -13,8 +13,6 @@ class HealingController extends Ctrl {
   final RxString audioSubTitle = ''.obs;
   final RxBool isCtrlByDevice = true.obs;
   final RxBool isDeviceLinking = false.obs;
-  final RxBool isRecordData = false.obs;
-  final List<int> bciCurrentTwoTimeMillis = [0, 0]; //用于判断连接状态
   late Timer _whileTrue;
   final RxString healingTimePlanKey = ''.obs;
   final RxInt healingTimePlanKeyIndex = 2.obs; //默认选择第三项，45分钟
@@ -27,29 +25,11 @@ class HealingController extends Ctrl {
   static const eventChannel = EventChannel('top.healingAI.brainlink/receiver');
   StreamSubscription? _bciAndHrvBroadcastListener;
 
-  /// 用于缓存历史脑波数据、hrv数据（30~60分钟）
-  final List<String> _bciData = <String>[""];
-  final List<double> _hrvData = <double>[];
-
-  final List<double> _bciDataAtt = <double>[];
-  final List<double> _bciDataMed = <double>[];
-  final List<double> _bciDataAp = <double>[];
-  final List<double> _bciDataDelta = <double>[];
-  final List<double> _bciDataTheta = <double>[];
-  final List<double> _bciDataLowAlpha = <double>[];
-  final List<double> _bciDataHighAlpha = <double>[];
-  final List<double> _bciDataLowBeta = <double>[];
-  final List<double> _bciDataHighBeta = <double>[];
-  final List<double> _bciDataLowGamma = <double>[];
-  final List<double> _bciDataMiddleGamma = <double>[];
-  final List<double> _bciDataTemperature = <double>[];
-  final List<double> _bciDataHeartRate = <double>[];
-  final List<double> _bciDataGrind = <double>[];
-
   //实时脑波数据
   final RxDouble bciAtt = 0.0.obs; //专注度
   final RxDouble bciMed = 0.0.obs; //安全感
-  final RxDouble bciAp = 0.0.obs; //愉悦度
+  final RxDouble bciAp = 0.0.obs; //愉悦度，全息能量
+  //
   final RxDouble bciDelta = 0.0.obs;
   final RxDouble bciTheta = 0.0.obs;
   final RxDouble bciLowAlpha = 0.0.obs;
@@ -58,74 +38,27 @@ class HealingController extends Ctrl {
   final RxDouble bciHighBeta = 0.0.obs;
   final RxDouble bciLowGamma = 0.0.obs;
   final RxDouble bciMiddleGamma = 0.0.obs;
+  //
   final RxDouble bciTemperature = 0.0.obs;
   final RxDouble bciHeartRate = 0.0.obs; //心率
   final RxDouble bciGrind = 0.0.obs;
   final RxInt bciCurrentTimeMillis = 0.obs; //时间戳
-  //最近60条脑波数据
-  final List<double> _bciDeltaHistory60 = <double>[];
-  final RxDouble bciDeltaHistory60Mean = 0.0.obs; //1
-  final List<double> _bciThetaHistory60 = <double>[];
-  final RxDouble bciThetaHistory60Mean = 0.0.obs; //2
-  final List<double> _bciLowAlphaHistory60 = <double>[];
-  final RxDouble bciLowAlphaHistory60Mean = 0.0.obs; //3
-  final List<double> _bciHighAlphaHistory60 = <double>[];
-  final RxDouble bciHighAlphaHistory60Mean = 0.0.obs; //4
-  final List<double> _bciLowBetaHistory60 = <double>[];
-  final RxDouble bciLowBetaHistory60Mean = 0.0.obs; //5
-  final List<double> _bciHighBetaHistory60 = <double>[];
-  final RxDouble bciHighBetaHistory60Mean = 0.0.obs; //6
-  final List<double> _bciGammaHistory60 = <double>[];
-  final RxDouble bciGammaHistory60Mean = 0.0.obs; //7
 
   //实时hrv数据
   final RxList<double> hrvRR = <double>[].obs;
-  //统计的hrv数据，基于_hrvData
-  final RxDouble hrvTP = 0.0.obs;
-  final RxDouble hrvLF = 0.0.obs;
-  final RxDouble hrvHF = 0.0.obs;
-  final RxDouble hrvLFHF = 0.0.obs;
+  final RxDouble hrvLFHF = 0.0.obs; //LFHF,动力能力
+  final RxDouble hrvNN = 0.0.obs; //NN50,幸福能量
+  //缓存hrv数据
+  final List<double> _hrvData = [];
 
   /// 基于实时脑波数据的简单实时情绪数据（非统计）
   final RxDouble curRelax = 0.0.obs; //松弛感
-  final RxDouble curSharp = 0.0.obs; //敏锐度
   final RxDouble curFlow = 0.0.obs; //心流指数
 
   final HemController hemController = Get.put(HemController());
   final EnvController envController = Get.put(EnvController());
   final BgmController bgmController = Get.put(BgmController());
   final BbmController bbmController = Get.put(BbmController());
-
-  final RxString customerNickname = ''.obs;
-  final RxInt customerAge = 18.obs;
-  final RxInt customerSex = 1.obs;
-  final RxString customerSleepP2Q1 = ''.obs;
-  List<String> customerSleepP2Q1_ = ["10分钟", "10~30分钟", "30~60分钟", "1小时以上"];
-  final RxString customerSleepP2Q2 = ''.obs;
-  Map<String, bool> customerSleepP2Q2_ = {
-    "夜间易醒且难以再次入睡": false,
-    "早醒（比预期早1小时以上）": false,
-    "白天疲劳感明显": false,
-    "睡眠浅、易受环境影响": false
-  };
-  final RxString customerSleepP2Q3 = ''.obs;
-  List<String> customerSleepP2Q3_ = ["非常满意", "较满意", "一般", "不满意", "非常不满意"];
-  final RxString customerSleepP3Q1 = ''.obs;
-  Map<String, bool> customerSleepP3Q1_ = {
-    "工作/学业": false,
-    "家庭关系": false,
-    "经济问题": false,
-    "健康问题": false,
-    "社交或情感关系": false
-  };
-  final RxString customerSleepP3Q2 = ''.obs;
-  Map<String, bool> customerSleepP3Q2_ = {
-    "烦躁易怒": false,
-    "注意力难以集中": false,
-    "对日常活动兴趣下降": false,
-    "身体紧绷或肌肉酸痛": false
-  };
-  final RxInt customerCheckSeconds = 180.obs;
 
   void setTimePlan(String k, int v) {
     isCtrlByTimePlan.value = true;
@@ -160,15 +93,15 @@ class HealingController extends Ctrl {
   void _initWhileTrue() {
     const seconds = Duration(seconds: 1);
     _whileTrue = Timer.periodic(seconds, (Timer timer) {
-      if (bciCurrentTwoTimeMillis[1] != bciCurrentTwoTimeMillis[0]) {
-        isDeviceLinking.value = true;
-        bciCurrentTwoTimeMillis[0] = bciCurrentTwoTimeMillis[1];
-      } else {
-        isDeviceLinking.value = false;
-      }
-      if (isRecordData.value && customerCheckSeconds.value > 0) {
-        customerCheckSeconds.value = customerCheckSeconds.value - 1;
-      }
+      // if (bciCurrentTwoTimeMillis[1] != bciCurrentTwoTimeMillis[0]) {
+      //   isDeviceLinking.value = true;
+      //   bciCurrentTwoTimeMillis[0] = bciCurrentTwoTimeMillis[1];
+      // } else {
+      //   isDeviceLinking.value = false;
+      // }
+      // if (isRecordData.value && customerCheckSeconds.value > 0) {
+      //   customerCheckSeconds.value = customerCheckSeconds.value - 1;
+      // }
     });
   }
 
@@ -190,10 +123,6 @@ class HealingController extends Ctrl {
     minY: 0,
     maxY: 100,
   );
-  final curSharpWaveController = WaveChartController(
-    minY: 0,
-    maxY: 100,
-  );
   final curFlowWaveController = WaveChartController(
     minY: 0,
     maxY: 100,
@@ -208,40 +137,60 @@ class HealingController extends Ctrl {
   );
   final bciApWaveController = WaveChartController(
     minY: 0,
-    maxY: 4,
+    maxY: 100,
+  );
+  final hrvLFHFWaveController = WaveChartController(
+    minY: 0,
+    maxY: 100,
+  );
+  final hrvNNWaveController = WaveChartController(
+    minY: 0,
+    maxY: 100,
+  );
+  final energyWaveController = WaveChart7Controller(
+    minY: 0,
+    maxY: 1,
+  );
+
+  ///
+  final bci8WaveController = WaveChart8Controller(
+    minY: 0,
+    maxY: 1,
   );
   final bciDeltaWaveController = WaveChartController(
     minY: 0,
-    maxY: 100000,
+    maxY: 1,
   );
   final bciThetaWaveController = WaveChartController(
     minY: 0,
-    maxY: 100000,
+    maxY: 1,
   );
   final bciLowAlphaWaveController = WaveChartController(
     minY: 0,
-    maxY: 100000,
+    maxY: 1,
   );
   final bciHighAlphaWaveController = WaveChartController(
     minY: 0,
-    maxY: 100000,
+    maxY: 1,
   );
   final bciLowBetaWaveController = WaveChartController(
     minY: 0,
-    maxY: 100000,
+    maxY: 1,
   );
   final bciHighBetaWaveController = WaveChartController(
     minY: 0,
-    maxY: 100000,
+    maxY: 1,
   );
   final bciLowGammaWaveController = WaveChartController(
     minY: 0,
-    maxY: 100000,
+    maxY: 1,
   );
   final bciMiddleGammaWaveController = WaveChartController(
     minY: 0,
-    maxY: 100000,
+    maxY: 1,
   );
+
+  ///
   final bciTemperatureWaveController = WaveChartController(
     minY: 0,
     maxY: 50,
@@ -259,23 +208,17 @@ class HealingController extends Ctrl {
     maxY: 1500,
   );
 
-  ///计算心流指数、敏锐度、松弛感
-  Future<void> _dataAnalysis() async {
-    curRelax.value = 0.5 * (100 - bciAtt.value) + 0.5 * bciMed.value;
-    curSharp.value = 0.5 * bciAtt.value + 0.5 * (100 - bciMed.value);
-    curFlow.value = 0.5 * bciAtt.value + 0.5 * bciMed.value;
-  }
-
   Future<void> _showRealData() async {
-    ///用于动态显示的心流指数、敏锐度、松弛感
+    ///用于动态显示的心流指数、松弛感
     await curRelaxWaveController.addDataPoint(curRelax.value);
-    await curSharpWaveController.addDataPoint(curSharp.value);
     await curFlowWaveController.addDataPoint(curFlow.value);
 
-    ///用于动态显示的实时脑波数据
+    ///专注度、安全感、愉悦度
     await bciAttWaveController.addDataPoint(bciAtt.value);
     await bciMedWaveController.addDataPoint(bciMed.value);
     await bciApWaveController.addDataPoint(bciAp.value);
+
+    ///用于动态显示的实时脑波数据
     await bciDeltaWaveController.addDataPoint(bciDelta.value);
     await bciThetaWaveController.addDataPoint(bciTheta.value);
     await bciLowAlphaWaveController.addDataPoint(bciLowAlpha.value);
@@ -287,50 +230,80 @@ class HealingController extends Ctrl {
     await bciTemperatureWaveController.addDataPoint(bciTemperature.value);
     await bciHeartRateWaveController.addDataPoint(bciHeartRate.value);
     await bciGrindWaveController.addDataPoint(bciGrind.value);
+    double x = 0.0;
+    x = bciDelta.value;
+    await bci8WaveController.addDataPoint(bci8WaveController.dataFlSpot7, x);
+    x = bciTheta.value;
+    await bci8WaveController.addDataPoint(bci8WaveController.dataFlSpot6, x);
+    x = bciLowAlpha.value;
+    await bci8WaveController.addDataPoint(bci8WaveController.dataFlSpot5, x);
+    x += bciHighAlpha.value;
+    await bci8WaveController.addDataPoint(bci8WaveController.dataFlSpot4, x);
+    x += bciLowBeta.value;
+    await bci8WaveController.addDataPoint(bci8WaveController.dataFlSpot3, x);
+    x += bciHighBeta.value;
+    await bci8WaveController.addDataPoint(bci8WaveController.dataFlSpot2, x);
+    x += bciLowGamma.value;
+    await bci8WaveController.addDataPoint(bci8WaveController.dataFlSpot1, x);
+    x += bciMiddleGamma.value;
+    await bci8WaveController.addDataPoint(bci8WaveController.dataFlSpot0, x);
+    if (bci8WaveController.dataFlSpot0.length > 600) {
+      await bci8WaveController.clearData();
+    }
 
     ///用于动态显示的实时hrv数据
     for (double item in hrvRR) {
       await hrvRRWaveController.addDataPoint(item);
     }
+    //NN50,LFHF
+    await hrvLFHFWaveController.addDataPoint(hrvLFHF.value);
+    await hrvNNWaveController.addDataPoint(hrvNN.value);
+    //
+    double et = 0.0;
+    et = bciAp.value +
+        curRelax.value +
+        curFlow.value +
+        bciAtt.value +
+        bciMed.value +
+        hrvNN.value +
+        hrvLFHF.value;
+    if (et > 0) {
+      double e = 0.0;
+      e += hrvLFHF.value;
+      await energyWaveController.addDataPoint(
+          energyWaveController.dataFlSpot6, e / et);
+      e += hrvNN.value;
+      await energyWaveController.addDataPoint(
+          energyWaveController.dataFlSpot5, e / et);
+      e += bciMed.value;
+      await energyWaveController.addDataPoint(
+          energyWaveController.dataFlSpot4, e / et);
+      e += bciAtt.value;
+      await energyWaveController.addDataPoint(
+          energyWaveController.dataFlSpot3, e / et);
+      e += curFlow.value;
+      await energyWaveController.addDataPoint(
+          energyWaveController.dataFlSpot2, e / et);
+      e += curRelax.value;
+      await energyWaveController.addDataPoint(
+          energyWaveController.dataFlSpot1, e / et);
+      e += bciAp.value;
+      await energyWaveController.addDataPoint(
+          energyWaveController.dataFlSpot0, e / et);
+    }
+    if (energyWaveController.dataFlSpot0.length > 600) {
+      await energyWaveController.clearData();
+    }
   }
 
   Future<void> clearData() async {
-    ///清空脑波数据缓存
-    _bciData.clear();
-    _bciDataAtt.clear();
-    _bciDataMed.clear();
-    _bciDataAp.clear();
-    _bciDataDelta.clear();
-    _bciDataTheta.clear();
-    _bciDataLowAlpha.clear();
-    _bciDataHighAlpha.clear();
-    _bciDataLowBeta.clear();
-    _bciDataHighBeta.clear();
-    _bciDataLowGamma.clear();
-    _bciDataMiddleGamma.clear();
-    _bciDataTemperature.clear();
-    _bciDataHeartRate.clear();
-    _bciDataGrind.clear();
-
-    ///清空hrv数据缓存
-    _hrvData.clear();
-
-    ///清空60秒实时脑波数据缓存
-    _bciDeltaHistory60.clear();
-    _bciThetaHistory60.clear();
-    _bciLowAlphaHistory60.clear();
-    _bciHighAlphaHistory60.clear();
-    _bciLowBetaHistory60.clear();
-    _bciHighBetaHistory60.clear();
-    _bciGammaHistory60.clear();
-
     ///清空用于动态显示的实时脑波数据缓存
     await curRelaxWaveController.clearData();
-    await curSharpWaveController.clearData();
     await curFlowWaveController.clearData();
     await bciAttWaveController.clearData();
     await bciMedWaveController.clearData();
     await bciApWaveController.clearData();
+    //
     await bciDeltaWaveController.clearData();
     await bciThetaWaveController.clearData();
     await bciLowAlphaWaveController.clearData();
@@ -342,90 +315,16 @@ class HealingController extends Ctrl {
     await bciTemperatureWaveController.clearData();
     await bciHeartRateWaveController.clearData();
     await bciGrindWaveController.clearData();
+//
+    await bci8WaveController.clearData();
 
     ///清空用于动态显示的实时hrv数据缓存
     await hrvRRWaveController.clearData();
-  }
-
-  List<String> get bciData {
-    return _bciData;
-  }
-
-  List<double> get bciDataAtt {
-    return _bciDataAtt;
-  }
-
-  List<double> get bciDataMed {
-    return _bciDataMed;
-  }
-
-  List<double> get bciDataAp {
-    return _bciDataAp;
-  }
-
-  List<double> get bciDataDelta {
-    return _bciDataDelta;
-  }
-
-  List<double> get bciDataTheta {
-    return _bciDataTheta;
-  }
-
-  List<double> get bciDataLowAlpha {
-    return _bciDataLowAlpha;
-  }
-
-  List<double> get bciDataHighAlpha {
-    return _bciDataHighAlpha;
-  }
-
-  List<double> get bciDataLowBeta {
-    return _bciDataLowBeta;
-  }
-
-  List<double> get bciDataHighBeta {
-    return _bciDataHighBeta;
-  }
-
-  List<double> get bciDataLowGamma {
-    return _bciDataLowGamma;
-  }
-
-  List<double> get bciDataMiddleGamma {
-    return _bciDataMiddleGamma;
-  }
-
-  List<double> get bciDataTemperature {
-    return _bciDataTemperature;
-  }
-
-  List<double> get bciDataHeartRate {
-    return _bciDataHeartRate;
-  }
-
-  List<double> get bciDataGrind {
-    return _bciDataGrind;
-  }
-
-  List<double> get hrvData {
-    return _hrvData;
-  }
-
-  get receivedBciDataCount => _bciData.length;
-  get receivedHrvDataCount => _hrvData.length;
-
-  Future<void> createReport() async {
-    await curRelaxWaveController.statistics();
-    await curSharpWaveController.statistics();
-    await curFlowWaveController.statistics();
-    await bciAttWaveController.statistics();
-    await bciMedWaveController.statistics();
-    await bciHeartRateWaveController.setBestLimits(60, 80);
-    await bciHeartRateWaveController.setBetterLimits(50, 90);
-    await bciHeartRateWaveController.statistics();
-    await hrvRRWaveController.setBestLimits(750, 1000);
-    await hrvRRWaveController.setBetterLimits(666, 1200);
-    await hrvRRWaveController.statistics();
+    //
+    await hrvLFHFWaveController.clearData();
+    await hrvNNWaveController.clearData();
+    //
+    await energyWaveController.clearData();
   }
 
   @override
@@ -434,9 +333,7 @@ class HealingController extends Ctrl {
     _initWhileTrue();
     _bciAndHrvBroadcastListener =
         eventChannel.receiveBroadcastStream().listen((data) async {
-      if (isRecordData.value == false) {
-        return;
-      }
+      isDeviceLinking.value = !isDeviceLinking.value;
       List<String> temp = data.toString().split('_');
       if (temp.length == 2) {
         if (temp[0] == "bci") {
@@ -445,159 +342,36 @@ class HealingController extends Ctrl {
             bciAtt.value = double.parse(temp[0]);
             bciMed.value = double.parse(temp[1]);
             bciAp.value = double.parse(temp[2]);
-            bciDelta.value = double.parse(temp[3]);
-            bciTheta.value = double.parse(temp[4]);
-            bciLowAlpha.value = double.parse(temp[5]);
-            bciHighAlpha.value = double.parse(temp[6]);
-            bciLowBeta.value = double.parse(temp[7]);
-            bciHighBeta.value = double.parse(temp[8]);
-            bciLowGamma.value = double.parse(temp[9]);
-            bciMiddleGamma.value = double.parse(temp[10]);
+            // bciDelta.value = double.parse(temp[3]);
+            // bciTheta.value = double.parse(temp[4]);
+            // bciLowAlpha.value = double.parse(temp[5]);
+            // bciHighAlpha.value = double.parse(temp[6]);
+            // bciLowBeta.value = double.parse(temp[7]);
+            // bciHighBeta.value = double.parse(temp[8]);
+            // bciLowGamma.value = double.parse(temp[9]);
+            // bciMiddleGamma.value = double.parse(temp[10]);
             bciTemperature.value = double.parse(temp[11]);
             bciHeartRate.value = double.parse(temp[12]);
             bciGrind.value = double.parse(temp[13]);
             bciCurrentTimeMillis.value = int.parse(temp[14]);
-            bciCurrentTwoTimeMillis[1] = bciCurrentTimeMillis.value;
-
-            _bciData.add(data.toString());
-            _bciData.length > 3600 ? _bciData.removeRange(0, 1800) : () {};
-
-            _bciDataAtt.add(bciAtt.value);
-            _bciDataAtt.length > 3600
-                ? _bciDataAtt.removeRange(0, 1800)
-                : () {};
-
-            _bciDataMed.add(bciMed.value);
-            _bciDataMed.length > 3600
-                ? _bciDataMed.removeRange(0, 1800)
-                : () {};
-
-            _bciDataAp.add(bciAp.value);
-            _bciDataAp.length > 3600 ? _bciDataAp.removeRange(0, 1800) : () {};
-
-            _bciDataDelta.add(bciDelta.value);
-            _bciDataDelta.length > 3600
-                ? _bciDataDelta.removeRange(0, 1800)
-                : () {};
-
-            _bciDataTheta.add(bciTheta.value);
-            _bciDataTheta.length > 3600
-                ? _bciDataTheta.removeRange(0, 1800)
-                : () {};
-
-            _bciDataLowAlpha.add(bciLowAlpha.value);
-            _bciDataLowAlpha.length > 3600
-                ? _bciDataLowAlpha.removeRange(0, 1800)
-                : () {};
-
-            _bciDataHighAlpha.add(bciHighAlpha.value);
-            _bciDataHighAlpha.length > 3600
-                ? _bciDataHighAlpha.removeRange(0, 1800)
-                : () {};
-
-            _bciDataLowBeta.add(bciLowBeta.value);
-            _bciDataLowBeta.length > 3600
-                ? _bciDataLowBeta.removeRange(0, 1800)
-                : () {};
-
-            _bciDataHighBeta.add(bciHighBeta.value);
-            _bciDataHighBeta.length > 3600
-                ? _bciDataHighBeta.removeRange(0, 1800)
-                : () {};
-
-            _bciDataLowGamma.add(bciLowGamma.value);
-            _bciDataLowGamma.length > 3600
-                ? _bciDataLowGamma.removeRange(0, 1800)
-                : () {};
-
-            _bciDataMiddleGamma.add(bciMiddleGamma.value);
-            _bciDataMiddleGamma.length > 3600
-                ? _bciDataMiddleGamma.removeRange(0, 1800)
-                : () {};
-
-            _bciDataTemperature.add(bciTemperature.value);
-            _bciDataTemperature.length > 3600
-                ? _bciDataTemperature.removeRange(0, 1800)
-                : () {};
-
-            _bciDataHeartRate.add(bciHeartRate.value);
-            _bciDataHeartRate.length > 3600
-                ? _bciDataHeartRate.removeRange(0, 1800)
-                : () {};
-
-            _bciDataGrind.add(bciGrind.value);
-            _bciDataGrind.length > 3600
-                ? _bciDataGrind.removeRange(0, 1800)
-                : () {};
-
-            //最近60条数据的平均值
-            //1 bciDelta
-            double sx = 100000;
-            _bciDeltaHistory60.add(bciDelta.value > sx ? sx : bciDelta.value);
-            _bciDeltaHistory60.length > 60
-                ? _bciDeltaHistory60.removeAt(0)
-                : () {};
-            double xBcidelta = _bciDeltaHistory60.reduce((a, b) => a + b);
-            //2 bciTheta
-            _bciThetaHistory60
-                .add((bciTheta.value > sx ? sx : bciTheta.value) * 2);
-            _bciThetaHistory60.length > 60
-                ? _bciThetaHistory60.removeAt(0)
-                : () {};
-            double xBcitheta = _bciThetaHistory60.reduce((a, b) => a + b);
-            //3 bciLowAlpha
-            _bciLowAlphaHistory60
-                .add((bciLowAlpha.value > sx ? sx : bciLowAlpha.value) * 3);
-            _bciLowAlphaHistory60.length > 60
-                ? _bciLowAlphaHistory60.removeAt(0)
-                : () {};
-            double xBcilowalpha = _bciLowAlphaHistory60.reduce((a, b) => a + b);
-            //4 bciHighAlpha
-            _bciHighAlphaHistory60
-                .add((bciHighAlpha.value > sx ? sx : bciHighAlpha.value) * 4);
-            _bciHighAlphaHistory60.length > 60
-                ? _bciHighAlphaHistory60.removeAt(0)
-                : () {};
-            double xBcihighalpha =
-                _bciHighAlphaHistory60.reduce((a, b) => a + b);
-            //5 bciLowBeta
-            _bciLowBetaHistory60
-                .add((bciLowBeta.value > sx ? sx : bciLowBeta.value) * 7);
-            _bciLowBetaHistory60.length > 60
-                ? _bciLowBetaHistory60.removeAt(0)
-                : () {};
-            double xBcilowbeta = _bciLowBetaHistory60.reduce((a, b) => a + b);
-            //6 bciHighBeta
-            _bciHighBetaHistory60
-                .add((bciHighBeta.value > sx ? sx : bciHighBeta.value) * 6);
-            _bciHighBetaHistory60.length > 60
-                ? _bciHighBetaHistory60.removeAt(0)
-                : () {};
-            double xBcihighbeta = _bciHighBetaHistory60.reduce((a, b) => a + b);
-            //7 bciLowGamma
-            _bciGammaHistory60
-                .add((bciLowGamma.value > sx ? sx : bciLowGamma.value) * 13);
-            _bciGammaHistory60.length > 60
-                ? _bciGammaHistory60.removeAt(0)
-                : () {};
-            double xBcigamma = _bciGammaHistory60.reduce((a, b) => a + b);
-
-            ///计算60秒的平均脑波数据
-            double xAll = xBcidelta +
-                xBcitheta +
-                xBcilowalpha +
-                xBcihighalpha +
-                xBcilowbeta +
-                xBcihighbeta +
-                xBcigamma;
-            if (xAll > 0) {
-              bciDeltaHistory60Mean.value = xBcidelta / xAll;
-              bciThetaHistory60Mean.value = xBcitheta / xAll;
-              bciLowAlphaHistory60Mean.value = xBcilowalpha / xAll;
-              bciHighAlphaHistory60Mean.value = xBcihighalpha / xAll;
-              bciLowBetaHistory60Mean.value = xBcilowbeta / xAll;
-              bciHighBetaHistory60Mean.value = xBcihighbeta / xAll;
-              bciGammaHistory60Mean.value = xBcigamma / xAll;
+//
+            double bs = double.parse(temp[3]) +
+                double.parse(temp[4]) +
+                double.parse(temp[5]) +
+                double.parse(temp[6]) +
+                double.parse(temp[7]) +
+                double.parse(temp[8]) +
+                double.parse(temp[9]) +
+                double.parse(temp[10]);
+            if (bs > 0) {
+              bciDelta.value = double.parse(temp[3]) / bs;
+              bciTheta.value = double.parse(temp[4]) / bs;
+              bciLowAlpha.value = double.parse(temp[5]) / bs;
+              bciHighAlpha.value = double.parse(temp[6]) / bs;
+              bciLowBeta.value = double.parse(temp[7]) / bs;
+              bciHighBeta.value = double.parse(temp[8]) / bs;
+              bciLowGamma.value = double.parse(temp[9]) / bs;
+              bciMiddleGamma.value = double.parse(temp[10]) / bs;
             }
           }
         }
@@ -610,10 +384,35 @@ class HealingController extends Ctrl {
             }
             hrvRR.value = x;
             _hrvData.addAll(x);
-            _hrvData.length > 3600 ? _hrvData.removeRange(0, 1800) : () {};
+            if (_hrvData.length > 600) {
+              _hrvData.removeRange(0, 300);
+            }
           }
         }
-        await _dataAnalysis();
+        if (_hrvData.length > 10) {
+          List<double> p = Data.calculateLFHF(_hrvData);
+          double p3 = p[3] > 5 ? 5 : p[3];
+          hrvLFHF.value = (5 - p3) * 20;
+        }
+        if (_hrvData.length > 2) {
+          double nn =
+              (_hrvData[_hrvData.length - 1] - _hrvData[_hrvData.length - 2])
+                  .abs();
+          nn = nn > 50 ? 50 : nn;
+          hrvNN.value = (nn / 50) * 100;
+        }
+
+        ///
+        curRelax.value = 0.5 * (100 - bciAtt.value) + 0.5 * bciMed.value;
+        curFlow.value = 0.5 * bciAtt.value + 0.5 * bciMed.value;
+        double bt = bciLowBeta.value + bciHighBeta.value;
+        if (bt > 0) {
+          double ap = bciTheta.value / bt;
+          ap = ap > 5 ? 5 : ap;
+          bciAp.value = ap * 20;
+        }
+
+        ///
         await _showRealData();
         await _ctrlByDevice();
       }
@@ -636,16 +435,5 @@ class HealingController extends Ctrl {
     _bciAndHrvBroadcastListener?.cancel();
     _whileTrue.cancel();
     super.onClose();
-  }
-
-  Future<void> statisticsHrv() async {
-    if (_hrvData.length < 10) {
-      return;
-    }
-    List<double> p = Data.calculateLFHF(_hrvData);
-    hrvTP.value = p[0];
-    hrvLF.value = p[1];
-    hrvHF.value = p[2];
-    hrvLFHF.value = p[3];
   }
 }

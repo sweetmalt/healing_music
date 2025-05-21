@@ -3,9 +3,10 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:healing_music/page/main_page.dart';
 
 class WaveChartController extends GetxController {
-  static const int maxDataPoints = 60;
+  static const int maxDataPoints = 20;
   final double minY;
   final double maxY;
   final RxList<FlSpot> dataFlSpot = <FlSpot>[].obs;
@@ -145,25 +146,29 @@ class WaveChartController extends GetxController {
   }
 
   Future<void> addDataPoint(double value) async {
-    if (value >= minY && value <= maxY) {
-      currentValue.value = value;
-      _data.add(value);
-      dataFlSpot.add(FlSpot(maxX, value));
-      maxX = dataFlSpot.length.toDouble();
-      if (maxX - minX > maxDataPoints) {
-        minX = maxX - maxDataPoints;
-      }
-      if (dataFlSpot.length >= 900) {
-        _data.removeRange(0, 600);
-        dataFlSpot.removeRange(0, 600);
-        for (int i = 0; i < dataFlSpot.length; i++) {
-          dataFlSpot[i] = FlSpot(i.toDouble(), dataFlSpot[i].y);
-        }
-        maxX = dataFlSpot.length.toDouble();
-        minX = maxX - maxDataPoints;
-      }
-      update();
+    double v = value;
+    if (v < minY) {
+      v = minY;
     }
+    if (v > maxY) {
+      v = maxY;
+    }
+    _data.add(v);
+    if (_data.length > 600) {
+      _data.removeRange(0, 300);
+    }
+    if (dataFlSpot.isEmpty) {
+      dataFlSpot.add(const FlSpot(0, 0));
+    }
+    maxX = dataFlSpot.length.toDouble();
+    dataFlSpot.add(FlSpot(maxX, v));
+    if (maxX - minX > maxDataPoints) {
+      minX = maxX - maxDataPoints;
+    }
+    if (dataFlSpot.length > 600) {
+      clearData();
+    }
+    update();
   }
 }
 
@@ -423,17 +428,18 @@ class WaveChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        height: 200,
+        height: 100,
         clipBehavior: Clip.hardEdge,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: ThemeData().colorScheme.primary),
-          color: ThemeData().colorScheme.primaryContainer,
+          color: Colors.black,
         ),
         child: Obx(() => LineChart(
+              duration: const Duration(milliseconds: 1000),
               LineChartData(
-                gridData: const FlGridData(show: true),
-                titlesData: const FlTitlesData(show: true),
+                gridData: const FlGridData(show: false),
+                titlesData: const FlTitlesData(show: false),
                 borderData: FlBorderData(show: false),
                 minX: controller.minX,
                 maxX: controller.maxX,
@@ -443,17 +449,439 @@ class WaveChart extends StatelessWidget {
                   LineChartBarData(
                     spots: controller.dataFlSpot,
                     isCurved: true,
-                    curveSmoothness: 0.5,
                     color: lineColor,
                     barWidth: lineWidth,
-                    preventCurveOverShooting: true,
+                    belowBarData: BarAreaData(
+                      show: true,
+                      color: lineColor,
+                    ),
                     dotData: const FlDotData(show: false),
-                    belowBarData: BarAreaData(show: true),
                     isStepLineChart: false,
-                    isStrokeCapRound: true,
                   ),
                 ],
               ),
             )));
+  }
+}
+
+class WaveChart8 extends StatelessWidget {
+  final WaveChart8Controller controller;
+  final double height;
+  final RxBool isFlay;
+
+  const WaveChart8({
+    super.key,
+    required this.controller,
+    required this.height,
+    required this.isFlay,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: context.width - 20,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.black,
+      ),
+      clipBehavior: Clip.hardEdge,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        reverse: true,
+        child: Obx(() {
+          return SizedBox(
+              width: isFlay.value
+                  ? context.width + controller.dataFlSpot0.length * 50.0
+                  : context.width,
+              height: height,
+              child: LineChart(
+                duration: const Duration(milliseconds: 1000),
+                LineChartData(
+                  gridData: const FlGridData(show: false),
+                  titlesData: const FlTitlesData(show: false),
+                  borderData: FlBorderData(show: false),
+                  minY: controller.minY,
+                  maxY: controller.maxY,
+                  lineBarsData: [
+                    LineChartBarData(
+                      barWidth: 1,
+                      spots: controller.dataFlSpot0,
+                      color: colorList[0],
+                      isCurved: true,
+                      belowBarData: BarAreaData(
+                        show: true,
+                        color: colorList[0],
+                      ),
+                      dotData: const FlDotData(show: false),
+                      isStepLineChart: false,
+                    ),
+                    LineChartBarData(
+                      barWidth: 1,
+                      spots: controller.dataFlSpot1,
+                      color: colorList[1],
+                      isCurved: true,
+                      belowBarData: BarAreaData(
+                        show: true,
+                        color: colorList[1],
+                      ),
+                      dotData: const FlDotData(show: false),
+                      isStepLineChart: false,
+                    ),
+                    LineChartBarData(
+                      barWidth: 1,
+                      spots: controller.dataFlSpot2,
+                      color: colorList[2],
+                      isCurved: true,
+                      belowBarData: BarAreaData(
+                        show: true,
+                        color: colorList[2],
+                      ),
+                      dotData: const FlDotData(show: false),
+                      isStepLineChart: false,
+                    ),
+                    LineChartBarData(
+                      barWidth: 1,
+                      spots: controller.dataFlSpot3,
+                      color: colorList[3],
+                      isCurved: true,
+                      belowBarData: BarAreaData(
+                        show: true,
+                        color: colorList[3],
+                      ),
+                      dotData: const FlDotData(show: false),
+                      isStepLineChart: false,
+                    ),
+                    LineChartBarData(
+                      barWidth: 1,
+                      spots: controller.dataFlSpot4,
+                      color: colorList[4],
+                      isCurved: true,
+                      belowBarData: BarAreaData(
+                        show: true,
+                        color: colorList[4],
+                      ),
+                      dotData: const FlDotData(show: false),
+                      isStepLineChart: false,
+                    ),
+                    LineChartBarData(
+                      barWidth: 1,
+                      spots: controller.dataFlSpot5,
+                      color: colorList[5],
+                      isCurved: true,
+                      belowBarData: BarAreaData(
+                        show: true,
+                        color: colorList[5],
+                      ),
+                      dotData: const FlDotData(show: false),
+                      isStepLineChart: false,
+                    ),
+                    LineChartBarData(
+                      barWidth: 1,
+                      spots: controller.dataFlSpot6,
+                      color: colorList[6],
+                      isCurved: true,
+                      dotData: const FlDotData(show: false),
+                      isStepLineChart: false,
+                    ),
+                    LineChartBarData(
+                      barWidth: 1,
+                      spots: controller.dataFlSpot7,
+                      color: colorList[7],
+                      isCurved: true,
+                      dotData: const FlDotData(show: false),
+                      isStepLineChart: false,
+                    ),
+                  ],
+                ),
+              ));
+        }),
+      ),
+    );
+  }
+}
+
+class WaveChart8Controller extends GetxController {
+  final double minY;
+  final double maxY;
+  final RxList<FlSpot> dataFlSpot0 = <FlSpot>[].obs;
+  final RxList<FlSpot> dataFlSpot1 = <FlSpot>[].obs;
+  final RxList<FlSpot> dataFlSpot2 = <FlSpot>[].obs;
+  final RxList<FlSpot> dataFlSpot3 = <FlSpot>[].obs;
+  final RxList<FlSpot> dataFlSpot4 = <FlSpot>[].obs;
+  final RxList<FlSpot> dataFlSpot5 = <FlSpot>[].obs;
+  final RxList<FlSpot> dataFlSpot6 = <FlSpot>[].obs;
+  final RxList<FlSpot> dataFlSpot7 = <FlSpot>[].obs;
+
+  WaveChart8Controller({
+    required this.minY,
+    required this.maxY,
+  });
+
+  @override
+  void onInit() {
+    super.onInit();
+    dataFlSpot0.add(const FlSpot(0, 0));
+    dataFlSpot1.add(const FlSpot(0, 0));
+    dataFlSpot2.add(const FlSpot(0, 0));
+    dataFlSpot3.add(const FlSpot(0, 0));
+    dataFlSpot4.add(const FlSpot(0, 0));
+    dataFlSpot5.add(const FlSpot(0, 0));
+    dataFlSpot6.add(const FlSpot(0, 0));
+    dataFlSpot7.add(const FlSpot(0, 0));
+  }
+
+  @override
+  void onClose() {
+    super.onClose();
+    dataFlSpot0.clear();
+    dataFlSpot1.clear();
+    dataFlSpot2.clear();
+    dataFlSpot3.clear();
+    dataFlSpot4.clear();
+    dataFlSpot5.clear();
+    dataFlSpot6.clear();
+    dataFlSpot7.clear();
+  }
+
+  Future<void> clearData() async {
+    dataFlSpot0.clear();
+    dataFlSpot0.add(const FlSpot(0, 0));
+    dataFlSpot1.clear();
+    dataFlSpot1.add(const FlSpot(0, 0));
+    dataFlSpot2.clear();
+    dataFlSpot2.add(const FlSpot(0, 0));
+    dataFlSpot3.clear();
+    dataFlSpot3.add(const FlSpot(0, 0));
+    dataFlSpot4.clear();
+    dataFlSpot4.add(const FlSpot(0, 0));
+    dataFlSpot5.clear();
+    dataFlSpot5.add(const FlSpot(0, 0));
+    dataFlSpot6.clear();
+    dataFlSpot6.add(const FlSpot(0, 0));
+    dataFlSpot7.clear();
+    dataFlSpot7.add(const FlSpot(0, 0));
+  }
+
+  Future<void> addDataPoint(RxList<FlSpot> dataFlSpot, double value) async {
+    double v = value;
+    if (v < minY) {
+      v = minY;
+    }
+    if (v > maxY) {
+      v = maxY;
+    }
+    if (dataFlSpot.isEmpty) {
+      dataFlSpot.add(const FlSpot(0, 0));
+    }
+    double x = dataFlSpot.length.toDouble();
+    dataFlSpot.add(FlSpot(x, v));
+    update();
+  }
+}
+
+
+class WaveChart7 extends StatelessWidget {
+  final WaveChart7Controller controller;
+  final double height;
+  final RxBool isFlay;
+
+  const WaveChart7({
+    super.key,
+    required this.controller,
+    required this.height,
+    required this.isFlay,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: context.width - 200,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.black,
+      ),
+      clipBehavior: Clip.hardEdge,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        reverse: true,
+        child: Obx(() {
+          return SizedBox(
+              width: isFlay.value
+                  ? context.width + controller.dataFlSpot0.length * 50.0
+                  : context.width,
+              height: height,
+              child: LineChart(
+                duration: const Duration(milliseconds: 1000),
+                LineChartData(
+                  gridData: const FlGridData(show: false),
+                  titlesData: const FlTitlesData(show: false),
+                  borderData: FlBorderData(show: false),
+                  minY: controller.minY,
+                  maxY: controller.maxY,
+                  lineBarsData: [
+                    LineChartBarData(
+                      barWidth: 1,
+                      spots: controller.dataFlSpot0,
+                      color: colorList[0],
+                      isCurved: true,
+                      belowBarData: BarAreaData(
+                        show: true,
+                        color: colorList[0],
+                      ),
+                      dotData: const FlDotData(show: false),
+                      isStepLineChart: false,
+                    ),
+                    LineChartBarData(
+                      barWidth: 1,
+                      spots: controller.dataFlSpot1,
+                      color: colorList[1],
+                      isCurved: true,
+                      belowBarData: BarAreaData(
+                        show: true,
+                        color: colorList[1],
+                      ),
+                      dotData: const FlDotData(show: false),
+                      isStepLineChart: false,
+                    ),
+                    LineChartBarData(
+                      barWidth: 1,
+                      spots: controller.dataFlSpot2,
+                      color: colorList[2],
+                      isCurved: true,
+                      belowBarData: BarAreaData(
+                        show: true,
+                        color: colorList[2],
+                      ),
+                      dotData: const FlDotData(show: false),
+                      isStepLineChart: false,
+                    ),
+                    LineChartBarData(
+                      barWidth: 1,
+                      spots: controller.dataFlSpot3,
+                      color: colorList[3],
+                      isCurved: true,
+                      belowBarData: BarAreaData(
+                        show: true,
+                        color: colorList[3],
+                      ),
+                      dotData: const FlDotData(show: false),
+                      isStepLineChart: false,
+                    ),
+                    LineChartBarData(
+                      barWidth: 1,
+                      spots: controller.dataFlSpot4,
+                      color: colorList[4],
+                      isCurved: true,
+                      belowBarData: BarAreaData(
+                        show: true,
+                        color: colorList[4],
+                      ),
+                      dotData: const FlDotData(show: false),
+                      isStepLineChart: false,
+                    ),
+                    LineChartBarData(
+                      barWidth: 1,
+                      spots: controller.dataFlSpot5,
+                      color: colorList[5],
+                      isCurved: true,
+                      belowBarData: BarAreaData(
+                        show: true,
+                        color: colorList[5],
+                      ),
+                      dotData: const FlDotData(show: false),
+                      isStepLineChart: false,
+                    ),
+                    LineChartBarData(
+                      barWidth: 1,
+                      spots: controller.dataFlSpot6,
+                      color: colorList[6],
+                      isCurved: true,
+                      belowBarData: BarAreaData(
+                        show: true,
+                        color: colorList[6],
+                      ),
+                      dotData: const FlDotData(show: false),
+                      isStepLineChart: false,
+                    )
+                  ],
+                ),
+              ));
+        }),
+      ),
+    );
+  }
+}
+
+class WaveChart7Controller extends GetxController {
+  final double minY;
+  final double maxY;
+  final RxList<FlSpot> dataFlSpot0 = <FlSpot>[].obs;
+  final RxList<FlSpot> dataFlSpot1 = <FlSpot>[].obs;
+  final RxList<FlSpot> dataFlSpot2 = <FlSpot>[].obs;
+  final RxList<FlSpot> dataFlSpot3 = <FlSpot>[].obs;
+  final RxList<FlSpot> dataFlSpot4 = <FlSpot>[].obs;
+  final RxList<FlSpot> dataFlSpot5 = <FlSpot>[].obs;
+  final RxList<FlSpot> dataFlSpot6 = <FlSpot>[].obs;
+
+  WaveChart7Controller({
+    required this.minY,
+    required this.maxY,
+  });
+
+  @override
+  void onInit() {
+    super.onInit();
+    dataFlSpot0.add(const FlSpot(0, 0));
+    dataFlSpot1.add(const FlSpot(0, 0));
+    dataFlSpot2.add(const FlSpot(0, 0));
+    dataFlSpot3.add(const FlSpot(0, 0));
+    dataFlSpot4.add(const FlSpot(0, 0));
+    dataFlSpot5.add(const FlSpot(0, 0));
+    dataFlSpot6.add(const FlSpot(0, 0));
+  }
+
+  @override
+  void onClose() {
+    super.onClose();
+    dataFlSpot0.clear();
+    dataFlSpot1.clear();
+    dataFlSpot2.clear();
+    dataFlSpot3.clear();
+    dataFlSpot4.clear();
+    dataFlSpot5.clear();
+    dataFlSpot6.clear();
+  }
+
+  Future<void> clearData() async {
+    dataFlSpot0.clear();
+    dataFlSpot0.add(const FlSpot(0, 0));
+    dataFlSpot1.clear();
+    dataFlSpot1.add(const FlSpot(0, 0));
+    dataFlSpot2.clear();
+    dataFlSpot2.add(const FlSpot(0, 0));
+    dataFlSpot3.clear();
+    dataFlSpot3.add(const FlSpot(0, 0));
+    dataFlSpot4.clear();
+    dataFlSpot4.add(const FlSpot(0, 0));
+    dataFlSpot5.clear();
+    dataFlSpot5.add(const FlSpot(0, 0));
+    dataFlSpot6.clear();
+    dataFlSpot6.add(const FlSpot(0, 0));
+  }
+
+  Future<void> addDataPoint(RxList<FlSpot> dataFlSpot, double value) async {
+    double v = value;
+    if (v < minY) {
+      v = minY;
+    }
+    if (v > maxY) {
+      v = maxY;
+    }
+    if (dataFlSpot.isEmpty) {
+      dataFlSpot.add(const FlSpot(0, 0));
+    }
+    double x = dataFlSpot.length.toDouble();
+    dataFlSpot.add(FlSpot(x, v));
+    update();
   }
 }

@@ -4,22 +4,20 @@ import 'package:healing_music/controller/players_controller.dart';
 import 'package:healing_music/controller/healing_controller.dart';
 import 'package:healing_music/controller/main_controller.dart';
 import 'package:healing_music/data/audios.dart';
-import 'package:healing_music/page/report_list_page.dart';
-import 'package:healing_music/widget/brain_wave_view.dart';
+import 'package:healing_music/page/main_page.dart';
 import 'package:healing_music/widget/circular_button.dart';
 import 'package:healing_music/widget/item.dart';
-import 'package:healing_music/widget/page_title.dart';
 import 'package:healing_music/widget/paragraph.dart';
 import 'package:healing_music/widget/paragraph_bottom.dart';
-import 'package:healing_music/widget/report_view.dart';
+
 import 'package:healing_music/widget/volume_view.dart';
+import 'package:healing_music/widget/wave_chart.dart';
 
 class HealingPage extends GetView<HealingController> {
   HealingPage({super.key});
   final MainController mainController = Get.find();
   final HealingController healingController = Get.put(HealingController());
-  final ReportViewController reportViewController =
-      Get.put(ReportViewController());
+
   final HemController hemController = Get.put(HemController());
   final EnvController envController = Get.put(EnvController());
   final BgmController bgmController = Get.put(BgmController());
@@ -146,64 +144,79 @@ class HealingPage extends GetView<HealingController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 25,
-        title: PageTitle('BCI'),
-        centerTitle: true,
-      ),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const SizedBox(height: 100),
-              ElevatedButton(
-                style: ButtonStyle(
-                  padding: WidgetStateProperty.all(
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      body: SingleChildScrollView(
+        //padding: const EdgeInsets.all(10),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              padding: const EdgeInsets.only(top: 10, bottom: 10),
+              decoration: const BoxDecoration(color: Colors.black),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Column(
+                    spacing: 10,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("全息能量", style: TextStyle(color: colorList[0])),
+                      Text("睡眠能量", style: TextStyle(color: colorList[1])),
+                      Text("代谢能量", style: TextStyle(color: colorList[2])),
+                      Text("免疫能量", style: TextStyle(color: colorList[3])),
+                      Text("消化能量", style: TextStyle(color: colorList[4])),
+                      Text("幸福能量", style: TextStyle(color: colorList[5])),
+                      Text("动力能量", style: TextStyle(color: colorList[6])),
+                    ],
                   ),
-                ),
-                onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    showDragHandle: true,
-                    useRootNavigator: true,
-                    isScrollControlled: true,
-                    useSafeArea: true,
-                    constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height * 0.9,
-                    ),
-                    builder: (context) {
-                      return BrainWaveView();
-                    },
-                  );
-                },
-                child: Text(
-                  "脑电检测",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: ThemeData().colorScheme.primary,
+                  WaveChart7(
+                    controller: healingController.energyWaveController,
+                    height: 200,
+                    isFlay: true.obs,
                   ),
-                ),
+                  Column(
+                    spacing: 10,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("愉悦感", style: TextStyle(color: colorList[0])),
+                      Text("松弛感", style: TextStyle(color: colorList[1])),
+                      Text("心流指数", style: TextStyle(color: colorList[2])),
+                      Text("专注度", style: TextStyle(color: colorList[3])),
+                      Text("安全感", style: TextStyle(color: colorList[4])),
+                      Text("NN50", style: TextStyle(color: colorList[5])),
+                      Text("LFHF", style: TextStyle(color: colorList[6])),
+                    ],
+                  ),
+                ],
               ),
-              const SizedBox(height: 100),
-              ElevatedButton(
-                onPressed: () {
-                  Get.to(() => ReportList());
-                },
-                child: Text(
-                  "脑电创作",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: ThemeData().colorScheme.primary,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 100),
-              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            ),
+            const SizedBox(height: 40),
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                Obx(() => CircularProgress(
+                    radius: 120,
+                    value: hemController.positionInMilliseconds.value /
+                        hemController.durationInMilliseconds.value,
+                    backgroundColor: ThemeData().colorScheme.primaryContainer,
+                    valueColor: ThemeData().colorScheme.primary)),
+                Obx(() => CircularProgress(
+                    radius: 100,
+                    value: envController.positionInMilliseconds.value /
+                        envController.durationInMilliseconds.value,
+                    backgroundColor: ThemeData().colorScheme.primaryContainer,
+                    valueColor: ThemeData().colorScheme.primary)),
+                Obx(() => CircularProgress(
+                    radius: 80,
+                    value: bgmController.positionInMilliseconds.value /
+                        bgmController.durationInMilliseconds.value,
+                    backgroundColor: ThemeData().colorScheme.primaryContainer,
+                    valueColor: ThemeData().colorScheme.primary)),
+                Obx(() => CircularProgress(
+                    radius: 60,
+                    value: bbmController.positionInMilliseconds.value /
+                        bbmController.durationInMilliseconds.value,
+                    backgroundColor: ThemeData().colorScheme.primaryContainer,
+                    valueColor: ThemeData().colorScheme.primary)),
                 Obx(
                   () => CircularIconButton(
                     onPressed: () {
@@ -214,211 +227,121 @@ class HealingPage extends GetView<HealingController> {
                         isScrollControlled: true,
                         useSafeArea: true,
                         constraints: BoxConstraints(
-                          maxHeight: MediaQuery.of(context).size.height * 0.9,
+                          maxHeight: MediaQuery.of(context).size.height * 0.6,
                         ),
                         builder: (context) {
-                          return BrainWaveView();
+                          return const VolumeView();
                         },
                       );
                     },
-                    icon: healingController.isCtrlByDevice.value
-                        ? Icons.media_bluetooth_on_rounded
-                        : Icons.media_bluetooth_off_rounded,
-                    backgroundColor: healingController.isDeviceLinking.value
-                        ? Colors.green
-                        : ThemeData().colorScheme.primaryContainer,
-                    foregroundColor: healingController.isDeviceLinking.value
-                        ? Colors.white
-                        : ThemeData().colorScheme.primary,
+                    icon: healingController.isMute.value
+                        ? Icons.volume_off_sharp
+                        : Icons.volume_up_sharp,
                   ),
                 ),
-                // const SizedBox(width: 40),
-                // CircularIconButton(
-                //   onPressed: () {
-                //     if (healingController.receivedBciDataCount < 10) {
-                //       Get.snackbar(
-                //         "请稍后……",
-                //         "数据量太少，请确保设备连接正常后，过一分钟再试",
-                //         backgroundColor: ThemeData().colorScheme.primary,
-                //         colorText: ThemeData().colorScheme.primaryContainer,
-                //       );
-                //       return;
-                //     }
-                //     Get.snackbar(
-                //       "报告生成中……",
-                //       "请稍后",
-                //       backgroundColor: ThemeData().colorScheme.primary,
-                //       colorText: ThemeData().colorScheme.primaryContainer,
-                //     );
-                //     reportViewController.energyScaling();
-
-                //     showModalBottomSheet(
-                //       context: context,
-                //       showDragHandle: true,
-                //       useRootNavigator: true,
-                //       isScrollControlled: true,
-                //       useSafeArea: true,
-                //       constraints: BoxConstraints(
-                //         maxHeight: MediaQuery.of(context).size.height * 0.9,
-                //       ),
-                //       builder: (context) {
-                //         return ReportView();
-                //       },
-                //     );
-                //   },
-                //   icon: Icons.menu_book_rounded,
-                //   backgroundColor: Colors.blue,
-                //   foregroundColor: Colors.white,
-                // ),
-              ]),
-              const SizedBox(
-                height: 10,
-              ),
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  Obx(() => CircularProgress(
-                      radius: 120,
-                      value: hemController.positionInMilliseconds.value /
-                          hemController.durationInMilliseconds.value,
-                      backgroundColor: ThemeData().colorScheme.primaryContainer,
-                      valueColor: ThemeData().colorScheme.primary)),
-                  Obx(() => CircularProgress(
-                      radius: 100,
-                      value: envController.positionInMilliseconds.value /
-                          envController.durationInMilliseconds.value,
-                      backgroundColor: ThemeData().colorScheme.primaryContainer,
-                      valueColor: ThemeData().colorScheme.primary)),
-                  Obx(() => CircularProgress(
-                      radius: 80,
-                      value: bgmController.positionInMilliseconds.value /
-                          bgmController.durationInMilliseconds.value,
-                      backgroundColor: ThemeData().colorScheme.primaryContainer,
-                      valueColor: ThemeData().colorScheme.primary)),
-                  Obx(() => CircularProgress(
-                      radius: 60,
-                      value: bbmController.positionInMilliseconds.value /
-                          bbmController.durationInMilliseconds.value,
-                      backgroundColor: ThemeData().colorScheme.primaryContainer,
-                      valueColor: ThemeData().colorScheme.primary)),
-                  Obx(
-                    () => CircularIconButton(
-                      onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          showDragHandle: true,
-                          useRootNavigator: true,
-                          isScrollControlled: true,
-                          useSafeArea: true,
-                          constraints: BoxConstraints(
-                            maxHeight: MediaQuery.of(context).size.height * 0.6,
-                          ),
-                          builder: (context) {
-                            return const VolumeView();
-                          },
-                        );
-                      },
-                      icon: healingController.isMute.value
-                          ? Icons.volume_off_sharp
-                          : Icons.volume_up_sharp,
+              ],
+            ),
+            const SizedBox(height: 10),
+            Obx(() => healingController.isCtrlByTimePlan.value
+                ? IntrinsicWidth(
+                    child: Container(
+                      height: 40,
+                      //margin: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                          color: ThemeData().colorScheme.secondaryContainer,
+                          border: Border.all(
+                              color: ThemeData().colorScheme.secondary,
+                              width: 1),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(5))),
+                      child: Text(
+                          "${healingController.healingTimePlanKey} - ${healingController.textTimeSeconds.value}",
+                          style: TextStyle(
+                              color: ThemeData().colorScheme.secondary,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold)),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Obx(() => healingController.isCtrlByTimePlan.value
-                  ? IntrinsicWidth(
-                      child: Container(
-                        height: 40,
-                        //margin: const EdgeInsets.all(10),
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                            color: ThemeData().colorScheme.secondaryContainer,
-                            border: Border.all(
-                                color: ThemeData().colorScheme.secondary,
-                                width: 1),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(5))),
-                        child: Text(
-                            "${healingController.healingTimePlanKey} - ${healingController.textTimeSeconds.value}",
-                            style: TextStyle(
-                                color: ThemeData().colorScheme.secondary,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold)),
-                      ),
-                    )
-                  : Container()),
-              Obx(() => healingController.isCtrlByTimePlan.value
-                  ? PlanZone(
-                      startTimePlan: startTimePlan,
-                      pauseTimePlan: pauseTimePlan,
-                      quitTimePlan: quitTimePlan,
-                      title: healingController.title.value,
-                      subTitle: healingController.subTitle.value,
-                      audioTitle: healingController.audioTitle.value,
-                      audioSubTitle: healingController.audioSubTitle.value,
-                      isTimerRunning: healingController.isTimerRunning.value,
-                      isShowDetails: healingController.isShowDetails.value,
-                      onLeadingTap: () => {
-                        healingController.isShowDetails.value =
-                            !healingController.isShowDetails.value
-                      },
-                      leadingIcon: healingController.isShowDetails.value
-                          ? Icons.keyboard_double_arrow_up
-                          : Icons.keyboard_double_arrow_down,
-                      healingTimeText:
-                          healingController.healingTimePlanTexts.toList(),
-                      healingTimeIndex:
-                          healingController.healingTimePlanIndex.value,
-                    )
-                  : Container()),
-              const SizedBox(height: 10),
-              PlayBox(
-                title: "脑波音频",
-                controller: hemController,
-              ),
-              AudiosRow(
-                audios: _audios.hem,
-                controller: hemController,
-              ),
-              PlayBox(
-                title: "生境纯音",
-                controller: envController,
-              ),
-              AudiosRow(
-                audios: _audios.env,
-                controller: envController,
-              ),
-              PlayBox(
-                title: "经典器乐",
-                controller: bgmController,
-              ),
-              AudiosRow(
-                audios: _audios.bgm,
-                controller: bgmController,
-              ),
-              PlayBox(
-                title: "双耳节拍",
-                controller: bbmController,
-              ),
-              AudiosRow(
-                audios: _audios.bbm,
-                controller: bbmController,
-              ),
-              ToolsRow(
-                audios: _audios.too,
-                controller: healingController,
-              ),
-              Container(
-                alignment: Alignment.center,
-                height: 120,
-                child: const Text("音乐疗愈美好生活"),
-              ),
-            ],
-          ),
+                  )
+                : Container()),
+            Obx(() => healingController.isCtrlByTimePlan.value
+                ? PlanZone(
+                    startTimePlan: startTimePlan,
+                    pauseTimePlan: pauseTimePlan,
+                    quitTimePlan: quitTimePlan,
+                    title: healingController.title.value,
+                    subTitle: healingController.subTitle.value,
+                    audioTitle: healingController.audioTitle.value,
+                    audioSubTitle: healingController.audioSubTitle.value,
+                    isTimerRunning: healingController.isTimerRunning.value,
+                    isShowDetails: healingController.isShowDetails.value,
+                    onLeadingTap: () => {
+                      healingController.isShowDetails.value =
+                          !healingController.isShowDetails.value
+                    },
+                    leadingIcon: healingController.isShowDetails.value
+                        ? Icons.keyboard_double_arrow_up
+                        : Icons.keyboard_double_arrow_down,
+                    healingTimeText:
+                        healingController.healingTimePlanTexts.toList(),
+                    healingTimeIndex:
+                        healingController.healingTimePlanIndex.value,
+                  )
+                : Container()),
+            const SizedBox(height: 40),
+            MyTextH3("脑波音频", colorSecondary),
+            PlayBox(
+              title: "脑波音频",
+              controller: hemController,
+            ),
+            AudiosRow(
+              audios: _audios.hem,
+              controller: hemController,
+            ),
+            const SizedBox(height: 40),
+            MyTextH3("生境纯音", colorSecondary),
+            PlayBox(
+              title: "生境纯音",
+              controller: envController,
+            ),
+            AudiosRow(
+              audios: _audios.env,
+              controller: envController,
+            ),
+            const SizedBox(height: 40),
+            MyTextH3("经典器乐", colorSecondary),
+            PlayBox(
+              title: "经典器乐",
+              controller: bgmController,
+            ),
+            AudiosRow(
+              audios: _audios.bgm,
+              controller: bgmController,
+            ),
+            const SizedBox(height: 40),
+            MyTextH3("双耳节拍", colorSecondary),
+            PlayBox(
+              title: "双耳节拍",
+              controller: bbmController,
+            ),
+            AudiosRow(
+              audios: _audios.bbm,
+              controller: bbmController,
+            ),
+            const SizedBox(height: 40),
+            MyTextH3("模拟响器", colorSecondary),
+            ToolsRow(
+              audios: _audios.too,
+              controller: healingController,
+            ),
+            Container(
+              alignment: Alignment.center,
+              transformAlignment: Alignment.center,
+              height: 200,
+              child: MyTextP3("Copyright 2025 HealingAI", colorPrimary),
+            ),
+          ],
         ),
       ),
     );

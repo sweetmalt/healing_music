@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:healing_music/page/main_page.dart';
-void main() {
+void main()async {
   WidgetsFlutterBinding.ensureInitialized();
+  
   runApp(const MyApp());
 }
 

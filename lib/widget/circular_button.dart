@@ -54,7 +54,7 @@ class CircularIconButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         shape: const CircleBorder(),
         padding: const EdgeInsets.all(10),
-        elevation: 1,
+        elevation: 0,
         backgroundColor: backgroundColor,
         foregroundColor: foregroundColor,
       ),

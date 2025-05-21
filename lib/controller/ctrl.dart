@@ -82,6 +82,7 @@ class Ctrl extends GetxController {
 
   Future<void> playAudio(VoidCallback onPlaying, VoidCallback onPlayEnd) async {
     isPlaying.value = true;
+    _player.setVolume(0.01);
     _player.play();
     //侦听播放进度
     _positionListener = Stream.periodic(const Duration(milliseconds: 200))
@@ -95,6 +96,13 @@ class Ctrl extends GetxController {
           if (p < 4000) {
             setVolume((p / 4000) * maxVol.value);
           } else if (p > d - 4000) {
+            setVolume(((d - p) / 4000) * maxVol.value);
+          } else {
+            setVolume(maxVol.value);
+          }
+        }
+        if (!isLoop.value && d > 8000 && !isMute.value) {
+          if (p > d - 4000) {
             setVolume(((d - p) / 4000) * maxVol.value);
           } else {
             setVolume(maxVol.value);

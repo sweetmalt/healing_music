@@ -5,7 +5,6 @@ import 'package:healing_music/controller/main_controller.dart';
 import 'package:healing_music/controller/players_controller.dart';
 import 'package:healing_music/data/audios.dart';
 import 'package:healing_music/widget/circular_button.dart';
-import 'package:healing_music/widget/page_title.dart';
 
 class AlbumPage extends StatelessWidget {
   final MainController mainController = Get.find();
@@ -31,13 +30,13 @@ class AlbumPage extends StatelessWidget {
       ),
       Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          toolbarHeight: 50,
-          title: PageTitle('Music Album'),
-          centerTitle: true,
-        ),
+        // appBar: AppBar(
+        //   backgroundColor: Colors.transparent,
+        //   elevation: 0,
+        //   toolbarHeight: 50,
+        //   title: PageTitle('Music Album'),
+        //   centerTitle: true,
+        // ),
         body: Center(
           child: SingleChildScrollView(
             child: Column(
@@ -126,7 +125,7 @@ class AlbumPage extends StatelessWidget {
                             foregroundColor: ThemeData().colorScheme.primary,
                           ),
                           onPressed: () {
-                            mainController.changePage(0);
+                            mainController.changePage(1);
                             Get.back(closeOverlays: true);
                           },
                           child: Row(

@@ -12,8 +12,8 @@
         },
         {
             "start": 300,
-            "end": 540,
-            "interval": "4分钟",
+            "end": 660,
+            "interval": "6分钟",
             "task": {
                 "player": "生境纯音",
                 "audio": "",
@@ -21,9 +21,9 @@
             }
         },
         {
-            "start": 540,
+            "start": 660,
             "end": 720,
-            "interval": "3分钟",
+            "interval": "1分钟",
             "task": {
                 "player": "脑波音频",
                 "audio": "",
@@ -146,8 +146,8 @@
         },
         {
             "start": 1920,
-            "end": 2100,
-            "interval": "3分钟",
+            "end": 2220,
+            "interval": "5分钟",
             "task": {
                 "player": "双耳节拍",
                 "audio": "60s 1HZ",
@@ -155,9 +155,9 @@
             }
         },
         {
-            "start": 2100,
+            "start": 2220,
             "end": 2580,
-            "interval": "8分钟",
+            "interval": "6分钟",
             "task": {
                 "player": "生境纯音",
                 "audio": "",
@@ -208,8 +208,8 @@
         },
         {
             "start": 1200,
-            "end": 2400,
-            "interval": "20分钟",
+            "end": 2440,
+            "interval": "24分钟",
             "task": {
                 "player": "生境纯音",
                 "audio": "",
@@ -217,9 +217,9 @@
             }
         },
         {
-            "start": 2400,
+            "start": 2440,
             "end": 2700,
-            "interval": "5分钟",
+            "interval": "1分钟",
             "task": {
                 "player": "双耳节拍",
                 "audio": "60s 1HZ",
